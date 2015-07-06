@@ -1,0 +1,35 @@
+{
+    "name": "react-example",
+    "version": "0.0.1",
+    "description": "react example",
+    "author": "tao.zeng",
+    "license": "MIT",
+    "scripts": {},
+    "main": "dist/react-ui.js",
+    "dependencies": {
+        "material-ui": "0.9.x",
+        "react-router": "0.13.x",
+        "react": "0.13.x"
+    },
+    "devDependencies": {
+        "Browserify":"",
+        "gulp": "^3.9.0",
+        "gulp-clean": "^0.3.1",
+        "gulp-folders": "^1.1.0",
+        "gulp-webpack": "^1.4.0",
+        "gulp-react": "^3.0.1",
+        "gulp-sourcemaps": "^1.5.2",
+        "eslint": "^0.24.0",
+        "gulp-eslint": "^0.15.0",
+        "eslint-plugin-react": "^2.4.0",
+        "babel": "^5.0.0",
+        "babel-loader": "^5.0.0",
+        "style-loader": "^0.8.0",
+        "url-loader": "^0.5.5",
+        "css-loader": "^0.9.0",
+        "eslint-loader": "^0.14.1",
+        "react-hot-loader": "^1.0.7",
+        "webpack": "^1.10.0",
+        "webpack-dev-server": "^1.10.0"
+    }
+}
