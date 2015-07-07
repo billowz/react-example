@@ -19,6 +19,7 @@
     "no-extra-semi":1,
     "no-underscore-dangle":0,
     "semi":1,
-    "semi-spacing":0
+    "semi-spacing":0,
+    "no-unused-vars":1
   }
 }

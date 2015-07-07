@@ -1,10 +1,15 @@
 var gulp = require('gulp');
+var concat = require('gulp-concat');
+var cmd = require('gulp-cmd');
 var clean = require('gulp-clean');
 var eslint = require('gulp-eslint');
-var webpack = require('gulp-webpack');
+var webpack = require('webpack');
+var gulpWebpack = require('gulp-webpack');
 var react = require('gulp-react');
 var sourcemaps = require('gulp-sourcemaps');
 var webpackConfig = require('./webpack.config.js');
+var emberEmblem = require('gulp-ember-emblem');
+var defineModule = require('gulp-define-module');
 
 gulp.task('eslint', function() {
     return gulp.src(['src/**'])
@@ -19,26 +24,29 @@ gulp.task('eslint', function() {
         .pipe(eslint.failOnError());
 });
 
-gulp.task('clean-dist', function() {
+gulp.task('clean:dist', function() {
     return gulp.src('./dist')
         .pipe(clean());
 });
 
-gulp.task('build-dist', ['clean-dist'], function() {
-    return gulp
-        .src('./')
-        .pipe(webpack(webpackConfig))
-        .pipe(gulp.dest('./dist'));
-});
-
-gulp.task('clean-lib', function() {
+gulp.task('clean:lib', function() {
     return gulp.src('./lib')
         .pipe(clean());
 });
 
-gulp.task('build-lib', ['clean-lib', 'eslint'], function() {
-    return gulp.src(['src/**/*.jsx','src/**/*.js'])
+gulp.task('clean', ['clean:dist', 'clean:lib']);
+
+gulp.task('build:dist', ['clean:dist', 'build:lib'], function() {
+    return gulp
+        .src('./')
+        .pipe(gulpWebpack(require('./webpack.config.js')))
+        .pipe(gulp.dest('./dist'));
+});
+
+gulp.task('build:lib', ['clean:lib', 'eslint'], function() {
+    return gulp.src(['src/**/*.jsx', 'src/**/*.js'])
         .pipe(react())
         .pipe(gulp.dest('lib'));
 });
-gulp.task('default', ['build-lib', 'build-dist']);
+
+gulp.task('default', ['build:dist']);

@@ -3,40 +3,28 @@ var pkg = require('./package.json');
 module.exports = {
     entry: {
         app: [
-            './src/index.js'
+            './lib/index.js'
         ]
     },
     output: {
         publicPath: 'assets/',
-        filename: pkg.name + '.js'
+        filename: '[name].js',
+        library: 'MyComponentExample',
+        libraryTarget: 'amd'
     },
     stats: {
         colors: true,
         reasons: false
     },
-    externals: [{
-        "react": {
-            root: "React",
-            commonjs2: "react",
-            commonjs: "react",
-            amd: "react"
-        },
-        "material-ui":{
-            root: "material-ui",
-            commonjs2: "material-ui",
-            commonjs: "material-ui",
-            amd: "material-ui"
-        }
-    }],
     resolve: {
+        root: ['./lib'],
         extensions: ['', '.js', '.jsx']
+    },
+    externals: {
+        react: "react"
     },
     module: {
         loaders: [{
-            test: /\.(js|jsx)$/,
-            exclude: /node_modules/,
-            loader: 'eslint-loader!babel-loader'
-        }, {
             test: /\.less$/,
             loader: 'style-loader!css-loader!autoprefixer-loader!less-loader'
         }, {
@@ -47,12 +35,15 @@ module.exports = {
             loader: 'url-loader?limit=8192'
         }]
     },
-    plugins: [
-        new webpack.optimize.DedupePlugin(),
-        new webpack.optimize.OccurenceOrderPlugin(),
-        new webpack.optimize.AggressiveMergingPlugin(),
-        new webpack.HotModuleReplacementPlugin(),
-        new webpack.NoErrorsPlugin(),
-        new webpack.optimize.CommonsChunkPlugin('common.js')
+    plugins: [new webpack.optimize.CommonsChunkPlugin({
+            name: 'common',
+            filename: 'common.js',
+            chunks: [
+                'app'
+            ]
+        }),
+        new webpack.ProvidePlugin({
+            React: "react"
+        })
     ]
 };

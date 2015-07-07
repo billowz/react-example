@@ -1,9 +1,8 @@
 var React = require('react');
-require('material-ui');
+var meterial = require('material-ui');
 var WorkBench = React.createClass({
     render: function() {
-        return <AppBar title = 'Title'
-        iconClassNameRight = "muidocs-icon-navigation-expand-more" / > ;
+        return <p>hello</p>;
     }
 });
 

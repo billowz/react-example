@@ -12,8 +12,11 @@
         "react": "0.13.x"
     },
     "devDependencies": {
-        "Browserify":"",
+        "gulp-cmd":"",
+        "gulp-ember-emblem":"",
+        "gulp-define-module":"",
         "gulp": "^3.9.0",
+        "gulp-concat":"",
         "gulp-clean": "^0.3.1",
         "gulp-folders": "^1.1.0",
         "gulp-webpack": "^1.4.0",
