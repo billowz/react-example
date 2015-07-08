@@ -1,7 +1,7 @@
 /******/ (function(modules) { // webpackBootstrap
 /******/ 	// install a JSONP callback for chunk loading
-/******/ 	var parentJsonpFunction = window["webpackJsonpMyComponentExample"];
-/******/ 	window["webpackJsonpMyComponentExample"] = function webpackJsonpCallback(chunkIds, moreModules) {
+/******/ 	var parentJsonpFunction = window["webpackJsonpreact_example"];
+/******/ 	window["webpackJsonpreact_example"] = function webpackJsonpCallback(chunkIds, moreModules) {
 /******/ 		// add "moreModules" to the modules object,
 /******/ 		// then flag all "chunkIds" as loaded and fire callback
 /******/ 		var moduleId, chunkId, i = 0, callbacks = [];

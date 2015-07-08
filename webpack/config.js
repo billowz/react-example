@@ -9,7 +9,7 @@ module.exports = {
     output: {
         publicPath: 'assets/',
         filename: '[name].js',
-        library: 'MyComponentExample',
+        library: pkg.name,
         libraryTarget: 'amd'
     },
     stats: {
@@ -23,27 +23,10 @@ module.exports = {
     externals: {
         react: "react"
     },
-    module: {
-        loaders: [{
-            test: /\.less$/,
-            loader: 'style-loader!css-loader!autoprefixer-loader!less-loader'
-        }, {
-            test: /\.css$/,
-            loader: 'style-loader!css-loader'
-        }, {
-            test: /\.(png|jpg|woff|woff2)$/,
-            loader: 'url-loader?limit=8192'
-        }]
-    },
     plugins: [new webpack.optimize.CommonsChunkPlugin({
             name: 'common',
             filename: 'common.js',
-            chunks: [
-                'app'
-            ]
-        }),
-        new webpack.ProvidePlugin({
-            React: "react"
+            chunks: ['app']
         })
     ]
 };
