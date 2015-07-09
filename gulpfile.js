@@ -58,7 +58,7 @@ gulp.task('clean:docs', function() {
 });
 
 gulp.task('clean:dist', function() {
-    return gulp.src(['dist/**','!dist/material-ui*'])
+    return gulp.src(['dist/**', '!dist/material-ui*'])
         .pipe(clean());
 });
 
@@ -74,11 +74,19 @@ gulp.task('build:docs', ['eslint:docs', 'clean:docs'], function() {
         .pipe(gulp.dest('docs'));
 });
 
-gulp.task('build:dist', ['clean:dist'], function() {
+gulp.task('build:dist', [], function() {
+    var cfg = require('./webpack/config.js');
     return gulp.src('./')
-        .pipe(gulpWebpack(require('./webpack/config.js')))
+        .pipe(gulpWebpack(cfg))
+        .pipe(gulp.dest('./dist'))
+        .pipe(rename(cfg.output.filename.replace(/.js$/, '.min.js')))
+        .pipe(uglify())
         .pipe(gulp.dest('./dist'));
 });
+
+gulp.task('clean', ['clean:dist', 'clean:lib', 'clean:docs']);
+
+gulp.task('build', ['build:lib', 'build:dist', 'build:material']);
 
 gulp.task('server', function() {
     var cfg = Object.create(require('./webpack/dev.config.js'));
@@ -90,9 +98,5 @@ gulp.task('server', function() {
         if (err) throw new gutil.PluginError('webpack-dev-server', err);
     });
 });
-
-gulp.task('clean', ['clean:dist', 'clean:lib', 'clean:docs']);
-
-gulp.task('build', ['build:lib', 'build:dist', 'build:material']);
 
 gulp.task('default', ['build']);
