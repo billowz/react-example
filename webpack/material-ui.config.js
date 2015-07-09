@@ -1,19 +1,16 @@
 var webpack = require('webpack');
 var libraryPath = './node_modules/material-ui/lib';
-var libraryName = 'material-ui';
 module.exports = {
-    libraryPath: libraryPath,
-    libraryName: libraryName,
     entry: {
         app: [
             libraryPath
         ]
     },
     output: {
-        publicPath: 'assets/',
-        filename: libraryName + '.js',
-        library: libraryName,
-        libraryTarget: 'amd'
+        path: __dirname + '/dist/',
+        filename: 'material-ui.js',
+        library: 'Material',
+        libraryTarget: 'umd'
     },
     stats: {
         colors: true,
@@ -24,6 +21,11 @@ module.exports = {
         extensions: ['', '.js']
     },
     externals: {
-        react: "react"
+        react: {
+            root: 'React',
+            commonjs: "react",
+            commonjs2: "react",
+            amd: "react"
+        }
     }
 };

@@ -1,32 +1,36 @@
 var webpack = require('webpack');
-var pkg = require('./package.json');
 module.exports = {
     entry: {
-        app: [
-            './lib/index.js'
-        ]
+        app: ['./src/index.js']
     },
     output: {
-        publicPath: 'assets/',
-        filename: '[name].js',
-        library: pkg.name,
-        libraryTarget: 'amd'
+        path: __dirname + '/dist/',
+        filename: 'react-ui.js',
+        library: 'ReactUI',
+        libraryTarget: 'umd'
     },
     stats: {
         colors: true,
         reasons: false
     },
     resolve: {
-        root: ['./lib'],
+        root: ['./src'],
         extensions: ['', '.js', '.jsx']
     },
     externals: {
-        react: "react"
+        react: {
+            root: 'React',
+            commonjs: "react",
+            commonjs2: "react",
+            amd: "react"
+        }
     },
-    plugins: [new webpack.optimize.CommonsChunkPlugin({
-            name: 'common',
-            filename: 'common.js',
-            chunks: ['app']
-        })
-    ]
+    module: {
+        loaders: [{
+            test: /\.(js|jsx)$/,
+            exclude: /node_modules/,
+            loader: 'babel'
+        }]
+    },
+    plugins: []
 };

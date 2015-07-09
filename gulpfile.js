@@ -1,23 +1,49 @@
-var gulp = require('gulp');
-uglify = require('gulp-uglify'),
+var gulp = require('gulp'),
+    path = require('path'),
+    fs = require('fs'),
+    uglify = require('gulp-uglify'),
     rename = require('gulp-rename'),
     concat = require('gulp-concat'),
     clean = require('gulp-clean'),
     eslint = require('gulp-eslint'),
-    webpack = require('gulp-webpack'),
+    sourcemaps = require('gulp-sourcemaps'),
     react = require('gulp-react'),
-    sourcemaps = require('gulp-sourcemaps');
+    webpack = require('webpack'),
+    gulpWebpack = require('gulp-webpack'),
+    WebpackDevServer = require('webpack-dev-server');
+
+gulp.task('build:material', function() {
+    var cfg = require('./webpack/material-ui.config.js');
+    fs.exists('./dist/' + cfg.output.filename, function(ret) {
+        if (!ret) {
+            gulp.src('./')
+                .pipe(gulpWebpack(cfg))
+                .pipe(gulp.dest('./dist'))
+                .pipe(rename(cfg.output.filename.replace(/.js$/, '.min.js')))
+                .pipe(uglify())
+                .pipe(gulp.dest('./dist'));
+        }
+    });
+});
 
 gulp.task('eslint', function() {
-    return gulp.src(['src/**'])
-        // eslint() attaches the lint output to the eslint property
-        // of the file object so it can be used by other modules.
+    return gulp.src(['src/**/*.js', 'src/**/*.jsx'])
         .pipe(eslint())
-        // eslint.format() outputs the lint results to the console.
-        // Alternatively use eslint.formatEach() (see Docs).
         .pipe(eslint.format())
-        // To have the process exit with an error code (1) on
-        // lint error, return the stream and pipe to failOnError last.
+        .pipe(eslint.failOnError());
+});
+
+gulp.task('eslint:lib', function() {
+    return gulp.src(['src/**/*.js', 'src/**/*.jsx', '!src/**/docs/*', '!src/**/test/*'])
+        .pipe(eslint())
+        .pipe(eslint.format())
+        .pipe(eslint.failOnError());
+});
+
+gulp.task('eslint:docs', function() {
+    return gulp.src(['src/**/docs/*.js', 'src/**/docs/*.jsx'])
+        .pipe(eslint())
+        .pipe(eslint.format())
         .pipe(eslint.failOnError());
 });
 
@@ -26,33 +52,47 @@ gulp.task('clean:lib', function() {
         .pipe(clean());
 });
 
-gulp.task('build:lib', ['eslint', 'clean:lib'], function() {
-    return gulp.src(['src/**/*.jsx', 'src/**/*.js'])
+gulp.task('clean:docs', function() {
+    return gulp.src('./docs')
+        .pipe(clean());
+});
+
+gulp.task('clean:dist', function() {
+    return gulp.src(['dist/**','!dist/material-ui*'])
+        .pipe(clean());
+});
+
+gulp.task('build:lib', ['eslint:lib', 'clean:lib'], function() {
+    return gulp.src(['src/**/*.jsx', 'src/**/*.js', '!src/**/docs/*', '!src/**/test/*'])
         .pipe(react())
         .pipe(gulp.dest('lib'));
 });
 
-gulp.task('clean:dist', function() {
-    return gulp.src('./dist')
-        .pipe(clean());
+gulp.task('build:docs', ['eslint:docs', 'clean:docs'], function() {
+    return gulp.src(['src/**/docs/*.js', 'src/**/docs/*.jsx'])
+        .pipe(react())
+        .pipe(gulp.dest('docs'));
 });
 
-gulp.task('build:dist', ['clean:dist', 'build:lib'], function() {
-    return gulp
-        .src('./')
-        .pipe(webpack(require('./webpack/config.js')))
-        .pipe(gulp.dest('./dist'));
-});
-
-gulp.task('build:material', function() {
-    var cfg = require('./webpack/material-ui.config.js');
+gulp.task('build:dist', ['clean:dist'], function() {
     return gulp.src('./')
-        .pipe(webpack(cfg))
-        .pipe(gulp.dest('./dist'))
-        .pipe(rename(cfg.libraryName + '.min.js'))
-        .pipe(uglify())
+        .pipe(gulpWebpack(require('./webpack/config.js')))
         .pipe(gulp.dest('./dist'));
 });
 
-gulp.task('clean', ['clean:dist', 'clean:lib']);
-gulp.task('default', ['build:material','build:dist']);
+gulp.task('server', function() {
+    var cfg = Object.create(require('./webpack/dev.config.js'));
+    new WebpackDevServer(webpack(cfg), {
+        contentBase: path.join('./'),
+        publicPath: cfg.output.publicPath,
+        hot: true
+    }).listen(cfg.port, cfg.host, function(err) {
+        if (err) throw new gutil.PluginError('webpack-dev-server', err);
+    });
+});
+
+gulp.task('clean', ['clean:dist', 'clean:lib', 'clean:docs']);
+
+gulp.task('build', ['build:lib', 'build:dist', 'build:material']);
+
+gulp.task('default', ['build']);
