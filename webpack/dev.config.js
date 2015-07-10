@@ -12,7 +12,7 @@ module.exports = {
         publicPath: '/assets/',
         path: __dirname + '/dist/',
         filename: 'react-ui.js',
-        library: 'ReactUI',
+        library: 'ReactUI2',
         libraryTarget: 'umd'
     },
     stats: {
@@ -29,6 +29,12 @@ module.exports = {
             commonjs: "react",
             commonjs2: "react",
             amd: "react"
+        },
+        'material-ui':{
+            root: 'Material',
+            commonjs: "material-ui",
+            commonjs2: "material-ui",
+            amd: "material-ui"
         }
     },
     module: {

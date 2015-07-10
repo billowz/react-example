@@ -79,18 +79,14 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 3 */
 /***/ function(module, exports, __webpack_require__) {
 
-	'use strict';
+	"use strict";
 
 	var React = __webpack_require__(2);
 	var WorkBench = React.createClass({
-	    displayName: 'WorkBench',
+	    displayName: "WorkBench",
 
 	    render: function render() {
-	        return React.createElement(
-	            'p',
-	            null,
-	            'h1121'
-	        );
+	        return React.createElement("input", { type: "text", value: "hello, word." });
 	    }
 	});
 	React.render(React.createElement(WorkBench, null), document.body);

@@ -1,6 +1,7 @@
 var gulp = require('gulp'),
     path = require('path'),
     fs = require('fs'),
+    express = require('express'),
     uglify = require('gulp-uglify'),
     rename = require('gulp-rename'),
     concat = require('gulp-concat'),
@@ -40,8 +41,8 @@ gulp.task('eslint:lib', function() {
         .pipe(eslint.failOnError());
 });
 
-gulp.task('eslint:docs', function() {
-    return gulp.src(['src/**/docs/*.js', 'src/**/docs/*.jsx'])
+gulp.task('eslint:doc', function() {
+    return gulp.src(['src/**/doc/*.js', 'src/**/doc/*.jsx'])
         .pipe(eslint())
         .pipe(eslint.format())
         .pipe(eslint.failOnError());
@@ -52,8 +53,8 @@ gulp.task('clean:lib', function() {
         .pipe(clean());
 });
 
-gulp.task('clean:docs', function() {
-    return gulp.src('./docs')
+gulp.task('clean:doc', function() {
+    return gulp.src('./doc')
         .pipe(clean());
 });
 
@@ -63,15 +64,15 @@ gulp.task('clean:dist', function() {
 });
 
 gulp.task('build:lib', ['eslint:lib', 'clean:lib'], function() {
-    return gulp.src(['src/**/*.jsx', 'src/**/*.js', '!src/**/docs/*', '!src/**/test/*'])
+    return gulp.src(['src/**/*.jsx', 'src/**/*.js', '!src/**/doc/*', '!src/**/test/*'])
         .pipe(react())
         .pipe(gulp.dest('lib'));
 });
 
-gulp.task('build:docs', ['eslint:docs', 'clean:docs'], function() {
-    return gulp.src(['src/**/docs/*.js', 'src/**/docs/*.jsx'])
+gulp.task('build:doc', ['eslint:doc', 'clean:doc'], function() {
+    return gulp.src(['src/**/doc/*.js', 'src/**/doc/*.jsx'])
         .pipe(react())
-        .pipe(gulp.dest('docs'));
+        .pipe(gulp.dest('doc'));
 });
 
 gulp.task('build:dist', [], function() {
@@ -84,19 +85,42 @@ gulp.task('build:dist', [], function() {
         .pipe(gulp.dest('./dist'));
 });
 
-gulp.task('clean', ['clean:dist', 'clean:lib', 'clean:docs']);
+gulp.task('clean', ['clean:dist', 'clean:lib', 'clean:doc']);
 
-gulp.task('build', ['build:lib', 'build:dist', 'build:material']);
+gulp.task('build', ['build:lib', 'build:dist', 'build:doc', 'build:material']);
 
 gulp.task('server', function() {
     var cfg = Object.create(require('./webpack/dev.config.js'));
-    new WebpackDevServer(webpack(cfg), {
-        contentBase: path.join('./'),
-        publicPath: cfg.output.publicPath,
-        hot: true
-    }).listen(cfg.port, cfg.host, function(err) {
-        if (err) throw new gutil.PluginError('webpack-dev-server', err);
+    cfg.host='localhost';
+    cfg.port=8080;
+    var devServer = new WebpackDevServer(webpack(cfg), {
+        contentBase: path.join('./misc'),
+        publicPath: '/assets/',
+        hot:true,
+        noInfo:false,
+        inline: true
     });
+    var app = express();
+    app.use('/', express['static'](path.resolve(process.cwd(), 'node_modules')));
+    app.use('/assets/material-ui.js', express['static'](path.resolve(process.cwd(), 'dist/material-ui.js')));
+    //app.use('/scripts/react/', express['static'](path.join(process.cwd(), 'node_modules/react/dist')));
+
+    app.use(devServer.app);
+    var listeningApp = app.listen(cfg.port, cfg.host, function(err, result) {
+        if (err) {
+            console.log(err);
+        }
+        console.log('Listening at port ' + cfg.port);
+    });
+    var socketio = require('webpack-dev-server/node_modules/socket.io');
+    devServer.io = socketio.listen(listeningApp, {
+        "log level": 2
+    });
+    devServer.io.sockets.on("connection", function(socket) {
+        if (this.hot) socket.emit("hot");
+        if (!this._stats) return;
+        this._sendStats(socket, devServer._stats.toJson());
+    }.bind(devServer));
 });
 
 gulp.task('default', ['build']);
