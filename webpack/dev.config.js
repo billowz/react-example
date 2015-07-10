@@ -1,14 +1,42 @@
 var webpack = require('webpack');
-var cfg = Object.create(require('./config.js'));
-cfg.host = 'localhost';
-cfg.port = 8080;
-cfg.output.publicPath = "/assets/";
-cfg.entry.app.push('webpack-dev-server/client?http://' + cfg.host + ':' + cfg.port, 'webpack/hot/only-dev-server');
-cfg.devtool = 'sourcemap';
-
-for (var i = 0; i < cfg.module.loaders.length; i++) {
-    cfg.module.loaders[i].loader = 'react-hot!' + cfg.module.loaders[i].loader;
-}
-cfg.plugins = cfg.plugins || [];
-cfg.plugins.push(new webpack.HotModuleReplacementPlugin(), new webpack.NoErrorsPlugin());
-module.exports = cfg;
+var host = 'localhost',
+    port = 8080;
+module.exports = {
+    host: host,
+    port: port,
+    entry: {
+        app: ['webpack-dev-server/client?http://' + host + ':' + port, 'webpack/hot/only-dev-server', './src/index.js']
+    },
+    devtool: 'sourcemap',
+    output: {
+        publicPath: '/assets/',
+        path: __dirname + '/dist/',
+        filename: 'react-ui.js',
+        library: 'ReactUI',
+        libraryTarget: 'umd'
+    },
+    stats: {
+        colors: true,
+        reasons: false
+    },
+    resolve: {
+        root: ['./src'],
+        extensions: ['', '.js', '.jsx']
+    },
+    externals: {
+        react: {
+            root: 'React',
+            commonjs: "react",
+            commonjs2: "react",
+            amd: "react"
+        }
+    },
+    module: {
+        loaders: [{
+            test: /\.(js|jsx)$/,
+            exclude: /node_modules/,
+            loader: 'react-hot!babel'
+        }]
+    },
+    plugins: [new webpack.HotModuleReplacementPlugin(), new webpack.NoErrorsPlugin()]
+};
