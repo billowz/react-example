@@ -20,6 +20,8 @@
     "no-underscore-dangle":0,
     "semi":1,
     "semi-spacing":0,
-    "no-unused-vars":1
+    "no-unused-vars":1,
+    "no-console":1,
+    "comma-spacing":1
   }
 }

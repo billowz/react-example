@@ -27,6 +27,20 @@ gulp.task('build:material', function() {
     });
 });
 
+gulp.task('build:react', function() {
+    var cfg = require('./webpack/react.config.js');
+    fs.exists('./dist/' + cfg.output.filename, function(ret) {
+        if (!ret) {
+            gulp.src('./')
+                .pipe(gulpWebpack(cfg))
+                .pipe(gulp.dest('./dist'))
+                .pipe(rename(cfg.output.filename.replace(/.js$/, '.min.js')))
+                .pipe(uglify())
+                .pipe(gulp.dest('./dist'));
+        }
+    });
+});
+
 gulp.task('eslint', function() {
     return gulp.src(['src/**/*.js', 'src/**/*.jsx'])
         .pipe(eslint())
@@ -87,22 +101,23 @@ gulp.task('build:dist', [], function() {
 
 gulp.task('clean', ['clean:dist', 'clean:lib', 'clean:doc']);
 
-gulp.task('build', ['build:lib', 'build:dist', 'build:doc', 'build:material']);
+gulp.task('build', ['build:lib', 'build:dist', 'build:doc', 'build:react', 'build:material']);
 
 gulp.task('server', function() {
     var cfg = Object.create(require('./webpack/dev.config.js'));
-    cfg.host='localhost';
-    cfg.port=8080;
+    cfg.host = 'localhost';
+    cfg.port = 8080;
     var devServer = new WebpackDevServer(webpack(cfg), {
         contentBase: path.join('./misc'),
         publicPath: '/assets/',
-        hot:true,
-        noInfo:false,
+        hot: true,
+        noInfo: false,
         inline: true
     });
     var app = express();
     app.use('/', express['static'](path.resolve(process.cwd(), 'node_modules')));
     app.use('/assets/material-ui.js', express['static'](path.resolve(process.cwd(), 'dist/material-ui.js')));
+    app.use('/assets/react.js', express['static'](path.resolve(process.cwd(), 'dist/react.js')));
     //app.use('/scripts/react/', express['static'](path.join(process.cwd(), 'node_modules/react/dist')));
 
     app.use(devServer.app);
