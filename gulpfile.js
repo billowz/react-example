@@ -103,7 +103,7 @@ gulp.task('clean', ['clean:dist', 'clean:lib', 'clean:doc']);
 
 gulp.task('build', ['build:lib', 'build:dist', 'build:doc', 'build:react', 'build:material']);
 
-gulp.task('server', function() {
+gulp.task('server', ['build'], function() {
     var cfg = Object.create(require('./webpack/dev.config.js'));
     cfg.host = 'localhost';
     cfg.port = 8080;

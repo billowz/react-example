@@ -1,6 +1,7 @@
 let React = require('react'),
   {MenuItem, LeftNav, Styles} = require('material-ui'),
-  {Colors, Spacing, Typography} = Styles;
+  {Colors, Spacing, Typography} = Styles,
+  Side = require('../side/Side');
 let SildeNav = React.createClass({
   getInitialState() {
     return {
@@ -37,10 +38,10 @@ let SildeNav = React.createClass({
     );
 
     return (
-      <LeftNav
+      <Side
       ref="nav"
       docked={false}
-      isInitiallyOpen={false}
+      isInitiallyOpen={true}
       header={header}
       menuItems={this.state.menuItems}
       selectedIndex={this._getSelectedIndex()}
