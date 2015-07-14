@@ -30,12 +30,12 @@ let WorkBench = React.createClass({
     return (<AppCanvas>
             <div>
             <AppBar title={this.props.title} onLeftIconButtonTouchTap={this._onLeftIconButtonTouchTap} iconElementRight={githubIcon}/>
-            </div><TimePicker
-  format="24hr"
-  hintText="24hr Format" />
-<DatePicker
-  hintText="Landscape Dialog"
-  mode="landscape"/>
+            </div>
+            <TimePicker format="24hr" hintText="24hr Format" />
+            <DatePicker
+              hintText="Landscape Dialog"
+              mode="landscape"
+              showYearSelector={true}/>
             <SildeNav ref="nav" title={this.props.title}/>
 
         </AppCanvas>

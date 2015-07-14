@@ -193,15 +193,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this.props.title
 	    );
 
-	    return React.createElement(Side, {
-	      ref: 'nav',
-	      docked: false,
-	      isInitiallyOpen: true,
-	      header: header,
-	      menuItems: this.state.menuItems,
-	      selectedIndex: this._getSelectedIndex(),
-	      openRight: true,
-	      onChange: this._onNavChange });
+	    return React.createElement(
+	      Side,
+	      { ref: 'nav' },
+	      React.createElement(
+	        'div',
+	        { style: this.getStyles(), onTouchTap: this._onHeaderClick },
+	        this.props.title
+	      )
+	    );
 	  },
 	  toggle: function toggle() {
 	    this.refs.nav.toggle();
@@ -239,6 +239,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var WindowListenable = Mixins.WindowListenable;
 	var Transitions = Styles.Transitions;
 	var AutoPrefix = Styles.AutoPrefix;
+	var Spacing = Styles.Spacing;
 
 	var Side = React.createClass({
 	  displayName: 'Side',
@@ -252,7 +253,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    docked: React.PropTypes.bool,
 	    model: React.PropTypes.bool,
 	    header: React.PropTypes.element,
-	    onChange: React.PropTypes.func,
 	    onOpen: React.PropTypes.func,
 	    onClose: React.PropTypes.func,
 	    direction: React.PropTypes.string
@@ -263,16 +263,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	  },
 	  getDefaultProps: function getDefaultProps() {
 	    return {
-	      docked: true,
+	      docked: false,
 	      model: true,
-	      direction: 'left'
+	      direction: 'bottom',
+	      width: Spacing.desktopKeylineIncrement * 4
 	    };
 	  },
 	  getInitialState: function getInitialState() {
 	    return {
-	      open: this.props.docked,
-	      maybeSwiping: false,
-	      swiping: null
+	      open: this.props.docked
 	    };
 	  },
 	  toggle: function toggle() {
@@ -302,34 +301,34 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return this.context.muiTheme.component.leftNav;
 	  },
 	  getStyles: function getStyles() {
-	    var x = this._getTranslateMultiplier() * (this.state.open ? 0 : this._getMaxTranslateX());
 	    var styles = {
 	      root: {
-	        height: '100%',
-	        width: this.getTheme().width,
 	        position: 'fixed',
 	        zIndex: 10,
 	        left: 0,
 	        top: 0,
-	        transform: 'translate3d(' + x + 'px, 0, 0)',
+	        right: 0,
+	        bottom: 0,
+	        transform: this._getTransformCss(),
 	        transition: !this.state.swiping && Transitions.easeOut(),
 	        backgroundColor: this.getTheme().color,
 	        overflow: 'hidden'
 	      },
-	      rootWhenOpenRight: {
-	        left: 'auto',
-	        right: 0
+	      horizontal: {
+	        height: '100%',
+	        width: this.props.width
 	      },
-	      rootWhenOpenTop: {
-	        left: 'auto',
-	        right: 0
+	      vertical: {
+	        width: '100%',
+	        height: this.props.width
 	      },
-	      rootWhenOpenBottom: {
-	        left: 'auto',
-	        right: 0
+	      right: {
+	        left: 'auto'
+	      },
+	      bottom: {
+	        top: 'auto'
 	      }
 	    };
-
 	    return styles;
 	  },
 	  render: function render() {
@@ -341,20 +340,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        transitionEnabled: !this.state.swiping,
 	        onTouchTap: this._onOverlayTouchTap });
 	    }
-
-	    var style = styles.root;
-	    switch (this.props.direction) {
-	      case 'right':
-	        style = this.mergeAndPrefix(style, styles.rootWhenOpenRight);
-	        break;
-	      case 'top':
-	        style = this.mergeAndPrefix(style, styles.rootWhenOpenTop);
-	        break;
-	      case 'bottom':
-	        style = this.mergeAndPrefix(style, styles.rootWhenOpenBottom);
-	        break;
-	    }
-	    this.mergeAndPrefix(style, this.props.style);
+	    var style = this.mergeAndPrefix(styles.root, styles[this.props.direction], styles[this._isVertical() ? 'vertical' : 'horizontal'], this.props.style);
 
 	    return React.createElement(
 	      'div',
@@ -367,120 +353,38 @@ return /******/ (function(modules) { // webpackBootstrap
 	          rounded: false,
 	          transitionEnabled: !this.state.swiping,
 	          style: style },
-	        this.props.header
+	        this.props.children
 	      )
 	    );
 	  },
-	  componentDidMount: function componentDidMount() {
-	    this._enableSwipeHandling();
+	  _isVertical: function _isVertical() {
+	    return this.props.direction === 'top' || this.props.direction === 'bottom';
 	  },
-	  componentDidUpdate: function componentDidUpdate() {
-	    this._enableSwipeHandling();
+	  _getTransformCss: function _getTransformCss(translateSize) {
+	    if (translateSize === null || translateSize === undefined) {
+	      translateSize = this._getMaxTranslate();
+	    }
+	    var size = this._getTranslateMultiplier() * (this.state.open ? 0 : translateSize);
+	    if (!this._isVertical()) {
+	      return 'translate3d(' + size + 'px, 0, 0)';
+	    } else {
+	      return 'translate3d(0, ' + size + 'px, 0)';
+	    }
 	  },
-	  componentWillUnmount: function componentWillUnmount() {
-	    this._disableSwipeHandling();
+	  _getTranslateMultiplier: function _getTranslateMultiplier() {
+	    return this.props.direction === 'left' || this.props.direction === 'top' ? -1 : 1;
+	  },
+	  _getMaxTranslate: function _getMaxTranslate() {
+	    if (!this._isVertical()) {
+	      return this.props.width + 10;
+	    } else {
+	      return this.props.width + 10;
+	    }
 	  },
 	  _onOverlayTouchTap: function _onOverlayTouchTap() {
 	    this.close();
-	  },
-	  _onWindowKeyUp: function _onWindowKeyUp(e) {
-	    if (e.keyCode === KeyCode.ESC && !this.props.docked && this.state.open) {
-	      this.close();
-	    }
-	  },
-	  _onWindowResize: function _onWindowResize() {},
-	  _getMaxTranslateX: function _getMaxTranslateX() {
-	    return this.getTheme().width + 10;
-	  },
-	  _getTranslateMultiplier: function _getTranslateMultiplier() {
-	    return this.props.openRight ? 1 : -1;
-	  },
-	  _enableSwipeHandling: function _enableSwipeHandling() {
-	    if (!this.props.docked) {
-	      document.body.addEventListener('touchstart', this._onBodyTouchStart);
-	    } else {
-	      this._disableSwipeHandling();
-	    }
-	  },
-	  _disableSwipeHandling: function _disableSwipeHandling() {
-	    document.body.removeEventListener('touchstart', this._onBodyTouchStart);
-	  },
-	  _onBodyTouchStart: function _onBodyTouchStart(e) {
-	    var touchStartX = e.touches[0].pageX;
-	    var touchStartY = e.touches[0].pageY;
-	    this.setState({
-	      maybeSwiping: true,
-	      touchStartX: touchStartX,
-	      touchStartY: touchStartY
-	    });
-	    document.body.addEventListener('touchmove', this._onBodyTouchMove);
-	    document.body.addEventListener('touchend', this._onBodyTouchEnd);
-	    document.body.addEventListener('touchcancel', this._onBodyTouchEnd);
-	  },
-	  _setPosition: function _setPosition(translateX) {
-	    var leftNav = React.findDOMNode(this.refs.clickAwayableElement);
-	    leftNav.style[AutoPrefix.single('transform')] = 'translate3d(' + this._getTranslateMultiplier() * translateX + 'px, 0, 0)';
-	    this.refs.overlay.setOpacity(1 - translateX / this._getMaxTranslateX());
-	  },
-	  _getTranslateX: function _getTranslateX(currentX) {
-	    return Math.min(Math.max(this.state.swiping === 'closing' ? this._getTranslateMultiplier() * (currentX - this.state.swipeStartX) : this._getMaxTranslateX() - this._getTranslateMultiplier() * (this.state.swipeStartX - currentX), 0), this._getMaxTranslateX());
-	  },
-	  _onBodyTouchMove: function _onBodyTouchMove(e) {
-	    var currentX = e.touches[0].pageX;
-	    var currentY = e.touches[0].pageY;
-
-	    if (this.state.swiping) {
-	      e.preventDefault();
-	      this._setPosition(this._getTranslateX(currentX));
-	    } else if (this.state.maybeSwiping) {
-	      var dXAbs = Math.abs(currentX - this.state.touchStartX);
-	      var dYAbs = Math.abs(currentY - this.state.touchStartY);
-	      // If the user has moved his thumb ten pixels in either direction,
-	      // we can safely make an assumption about whether he was intending
-	      // to swipe or scroll.
-	      var threshold = 10;
-
-	      if (dXAbs > threshold && dYAbs <= threshold) {
-	        this.setState({
-	          swiping: this.state.open ? 'closing' : 'opening',
-	          open: true,
-	          swipeStartX: currentX
-	        });
-	        this._setPosition(this._getTranslateX(currentX));
-	      } else if (dXAbs <= threshold && dYAbs > threshold) {
-	        this._onBodyTouchEnd();
-	      }
-	    }
-	  },
-	  _onBodyTouchEnd: function _onBodyTouchEnd(e) {
-	    if (this.state.swiping) {
-	      var currentX = e.changedTouches[0].pageX;
-	      var translateRatio = this._getTranslateX(currentX) / this._getMaxTranslateX();
-
-	      this.setState({
-	        maybeSwiping: false,
-	        swiping: null
-	      });
-
-	      // We have to open or close after setting swiping to null,
-	      // because only then CSS transition is enabled.
-	      if (translateRatio > 0.5) {
-	        this.close();
-	      } else {
-	        this._setPosition(0);
-	      }
-	    } else {
-	      this.setState({
-	        maybeSwiping: false
-	      });
-	    }
-
-	    document.body.removeEventListener('touchmove', this._onBodyTouchMove);
-	    document.body.removeEventListener('touchend', this._onBodyTouchEnd);
-	    document.body.removeEventListener('touchcancel', this._onBodyTouchEnd);
 	  }
 	});
-
 	module.exports = Side;
 
 /***/ }
