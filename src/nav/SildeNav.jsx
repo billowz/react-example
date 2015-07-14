@@ -38,15 +38,11 @@ let SildeNav = React.createClass({
     );
 
     return (
-      <Side
-      ref="nav"
-      docked={false}
-      isInitiallyOpen={true}
-      header={header}
-      menuItems={this.state.menuItems}
-      selectedIndex={this._getSelectedIndex()}
-      openRight={true}
-      onChange={this._onNavChange} />
+      <Side ref="nav">
+          <div style={this.getStyles()} onTouchTap={this._onHeaderClick}>
+            {this.props.title}
+          </div>
+      </Side>
       );
   },
   toggle() {

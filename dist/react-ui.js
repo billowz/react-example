@@ -92,7 +92,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	var DatePicker = _require.DatePicker;
 	var Styles = _require.Styles;
 	var SildeNav = __webpack_require__(5);
-	var side = __webpack_require__(6);
 
 	var ThemeManager = new Styles.ThemeManager();
 	var WorkBench = React.createClass({
@@ -164,7 +163,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var Colors = Styles.Colors;
 	var Spacing = Styles.Spacing;
 	var Typography = Styles.Typography;
-
+	var Side = __webpack_require__(6);
 	var SildeNav = React.createClass({
 	  displayName: 'SildeNav',
 
@@ -194,9 +193,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this.props.title
 	    );
 
-	    return React.createElement(LeftNav, {
+	    return React.createElement(Side, {
 	      ref: 'nav',
-	      docked: true,
+	      docked: false,
 	      isInitiallyOpen: true,
 	      header: header,
 	      menuItems: this.state.menuItems,
@@ -258,25 +257,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	    onClose: React.PropTypes.func,
 	    direction: React.PropTypes.string
 	  },
-	  direction: {
-	    left: 'left',
-	    right: 'right',
-	    top: 'top',
-	    bottom: 'bottom'
-	  },
-
 	  windowListeners: {
 	    'keyup': '_onWindowKeyUp',
 	    'resize': '_onWindowResize'
 	  },
-
 	  getDefaultProps: function getDefaultProps() {
 	    return {
 	      docked: true,
-	      model: true
+	      model: true,
+	      direction: 'left'
 	    };
 	  },
-
 	  getInitialState: function getInitialState() {
 	    return {
 	      open: this.props.docked,
@@ -284,52 +275,32 @@ return /******/ (function(modules) { // webpackBootstrap
 	      swiping: null
 	    };
 	  },
-
-	  componentDidMount: function componentDidMount() {
-	    this._updateMenuHeight();
-	    this._enableSwipeHandling();
-	  },
-
-	  componentDidUpdate: function componentDidUpdate() {
-	    this._updateMenuHeight();
-	    this._enableSwipeHandling();
-	  },
-
-	  componentWillUnmount: function componentWillUnmount() {
-	    this._disableSwipeHandling();
-	  },
-
 	  toggle: function toggle() {
 	    this.setState({
 	      open: !this.state.open
 	    });
 	    return this;
 	  },
-
 	  close: function close() {
 	    this.setState({
 	      open: false
 	    });
-	    if (this.props.onNavClose) this.props.onNavClose();
+	    if (this.props.onClose) this.props.onClose();
 	    return this;
 	  },
-
 	  open: function open() {
 	    this.setState({
 	      open: true
 	    });
-	    if (this.props.onNavOpen) this.props.onNavOpen();
+	    if (this.props.onOpen) this.props.onOpen();
 	    return this;
 	  },
-
 	  getThemePalette: function getThemePalette() {
 	    return this.context.muiTheme.palette;
 	  },
-
 	  getTheme: function getTheme() {
 	    return this.context.muiTheme.component.leftNav;
 	  },
-
 	  getStyles: function getStyles() {
 	    var x = this._getTranslateMultiplier() * (this.state.open ? 0 : this._getMaxTranslateX());
 	    var styles = {
@@ -345,127 +316,96 @@ return /******/ (function(modules) { // webpackBootstrap
 	        backgroundColor: this.getTheme().color,
 	        overflow: 'hidden'
 	      },
-	      menu: {
-	        overflowY: 'auto',
-	        overflowX: 'hidden',
-	        height: '100%'
-	      },
-	      menuItem: {
-	        height: this.context.muiTheme.spacing.desktopLeftNavMenuItemHeight,
-	        lineHeight: this.context.muiTheme.spacing.desktopLeftNavMenuItemHeight + 'px'
-	      },
 	      rootWhenOpenRight: {
+	        left: 'auto',
+	        right: 0
+	      },
+	      rootWhenOpenTop: {
+	        left: 'auto',
+	        right: 0
+	      },
+	      rootWhenOpenBottom: {
 	        left: 'auto',
 	        right: 0
 	      }
 	    };
-	    styles.menuItemLink = this.mergeAndPrefix(styles.menuItem, {
-	      display: 'block',
-	      textDecoration: 'none',
-	      color: this.getThemePalette().textColor
-	    });
-	    styles.menuItemSubheader = this.mergeAndPrefix(styles.menuItem, {
-	      overflow: 'hidden'
-	    });
 
 	    return styles;
 	  },
-
 	  render: function render() {
-	    var selectedIndex = this.props.selectedIndex;
 	    var overlay = undefined;
-
 	    var styles = this.getStyles();
 	    if (!this.props.docked) {
 	      overlay = React.createElement(Overlay, { ref: 'overlay',
 	        show: this.state.open,
 	        transitionEnabled: !this.state.swiping,
-	        onTouchTap: this._onOverlayTouchTap
-	      });
+	        onTouchTap: this._onOverlayTouchTap });
 	    }
+
+	    var style = styles.root;
+	    switch (this.props.direction) {
+	      case 'right':
+	        style = this.mergeAndPrefix(style, styles.rootWhenOpenRight);
+	        break;
+	      case 'top':
+	        style = this.mergeAndPrefix(style, styles.rootWhenOpenTop);
+	        break;
+	      case 'bottom':
+	        style = this.mergeAndPrefix(style, styles.rootWhenOpenBottom);
+	        break;
+	    }
+	    this.mergeAndPrefix(style, this.props.style);
 
 	    return React.createElement(
 	      'div',
 	      { className: this.props.className },
-	      ' ',
 	      overlay,
-	      ' ',
 	      React.createElement(
 	        Paper,
 	        { ref: 'clickAwayableElement',
 	          zDepth: 2,
 	          rounded: false,
 	          transitionEnabled: !this.state.swiping,
-	          style: this.mergeAndPrefix(styles.root, this.props.openRight && styles.rootWhenOpenRight, this.props.style) },
-	        ' ',
-	        this.props.header,
-	        ' '
-	      ),
-	      ' '
+	          style: style },
+	        this.props.header
+	      )
 	    );
 	  },
-
-	  _updateMenuHeight: function _updateMenuHeight() {
-	    if (this.props.header) {
-	      var container = React.findDOMNode(this.refs.clickAwayableElement);
-	      var menu = React.findDOMNode(this.refs.menuItems);
-	      var menuHeight = container.clientHeight - menu.offsetTop;
-	      menu.style.height = menuHeight + 'px';
-	    }
+	  componentDidMount: function componentDidMount() {
+	    this._enableSwipeHandling();
 	  },
-
-	  _onMenuItemClick: function _onMenuItemClick(e, key, payload) {
-	    if (this.props.onChange && this.props.selectedIndex !== key) {
-	      this.props.onChange(e, key, payload);
-	    }
-	    if (!this.props.docked) this.close();
+	  componentDidUpdate: function componentDidUpdate() {
+	    this._enableSwipeHandling();
 	  },
-
+	  componentWillUnmount: function componentWillUnmount() {
+	    this._disableSwipeHandling();
+	  },
 	  _onOverlayTouchTap: function _onOverlayTouchTap() {
 	    this.close();
 	  },
-
 	  _onWindowKeyUp: function _onWindowKeyUp(e) {
 	    if (e.keyCode === KeyCode.ESC && !this.props.docked && this.state.open) {
 	      this.close();
 	    }
 	  },
-
-	  _onWindowResize: function _onWindowResize() {
-	    this._updateMenuHeight();
-	  },
-
+	  _onWindowResize: function _onWindowResize() {},
 	  _getMaxTranslateX: function _getMaxTranslateX() {
 	    return this.getTheme().width + 10;
 	  },
-
 	  _getTranslateMultiplier: function _getTranslateMultiplier() {
 	    return this.props.openRight ? 1 : -1;
 	  },
-
 	  _enableSwipeHandling: function _enableSwipeHandling() {
 	    if (!this.props.docked) {
 	      document.body.addEventListener('touchstart', this._onBodyTouchStart);
-	      if (!openNavEventHandler) {
-	        openNavEventHandler = this._onBodyTouchStart;
-	      }
 	    } else {
 	      this._disableSwipeHandling();
 	    }
 	  },
-
 	  _disableSwipeHandling: function _disableSwipeHandling() {
 	    document.body.removeEventListener('touchstart', this._onBodyTouchStart);
-	    if (openNavEventHandler === this._onBodyTouchStart) {
-	      openNavEventHandler = null;
-	    }
 	  },
-
 	  _onBodyTouchStart: function _onBodyTouchStart(e) {
-	    if (!this.state.open && openNavEventHandler !== this._onBodyTouchStart) {
-	      return;
-	    }
-
 	    var touchStartX = e.touches[0].pageX;
 	    var touchStartY = e.touches[0].pageY;
 	    this.setState({
@@ -473,22 +413,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	      touchStartX: touchStartX,
 	      touchStartY: touchStartY
 	    });
-
 	    document.body.addEventListener('touchmove', this._onBodyTouchMove);
 	    document.body.addEventListener('touchend', this._onBodyTouchEnd);
 	    document.body.addEventListener('touchcancel', this._onBodyTouchEnd);
 	  },
-
 	  _setPosition: function _setPosition(translateX) {
 	    var leftNav = React.findDOMNode(this.refs.clickAwayableElement);
 	    leftNav.style[AutoPrefix.single('transform')] = 'translate3d(' + this._getTranslateMultiplier() * translateX + 'px, 0, 0)';
 	    this.refs.overlay.setOpacity(1 - translateX / this._getMaxTranslateX());
 	  },
-
 	  _getTranslateX: function _getTranslateX(currentX) {
 	    return Math.min(Math.max(this.state.swiping === 'closing' ? this._getTranslateMultiplier() * (currentX - this.state.swipeStartX) : this._getMaxTranslateX() - this._getTranslateMultiplier() * (this.state.swipeStartX - currentX), 0), this._getMaxTranslateX());
 	  },
-
 	  _onBodyTouchMove: function _onBodyTouchMove(e) {
 	    var currentX = e.touches[0].pageX;
 	    var currentY = e.touches[0].pageY;
@@ -516,7 +452,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }
 	    }
 	  },
-
 	  _onBodyTouchEnd: function _onBodyTouchEnd(e) {
 	    if (this.state.swiping) {
 	      var currentX = e.changedTouches[0].pageX;
@@ -544,7 +479,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    document.body.removeEventListener('touchend', this._onBodyTouchEnd);
 	    document.body.removeEventListener('touchcancel', this._onBodyTouchEnd);
 	  }
-
 	});
 
 	module.exports = Side;
