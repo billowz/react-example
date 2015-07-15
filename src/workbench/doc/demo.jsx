@@ -1,2 +1,7 @@
-var react = require('react');
-var ui = require('react-ui');
+let React = require('react'),
+  {WorkBench} = require('react-ui');
+module.exports = React.createClass({
+  render() {
+    return (<WorkBench title="Workbench Demo"/>);
+  }
+});

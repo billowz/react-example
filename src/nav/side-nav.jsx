@@ -1,8 +1,8 @@
 let React = require('react'),
   {MenuItem, LeftNav, Styles} = require('material-ui'),
   {Colors, Spacing, Typography} = Styles,
-  Side = require('../side/Side');
-let SildeNav = React.createClass({displayName: "SildeNav",
+  Side = require('../layout/side');
+let SildeNav = React.createClass({
   getInitialState() {
     return {
       menuItems: [
@@ -32,17 +32,17 @@ let SildeNav = React.createClass({displayName: "SildeNav",
   },
   render() {
     let header = (
-    React.createElement("div", {style: this.getStyles(), onTouchTap: this._onHeaderClick}, 
-        this.props.title
-      )
+    <div style={this.getStyles()} onTouchTap={this._onHeaderClick}>
+        {this.props.title}
+      </div>
     );
 
     return (
-      React.createElement(Side, {ref: "nav"}, 
-          React.createElement("div", {style: this.getStyles(), onTouchTap: this._onHeaderClick}, 
-            this.props.title
-          )
-      )
+      <Side ref="nav">
+          <div style={this.getStyles()} onTouchTap={this._onHeaderClick}>
+            {this.props.title}
+          </div>
+      </Side>
       );
   },
   toggle() {

@@ -1,6 +1,6 @@
 let React = require('react'),
   {AppCanvas, AppBar, IconButton, TimePicker, DatePicker, Styles} = require('material-ui'),
-  SildeNav = require('../nav/SildeNav');
+  SildeNav = require('../nav/side-nav');
 
 
 let ThemeManager = new Styles.ThemeManager();
@@ -46,5 +46,4 @@ let WorkBench = React.createClass({
     console.log('-->', this);
   }
 });
-React.render(< WorkBench title="React UI"/ >, document.body);
 module.exports = WorkBench;

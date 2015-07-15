@@ -1,5 +1,5 @@
 var webpack = require('webpack');
-var libraryPath = './src/react.js';
+var libraryPath = './react-with-tap.js';
 module.exports = {
     entry: {
         app: [
