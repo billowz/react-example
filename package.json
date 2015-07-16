@@ -21,12 +21,11 @@
         "animate.css": "~3.2.3"
     },
     "devDependencies": {
-        "memory-fs":"",
+        "rimraf":"",
         "through2":"",
-        "gulp-util":"^3.0.6",
-        "express": "^4.13.1",
         "path": "^0.11.14",
         "gulp": "^3.9.0",
+        "gulp-util":"^3.0.6",
         "gulp-uglify": "",
         "gulp-rename": "",
         "gulp-concat": "^2.6.0",
@@ -37,8 +36,9 @@
         "gulp-sourcemaps": "^1.5.2",
         "eslint": "^0.24.0",
         "gulp-eslint": "^0.15.0",
-        "eslint-plugin-react": "^2.4.0",
         "babel": "^5.0.0",
+        "gulp-babel":"",
+        "eslint-plugin-react": "^2.4.0",
         "babel-loader": "^5.0.0",
         "style-loader": "^0.8.0",
         "url-loader": "^0.5.5",
@@ -46,6 +46,7 @@
         "eslint-loader": "^0.14.1",
         "react-hot-loader": "^1.0.7",
         "webpack": "^1.10.0",
-        "webpack-dev-server": "^1.10.0"
+        "webpack-dev-server": "^1.10.0",
+        "express": "^4.13.1"
     }
 }

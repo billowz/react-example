@@ -1,7 +1,5 @@
 /*@MODULE_GENERATOR@*/
-"use strict";
-
-module.exports = {
+module.exports={
 	Ccc: require("./ccc"),
 	Index: require("./index"),
 	Layout: require("./layout/layout"),

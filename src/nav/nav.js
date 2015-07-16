@@ -1,3 +1,5 @@
-module.exports = {
-    SideNav: require('./side-nav')
+/*@MODULE_GENERATOR@*/
+module.exports={
+	Nav: require("./nav"),
+	SideNav: require("./side-nav")
 };

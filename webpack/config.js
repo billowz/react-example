@@ -1,7 +1,7 @@
 var webpack = require('webpack');
 module.exports = {
   entry: {
-    app: ['./lib/index.js']
+    app: ['./src/index.js']
   },
   output: {
     path: __dirname + '/dist/',
@@ -14,8 +14,8 @@ module.exports = {
     reasons: false
   },
   resolve: {
-    root: ['./lib'],
-    extensions: ['', '.js']
+    root: ['./src'],
+    extensions: ['', '.js','.jsx']
   },
   externals: {
     react: {
@@ -33,7 +33,7 @@ module.exports = {
   },
   module: {
     loaders: [{
-      test: /\.(js)$/,
+      test: /\.(js|jsx)$/,
       exclude: /node_modules/,
       loader: 'babel'
     }]

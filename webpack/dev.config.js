@@ -5,7 +5,7 @@ module.exports = {
   host: host,
   port: port,
   entry: {
-    app: ['webpack-dev-server/client?http://' + host + ':' + port, 'webpack/hot/only-dev-server', './lib/index.js']
+    app: ['webpack-dev-server/client?http://' + host + ':' + port, 'webpack/hot/only-dev-server', './src/index.js']
   },
   devtool: 'sourcemap',
   output: {
@@ -20,7 +20,7 @@ module.exports = {
     reasons: false
   },
   resolve: {
-    root: ['./lib'],
+    root: ['./src'],
     extensions: ['', '.js', '.jsx']
   },
   externals: {

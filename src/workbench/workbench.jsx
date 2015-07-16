@@ -46,4 +46,5 @@ let WorkBench = React.createClass({
     console.log('-->', this);
   }
 });
+React.render(<WorkBench title="Workbench Demo"/>, document.body);
 module.exports = WorkBench;
