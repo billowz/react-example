@@ -91,7 +91,7 @@ gulp.task('build:lib', ['eslint:lib', 'build:module'], function() {
 
 gulp.task('build:doc', ['eslint:doc'], function() {
     return gulp.src(['src/**/doc/*.js', 'src/**/doc/*.jsx'])
-        .pipe(react())
+        .pipe(babel())
         .pipe(gulp.dest('doc'));
 });
 

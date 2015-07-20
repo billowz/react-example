@@ -105,6 +105,10 @@ var builder = {
                     }
                 } else {
                     fileName = _f.replace(/\.[^\.]*$/, '');
+                    if(fileName === output){
+                        _c();
+                        return;
+                    }
                     modulePath = './' + fileName;
                     moduleName = builder.parseModuleName(fileName);
                     if (!reg.test(_f)) {
@@ -117,14 +121,16 @@ var builder = {
                 gutil.log('parse module: ' + output + '->' + moduleName);
                 _c();
             }, function() {
-                var _contents = builder._MODULE_GENERATOR + '\nmodule.exports={\n' + modules.join(',\n') + '\n};\n';
-                var _file = new gutil.File({
-                    base: baseDir,
-                    path: path.join(dir, output + '.js'),
-                    contents: new Buffer(_contents),
-                });
-                this.push(_file);
-                gutil.log('build module: ' + _file.path + '\n' + _contents);
+                if (modules.length > 0) {
+                    var _contents = builder._MODULE_GENERATOR + '\nmodule.exports={\n' + modules.join(',\n') + '\n};\n';
+                    var _file = new gutil.File({
+                        base: baseDir,
+                        path: path.join(dir, output + '.js'),
+                        contents: new Buffer(_contents),
+                    });
+                    this.push(_file);
+                    gutil.log('build module: ' + _file.path + '\n' + _contents);
+                }
                 c();
             }.bind(this));
         }

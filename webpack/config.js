@@ -14,7 +14,6 @@ module.exports = {
     reasons: false
   },
   resolve: {
-    root: ['./src'],
     extensions: ['', '.js','.jsx']
   },
   externals: {
