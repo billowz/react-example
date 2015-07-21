@@ -79,7 +79,10 @@ gulp.task('clean:dist', function() {
 
 gulp.task('build:module', function() {
     return gulp.src('./src')
-        .pipe(moduleBuilder.build('index', 'module.exports={\n<%for(var i=0; i<modules.length; i++){%>\t<%=modules[i].name%>: require(\'<%=modules[i].path%>\')<%=i<modules.length-1?",":""%>\n<%}%>};'))
+        .pipe(moduleBuilder.build({
+            out:'index',
+            tpl: 'module.exports={\n<%for(var i=0; i<modules.length; i++){%>\t<%=modules[i].name%>: require(\'<%=modules[i].path%>\')<%=i<modules.length-1?",":""%>\n<%}%>};'
+        }))
         .pipe(gulp.dest('src'));
 });
 
