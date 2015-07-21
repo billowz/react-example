@@ -2,6 +2,7 @@ var path = require('path'),
     gutil = require('gulp-util'),
     through = require('through2'),
     fs = require('fs'),
+    ejs = require('ejs'),
     rimraf = require('rimraf');
 var builder = {
     parseModuleName: function(name) {
@@ -62,93 +63,103 @@ var builder = {
             }.bind(this), c);
         });
     },
-    build: function(output, reg, dirReg) {
-        reg = reg || '(\\.js)x?$';
-        reg = new RegExp(reg);
-        dirReg = new RegExp(dirReg);
-        var build = function(baseDir, dir, output, c) {
-            output = output || 'index';
-            var existingFilePath = path.join(dir, output + '.js'),
-                gen = true;
-            if (fs.existsSync(existingFilePath)) {
-                var dat = fs.readFileSync(existingFilePath, 'utf-8');
-                if (dat.indexOf(builder._MODULE_GENERATOR) !== 0) {
-                    gen = false;
-                }
-            } else {
-                existingFilePath = path.join(dir, output + '.jsx');
-                var dat = fs.readFileSync(existingFilePath, 'utf-8');
-                if (dat.indexOf(builder._MODULE_GENERATOR) !== 0) {
-                    gen = false;
-                }
-            }
-            if (!gen) {
-                gutil.log('skip module: ' + output + ' ' + existingFilePath);
-                c();
+    _buildModuleIndex: function(baseDir, dir, output, filter, callback, tpl) {
+        output = output || 'index';
+        var filePath = path.join(dir, output + '.jsx'),
+            file, hasFile;
+        if (!fs.existsSync(filePath)) {
+            filePath = path.join(dir, output + '.js');
+            hasFile = fs.existsSync(filePath);
+        } else {
+            hasFile = true;
+        }
+        if (hasFile) {
+            if (fs.readFileSync(filePath, 'utf-8').indexOf(builder._MODULE_GENERATOR) !== 0) {
+                callback();
                 return;
             }
-
-            gutil.log('parse module: ' + output);
-            var modules = [];
-            builder.scanFiles(dir, function() {
-                return false
-            }, function(_f, _isdir, _c) {
-                var fileName, modulePath, moduleName;
-                _f = _f.replace(/.*[\\/]/g, '');
-                if (_isdir) {
-                    fileName = _f;
-                    modulePath = './' + _f + '/' + _f;
-                    moduleName = builder.parseModuleName(fileName);
-                    if (!dirReg.test(_f)) {
-                        _c();
-                        return;
-                    }
-                } else {
-                    fileName = _f.replace(/\.[^\.]*$/, '');
-                    if(fileName === output){
-                        _c();
-                        return;
-                    }
-                    modulePath = './' + fileName;
-                    moduleName = builder.parseModuleName(fileName);
-                    if (!reg.test(_f)) {
-                        gutil.log('skip child module: ' + output + '.' + moduleName);
-                        _c();
-                        return;
-                    }
-                }
-                modules.push('\t' + moduleName + ': require("' + modulePath + '")');
-                gutil.log('parse module: ' + output + '->' + moduleName);
-                _c();
-            }, function() {
-                if (modules.length > 0) {
-                    var _contents = builder._MODULE_GENERATOR + '\nmodule.exports={\n' + modules.join(',\n') + '\n};\n';
-                    var _file = new gutil.File({
-                        base: baseDir,
-                        path: path.join(dir, output + '.js'),
-                        contents: new Buffer(_contents),
-                    });
-                    this.push(_file);
-                    gutil.log('build module: ' + _file.path + '\n' + _contents);
-                }
-                c();
-            }.bind(this));
         }
+        var modules = [];
+        builder.scanFiles(dir, function() {
+            return false
+        }, function(_f, _isdir, _c) {
+            var fileName, modulePath, moduleName;
+            _f = _f.replace(/.*[\\/]/g, '');
+            if (!filter(_f, _isdir)) {
+                _c();
+                return;
+            }
+            if (_isdir) {
+                fileName = _f;
+                modulePath = './' + _f + '/' + _f;
+                moduleName = builder.parseModuleName(fileName);
+            } else {
+                fileName = _f.replace(/\.[^\.]*$/, '');
+                if (fileName === output) {
+                    _c();
+                    return;
+                }
+                modulePath = './' + fileName;
+                moduleName = builder.parseModuleName(fileName);
+            }
+            modules.push({
+                name: moduleName,
+                path: modulePath
+            });
+            _c();
+        }, function() {
+            if (modules.length > 0) {
+                var _contents = builder._MODULE_GENERATOR + '\n' + ejs.render(tpl, {
+                    modules: modules
+                });
+                var _file = new gutil.File({
+                    base: baseDir,
+                    path: filePath,
+                    contents: new Buffer(_contents),
+                });
+                callback(_file);
+                gutil.log('build module: ' + _file.path + '\n' + _contents);
+            } else {
+                callback();
+            }
+        });
+    },
+    build: function(opt) {
+        opt = opt || {};
+        var output = opt.out || 'index',
+            reg = opt.reg || /(\\.js)x?$/,
+            dirReg = opt.dirReg || /^doc$/,
+            buildSubModule = opt.buildSubModule || false,
+            build = function(baseDir, dir, output, c) {
+                builder._buildModuleIndex(baseDir, dir, output, function(f, isdir) {
+                    if (isdir) return dirReg.test(f);
+                    return reg.test(f);
+                }, function(f) {
+                    if (f) {
+                        this.push(f);
+                    }
+                    c();
+                }.bind(this), tpl);
+            }
         return through.obj(function(dir, e, c) {
             build = build.bind(this);
             build(dir.path, dir.path, output, function() {
-                builder.scanFiles(dir.path, null, function(f, isDir, _c) {
-                    if (isDir) {
-                        var n = f.replace(/.*[\\/]/g, '');
-                        if (!dirReg.test(n)) {
+                if(!buildSubModule){
+                    c();
+                }else{
+                    builder.scanFiles(dir.path, null, function(f, isDir, _c) {
+                        if (isDir) {
+                            var n = f.replace(/.*[\\/]/g, '');
+                            if (!dirReg.test(n)) {
+                                _c();
+                                return;
+                            }
+                            build(dir.path, f, n, _c);
+                        } else {
                             _c();
-                            return;
                         }
-                        build(dir.path, f, n, _c);
-                    } else {
-                        _c();
-                    }
-                }.bind(this), c);
+                    }.bind(this), c);
+                }
             }.bind(this));
         });
     }

@@ -79,10 +79,15 @@ gulp.task('clean:dist', function() {
 
 gulp.task('build:module', function() {
     return gulp.src('./src')
-        .pipe(moduleBuilder.build('index', null, '[^doc]'))
+        .pipe(moduleBuilder.build('index', 'module.exports={\n<%for(var i=0; i<modules.length; i++){%>\t<%=modules[i].name%>: require(\'<%=modules[i].path%>\')<%=i<modules.length-1?",":""%>\n<%}%>};'))
         .pipe(gulp.dest('src'));
 });
 
+gulp.task('build:docmodule', function() {
+    return gulp.src('./src')
+        .pipe(moduleBuilder.build('doc', null, '[doc]', fs.readFileSync('./misc/doc.js').toString()))
+        .pipe(gulp.dest('src'));
+});
 gulp.task('build:lib', ['eslint:lib', 'build:module'], function() {
     return gulp.src(['src/**/*.jsx', 'src/**/*.js', '!src/**/doc/*', '!src/**/test/*'])
         .pipe(babel())
@@ -111,8 +116,6 @@ gulp.task('build', ['build:lib', 'build:doc', 'build:dist', 'build:react', 'buil
 
 gulp.task('server', ['build:module', 'build:react', 'build:material'], function() {
     var cfg = Object.create(require('./webpack/dev.config.js'));
-    cfg.host = 'localhost';
-    cfg.port = 8080;
     var devServer = new WebpackDevServer(webpack(cfg), {
         contentBase: path.join('./misc'),
         publicPath: '/assets/',

@@ -1,6 +1,6 @@
 var webpack = require('webpack');
 var host = 'localhost',
-  port = 8080;
+  port = 8089;
 module.exports = {
   host: host,
   port: port,
@@ -20,6 +20,7 @@ module.exports = {
     reasons: false
   },
   resolve: {
+    root: ['./src'],
     extensions: ['', '.js', '.jsx']
   },
   externals: {
