@@ -79,8 +79,14 @@ gulp.task('clean:dist', function() {
 
 gulp.task('build:module', function() {
     return gulp.src('./src')
-        .pipe(moduleBuilder.build({
+        .pipe(moduleBuilder.buildModule({
             out:'index',
+            dirReg:{
+                exclude:[/\/doc\//g]
+            },
+            fileReg:{
+
+            },
             tpl: 'module.exports={\n<%for(var i=0; i<modules.length; i++){%>\t<%=modules[i].name%>: require(\'<%=modules[i].path%>\')<%=i<modules.length-1?",":""%>\n<%}%>};'
         }))
         .pipe(gulp.dest('src'));
@@ -88,7 +94,13 @@ gulp.task('build:module', function() {
 
 gulp.task('build:docmodule', function() {
     return gulp.src('./src')
-        .pipe(moduleBuilder.build('doc', null, '[doc]', fs.readFileSync('./misc/doc.js').toString()))
+        .pipe(moduleBuilder.buildDoc({
+            out:'doc',
+            fileReg:{
+                include:[/(^doc\/)|(\/doc\/)/g]
+            },
+            tpl:fs.readFileSync('./misc/doc.js').toString()
+        }))
         .pipe(gulp.dest('src'));
 });
 gulp.task('build:lib', ['eslint:lib', 'build:module'], function() {
