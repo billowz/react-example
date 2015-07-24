@@ -1,5 +1,5 @@
 /*@MODULE_GENERATOR@*/
-/*Wed, 22 Jul 2015 10:17:41 GMT*/
+/*Thu, 23 Jul 2015 03:42:13 GMT*/
 let React = require('react'),
     {Navbar, Nav, NavItem, DropdownButton, MenuItem} = require('react-bootstrap'),
     rui = require('react-ui'),
@@ -7,7 +7,11 @@ let React = require('react'),
     
         LayoutDocDemo : require('./layout/doc/demo'),
     
-        WorkbenchDocDoc : require('./workbench/doc/doc')
+        WorkbenchDocDoc : require('./workbench/doc/doc'),
+    
+        WorkbenchDocDemo : require('./workbench/doc/demo'),
+    
+        WorkbenchDocReadme : require('./workbench/doc/readme')
     
     };
 React.render(<Navbar brand='React UI'>

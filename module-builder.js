@@ -4,7 +4,8 @@ var path = require('path'),
     fs = require('fs'),
     gulp = require('gulp'),
     ejs = require('ejs'),
-    rimraf = require('rimraf');
+    rimraf = require('rimraf'),
+    is = require('is');
 
 var builder = {
     parseModuleName: function(name) {
@@ -51,6 +52,66 @@ var builder = {
             });
         });
     },
+    extend: function() {
+        var target = arguments[0] || {};
+        var i = 1;
+        var length = arguments.length;
+        var deep = false;
+        var options, name, src, copy, copyIsArray, clone;
+
+        // Handle a deep copy situation
+        if (typeof target === 'boolean') {
+            deep = target;
+            target = arguments[1] || {};
+            // skip the boolean and the target
+            i = 2;
+        }
+
+        // Handle case when target is a string or something (possible in deep copy)
+        if (!is.object(target) && !is.fn(target)) {
+            target = {};
+        }
+
+        for (; i < length; i++) {
+            // Only deal with non-null/undefined values
+            options = arguments[i];
+            if (options != null) {
+                if (typeof options === 'string') {
+                    options = options.split('');
+                }
+                // Extend the base object
+                for (name in options) {
+                    src = target[name];
+                    copy = options[name];
+
+                    // Prevent never-ending loop
+                    if (target === copy) {
+                        continue;
+                    }
+
+                    // Recurse if we're merging plain objects or arrays
+                    if (deep && copy && (is.hash(copy) || (copyIsArray = Array.isArray(copy)))) {
+                        if (copyIsArray) {
+                            copyIsArray = false;
+                            clone = src && is.array(src) ? src : [];
+                        } else {
+                            clone = src && is.hash(src) ? src : {};
+                        }
+
+                        // Never move original objects, clone them
+                        target[name] = builder.extend(deep, clone, copy);
+
+                        // Don't bring in undefined values
+                    } else if (typeof copy !== 'undefined') {
+                        target[name] = copy;
+                    }
+                }
+            }
+        }
+
+        // Return the modified object
+        return target;
+    },
     _MODULE_GENERATOR: '/*@MODULE_GENERATOR@*/'
 };
 
@@ -66,13 +127,14 @@ function checkReg(str, includes, excludes) {
     includes = checkArray(includes);
     excludes = checkArray(excludes);
     for (var i = 0; i < includes.length; i++) {
-        if (!includes[i].test(str)) {
-            gutil.log('::'+str+' '+includes[i])
+        var reg = new RegExp(includes[i]);
+        if (!reg.test(str)) {
             return false;
         }
     }
     for (var i = 0; i < excludes.length; i++) {
-        if (excludes[i].test(str)) {
+        var reg = new RegExp(excludes[i]);
+        if (reg.test(str)) {
             return false;
         }
     }
@@ -80,13 +142,6 @@ function checkReg(str, includes, excludes) {
 }
 
 function _scanDirModules(baseDir, dir, opt, dirCallback, end) {
-    opt = opt || {};
-    opt.fileReg = opt.fileReg || {};
-    opt.dirReg = opt.dirReg || {};
-    opt.fileReg.include = checkArray(opt.fileReg.include);
-    opt.fileReg.exclude = checkArray(opt.fileReg.exclude);
-    opt.dirReg.include = checkArray(opt.dirReg.include);
-    opt.dirReg.exclude = checkArray(opt.dirReg.exclude);
     var modules = [];
     gutil.log('scan ' + dir)
     builder.scanFiles(dir, function() {
@@ -108,7 +163,6 @@ function _scanDirModules(baseDir, dir, opt, dirCallback, end) {
             });
             c();
         } else {
-            gutil.log(reg.include[0]);
             dirCallback({
                 baseDir: baseDir,
                 dir: filePath,
@@ -118,41 +172,40 @@ function _scanDirModules(baseDir, dir, opt, dirCallback, end) {
             }, c);
         }
     }, function() {
-        gutil.log('scan end ' + dir)
+        // gutil.log('scan end ' + dir)
         end(modules);
     });
 }
 
 function _buildModule(basePath, dirPath, opt, c) {
-    opt = opt || {};
-    var output = opt.out || 'index',
+    var output = opt.out + '.js',
         fileReg = opt.fileReg || {},
-        buildSubModule = opt.buildSubModule === false,
         tpl = opt.tpl || '',
-        dirCallback = opt.dirCallback;
-    fileReg.exclude = checkArray(fileReg.execute);
-    var moduleFilePath = path.join(dirPath, output + '.jsx'),
-        file, hasFile;
-    if (!fs.existsSync(moduleFilePath)) {
-        moduleFilePath = path.join(dirPath, output + '.js');
-        hasFile = fs.existsSync(moduleFilePath);
+        dirCallback = opt.dirCallback,
+        outputPath,
+        hasFile = false;
+
+    if (!fs.existsSync(path.join(dirPath, output))) {
+        output = opt.out + '.jsx';
+        hasFile = fs.existsSync(path.join(dirPath, output));
     } else {
         hasFile = true;
     }
-    if (hasFile) {
-        if (fs.readFileSync(moduleFilePath, 'utf-8').indexOf(builder._MODULE_GENERATOR) !== 0) {
-            c();
-            return;
-        }
+    outputPath = path.join(dirPath, output);
+    if (hasFile && fs.readFileSync(outputPath, 'utf-8')
+        .indexOf(builder._MODULE_GENERATOR) !== 0) {
+        c();
+        return;
     }
-    var relativePath = moduleFilePath.substr(dirPath.length + 1).replace(/[\\]/g, '/');
-    gutil.log('building module: ' + relativePath)
-    fileReg.exclude.push(new RegExp('^' + relativePath.replace(/\//g, '\/').replace(/\./g, '\\.') + '$'));
-    _scanDirModules(dirPath, dirPath, opt, dirCallback,
+
+    gutil.log('building module: ' + output);
+    fileReg.exclude.push(new RegExp('^' + output.replace(/\//g, '\/').replace(/\./g, '\\.') + '$'));
+
+    _scanDirModules(basePath, dirPath, opt, dirCallback,
         function(modules) {
             var _file = new gutil.File({
                 base: basePath,
-                path: moduleFilePath,
+                path: outputPath,
                 contents: new Buffer(
                     builder._MODULE_GENERATOR + '\n/*' + new Date().toGMTString() + '*/\n' + ejs.render(tpl, {
                         modules: modules
@@ -162,38 +215,62 @@ function _buildModule(basePath, dirPath, opt, c) {
             this.push(_file);;
             c();
         }.bind(this));
+    return output;
 }
-
-function _build(opt) {
-    return through.obj(function(dir, e, c) {
-        var builder = _buildModule.bind(this);
-        builder(dir.path, dir.path, opt, c);
-    });
+var initOpt = function(opt) {
+    opt = opt || {};
+    opt.fileReg = opt.fileReg || {};
+    opt.dirReg = opt.dirReg || {};
+    opt.fileReg.include = checkArray(opt.fileReg.include);
+    opt.fileReg.exclude = checkArray(opt.fileReg.exclude);
+    opt.dirReg.include = checkArray(opt.dirReg.include);
+    opt.dirReg.exclude = checkArray(opt.dirReg.exclude);
+    return opt;
 }
 builder.buildDoc = function(opts) {
-    opts.dirCallback = function(opt, c) {
+    opts = initOpt(opts);
+    opts.out = opts.out || 'doc';
+    opts.dirReg.include.push(/(^doc\/)|(\/doc\/)/g);
+    var dirCallback = function(opt, c) {
         _scanDirModules(opt.baseDir, opt.dir, opt.opt, opts.dirCallback,
             function(modules) {
                 opt.modules.push.apply(opt.modules, modules);
                 c();
             });
-    }
-    return _build(opts);
+    };
+    return through.obj(function(dir, e, c) {
+        var _builder = _buildModule.bind(this);
+        opts.dirCallback = dirCallback.bind(this);
+        _builder(dir.path, dir.path, opts, c);
+    });
+
 }
 builder.buildModule = function(opts) {
-    opts.dirCallback = function(opt, c) {
-        var relativePath = opt.relativePath,
-            modules = opt.modules;
-        var moduleName = relativePath.replace(/[/]/g, '_').replace(/\.[^\.]*$/, '');
-        var modulePath = './' + relativePath + '/' + relativePath.replace(/.*\//g, '');
-        moduleName = builder.parseModuleName(moduleName);
-        modules.push({
-            name: moduleName,
-            path: modulePath
-        });
-        c();
-    }
-    return _build(opts);
+    opts = initOpt(opts);
+    opts.out = opts.out || 'index';
+    opts.dirReg.exclude.push(/(^doc\/)|(\/doc\/)/g)
+    return through.obj(function(dir, e, c) {
+        var _builder = _buildModule.bind(this);
+        var dirCallback = function(opt, c) {
+            var relativePath = opt.relativePath,
+                modules = opt.modules,
+                copt = builder.extend(true, {}, opts),
+                fileReg = copt.fileReg || {};
+
+            fileReg.exclude = checkArray(fileReg.execute);
+            _builder(dir.path, opt.dir, copt, c);
+
+            var moduleName = relativePath.replace(/[/]/g, '_').replace(/\.[^\.]*$/, '');
+            var modulePath = './' + relativePath + '/' + opt.opt.out;
+            moduleName = builder.parseModuleName(moduleName);
+            modules.push({
+                name: moduleName,
+                path: modulePath
+            });
+        };
+        opts.dirCallback = dirCallback.bind(this);
+        _builder(dir.path, dir.path, builder.extend(true, {}, opts), c);
+    });
 };
 
 module.exports = builder;

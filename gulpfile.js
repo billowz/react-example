@@ -82,7 +82,7 @@ gulp.task('build:module', function() {
         .pipe(moduleBuilder.buildModule({
             out:'index',
             dirReg:{
-                exclude:[/\/doc\//g]
+                //exclude:[/\/doc\//g]
             },
             fileReg:{
 
