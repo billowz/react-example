@@ -80,12 +80,11 @@ gulp.task('clean:dist', function() {
 gulp.task('build:module', function() {
     return gulp.src('./src')
         .pipe(moduleBuilder.buildModule({
-            out:'index',
-            dirReg:{
-                //exclude:[/\/doc\//g]
-            },
-            fileReg:{
-
+            out: function(dir, root){
+                if(root){
+                    return 'index';
+                }
+                return dir.replace(/.*[\\/]/g, '');
             },
             tpl: 'module.exports={\n<%for(var i=0; i<modules.length; i++){%>\t<%=modules[i].name%>: require(\'<%=modules[i].path%>\')<%=i<modules.length-1?",":""%>\n<%}%>};'
         }))
@@ -95,10 +94,7 @@ gulp.task('build:module', function() {
 gulp.task('build:docmodule', function() {
     return gulp.src('./src')
         .pipe(moduleBuilder.buildDoc({
-            out:'doc',
-            fileReg:{
-                include:[/(^doc\/)|(\/doc\/)/g]
-            },
+            out: 'doc',
             tpl:fs.readFileSync('./misc/doc.js').toString()
         }))
         .pipe(gulp.dest('src'));

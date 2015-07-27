@@ -1,17 +1,9 @@
 /*@MODULE_GENERATOR@*/
-/*Thu, 23 Jul 2015 03:42:13 GMT*/
+/*Mon, 27 Jul 2015 09:26:23 GMT*/
 let React = require('react'),
     {Navbar, Nav, NavItem, DropdownButton, MenuItem} = require('react-bootstrap'),
     rui = require('react-ui'),
     doc = {
-    
-        LayoutDocDemo : require('./layout/doc/demo'),
-    
-        WorkbenchDocDoc : require('./workbench/doc/doc'),
-    
-        WorkbenchDocDemo : require('./workbench/doc/demo'),
-    
-        WorkbenchDocReadme : require('./workbench/doc/readme')
     
     };
 React.render(<Navbar brand='React UI'>

@@ -1,6 +1,5 @@
 /*@MODULE_GENERATOR@*/
-/*Fri, 24 Jul 2015 09:17:57 GMT*/
+/*Mon, 27 Jul 2015 06:03:16 GMT*/
 module.exports={
-	TtIndex: require('./tt/index'),
-	TtTt: require('./tt/tt')
+	Tt: require('./tt')
 };
