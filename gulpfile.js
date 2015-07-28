@@ -80,8 +80,8 @@ gulp.task('clean:dist', function() {
 gulp.task('build:module', function() {
     return gulp.src('./src')
         .pipe(moduleBuilder.buildModule({
-            out: function(dir, root){
-                if(root){
+            out: function(dir){
+                if(dir === path.join(__dirname, 'src')){
                     return 'index';
                 }
                 return dir.replace(/.*[\\/]/g, '');

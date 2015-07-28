@@ -1,5 +1,5 @@
 /*@MODULE_GENERATOR@*/
-/*Mon, 27 Jul 2015 08:27:20 GMT*/
+/*Tue, 28 Jul 2015 06:15:35 GMT*/
 module.exports={
 	Index: require('./index')
 };

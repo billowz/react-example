@@ -1,9 +1,11 @@
 /*@MODULE_GENERATOR@*/
-/*Mon, 27 Jul 2015 08:27:20 GMT*/
+/*Tue, 28 Jul 2015 09:58:51 GMT*/
 module.exports={
 	Ccc: require('./ccc'),
-	Nav: require('./nav/nav'),
+	Doc: require('./doc'),
+	Index: require('./index'),
 	Layout: require('./layout/layout'),
+	Nav: require('./nav/nav'),
 	Tt: require('./tt/tt'),
 	Workbench: require('./workbench/workbench')
 };
