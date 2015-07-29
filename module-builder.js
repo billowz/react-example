@@ -2,9 +2,7 @@ var path = require('path'),
     gutil = require('gulp-util'),
     through = require('through2'),
     fs = require('fs'),
-    gulp = require('gulp'),
     ejs = require('ejs'),
-    rimraf = require('rimraf'),
     is = require('is');
 
 var builder = {

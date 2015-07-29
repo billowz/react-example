@@ -17,4 +17,5 @@ React.render(<Navbar brand='React UI'>
       </DropdownButton>
     </Nav>
   </Navbar>, document.body);
-module.exports = doc;
+rui.Doc = doc;
+module.exports = rui;

@@ -1,5 +1,5 @@
 /*@MODULE_GENERATOR@*/
-/*Wed, 29 Jul 2015 08:27:23 GMT*/
+/*Wed, 29 Jul 2015 16:28:26 GMT*/
 module.exports={
 	Side: require('./side')
 };

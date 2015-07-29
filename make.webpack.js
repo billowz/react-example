@@ -2,6 +2,7 @@ module.exports = function(option) {
     var cfg = {
         entry: option.entry,
         output: {
+            publicPath: option.publicPath,
             path: option.output.replace(/[\\/][^\\/]*$/, ''),
             filename: option.output.replace(/.*[\\/]/, ''),
             library: option.library,
