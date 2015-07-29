@@ -1,10 +1,8 @@
 let React = require('react'),
     {Navbar, Nav, NavItem, DropdownButton, MenuItem} = require('react-bootstrap'),
     rui = require('react-ui'),
-    doc = {
-    <% for (var i = 0; i < modules.length; i++) { %>
-        <%= modules[i].name %> : require('<%=modules[i].path%>')<%= i < modules.length - 1 ? "," : "" %>
-    <% } %>
+    doc = {<% for (var i = 0; i < modules.length; i++) { %>
+        <%= modules[i].name %> : require('<%=modules[i].path%>')<%= i < modules.length - 1 ? "," : "" %><% } %>
     };
 React.render(<Navbar brand='React UI'>
     <Nav>
@@ -19,4 +17,4 @@ React.render(<Navbar brand='React UI'>
       </DropdownButton>
     </Nav>
   </Navbar>, document.body);
-modules.exports = doc;
+module.exports = doc;

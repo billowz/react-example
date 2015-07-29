@@ -1,19 +1,16 @@
 /*@MODULE_GENERATOR@*/
-/*Tue, 28 Jul 2015 09:48:26 GMT*/
+/*Wed, 29 Jul 2015 08:27:23 GMT*/
 let React = require('react'),
     {Navbar, Nav, NavItem, DropdownButton, MenuItem} = require('react-bootstrap'),
     rui = require('react-ui'),
     doc = {
-    
         LayoutDocDemo : require('./layout/doc/demo'),
-    
         WorkbenchDocDemo : require('./workbench/doc/demo')
-    
     };
 React.render(<Navbar brand='React UI'>
     <Nav>
-      <NavItem eventKey={1} href='#'>Link</NavItem>
-      <NavItem eventKey={2} href='#'>Link</NavItem>
+      <NavItem eventKey={1} href='#'>Lin2k2</NavItem>
+      <NavItem eventKey={2} href='#'>Link3</NavItem>
       <DropdownButton eventKey={3} title='Dropdown'>
         <MenuItem eventKey='1'>Action</MenuItem>
         <MenuItem eventKey='2'>Another action</MenuItem>
@@ -23,4 +20,4 @@ React.render(<Navbar brand='React UI'>
       </DropdownButton>
     </Nav>
   </Navbar>, document.body);
-modules.exports = doc;
+module.exports = doc;

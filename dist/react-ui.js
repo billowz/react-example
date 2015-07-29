@@ -6,8 +6,8 @@
 	else if(typeof exports === 'object')
 		exports["RUI"] = factory(require("react"), require("material-ui"));
 	else
-		root["RUI"] = factory(root["React"], root["Material"]);
-})(this, function(__WEBPACK_EXTERNAL_MODULE_5__, __WEBPACK_EXTERNAL_MODULE_6__) {
+		root["RUI"] = factory(root["React"], root["MaterialUI"]);
+})(this, function(__WEBPACK_EXTERNAL_MODULE_4__, __WEBPACK_EXTERNAL_MODULE_5__) {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -54,50 +54,45 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
-	module.exports = __webpack_require__(1);
-
-
-/***/ },
-/* 1 */
-/***/ function(module, exports, __webpack_require__) {
-
 	/*@MODULE_GENERATOR@*/
-	"use strict";
+	/*Wed, 29 Jul 2015 07:57:09 GMT*/
+	'use strict';
 
 	module.exports = {
-		Ccc: __webpack_require__(2),
-		Layout: __webpack_require__(3),
-		Tt: __webpack_require__(7),
-		Nav: __webpack_require__(8),
+		Ccc: __webpack_require__(1),
+		Layout: __webpack_require__(2),
+		Nav: __webpack_require__(6),
+		Tt: __webpack_require__(8),
 		Workbench: __webpack_require__(10)
 	};
 
 /***/ },
-/* 2 */
+/* 1 */
 /***/ function(module, exports) {
 
 	"use strict";
 
 /***/ },
-/* 3 */
+/* 2 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/*@MODULE_GENERATOR@*/
-	"use strict";
+	/*Wed, 29 Jul 2015 07:57:09 GMT*/
+	'use strict';
 
 	module.exports = {
-		Side: __webpack_require__(4)
+		Side: __webpack_require__(3)
 	};
 
 /***/ },
-/* 4 */
+/* 3 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var React = __webpack_require__(5);
+	var React = __webpack_require__(4);
 
-	var _require = __webpack_require__(6);
+	var _require = __webpack_require__(5);
 
 	var Utils = _require.Utils;
 	var Mixins = _require.Mixins;
@@ -254,6 +249,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = Side;
 
 /***/ },
+/* 4 */
+/***/ function(module, exports) {
+
+	module.exports = __WEBPACK_EXTERNAL_MODULE_4__;
+
+/***/ },
 /* 5 */
 /***/ function(module, exports) {
 
@@ -261,41 +262,25 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 6 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
-	module.exports = __WEBPACK_EXTERNAL_MODULE_6__;
+	/*@MODULE_GENERATOR@*/
+	/*Wed, 29 Jul 2015 07:57:09 GMT*/
+	'use strict';
+
+	module.exports = {
+		SideNav: __webpack_require__(7)
+	};
 
 /***/ },
 /* 7 */
 /***/ function(module, exports, __webpack_require__) {
 
-	/*@MODULE_GENERATOR@*/
-	"use strict";
-
-	module.exports = {
-		Tt: __webpack_require__(7)
-	};
-
-/***/ },
-/* 8 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/*@MODULE_GENERATOR@*/
-	"use strict";
-
-	module.exports = {
-		SideNav: __webpack_require__(9)
-	};
-
-/***/ },
-/* 9 */
-/***/ function(module, exports, __webpack_require__) {
-
 	'use strict';
 
-	var React = __webpack_require__(5);
+	var React = __webpack_require__(4);
 
-	var _require = __webpack_require__(6);
+	var _require = __webpack_require__(5);
 
 	var MenuItem = _require.MenuItem;
 	var LeftNav = _require.LeftNav;
@@ -303,7 +288,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var Colors = Styles.Colors;
 	var Spacing = Styles.Spacing;
 	var Typography = Styles.Typography;
-	var Side = __webpack_require__(4);
+	var Side = __webpack_require__(3);
 	var SildeNav = React.createClass({
 	  displayName: 'SildeNav',
 
@@ -360,14 +345,38 @@ return /******/ (function(modules) { // webpackBootstrap
 	//this.context.router.transitionTo(payload.route);
 
 /***/ },
+/* 8 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/*@MODULE_GENERATOR@*/
+	/*Wed, 29 Jul 2015 07:48:52 GMT*/
+	'use strict';
+
+	module.exports = {
+		Index: __webpack_require__(9)
+	};
+
+/***/ },
+/* 9 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/*@MODULE_GENERATOR@*/
+	/*Mon, 27 Jul 2015 06:03:16 GMT*/
+	'use strict';
+
+	module.exports = {
+		Tt: __webpack_require__(8)
+	};
+
+/***/ },
 /* 10 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var React = __webpack_require__(5);
+	var React = __webpack_require__(4);
 
-	var _require = __webpack_require__(6);
+	var _require = __webpack_require__(5);
 
 	var AppCanvas = _require.AppCanvas;
 	var AppBar = _require.AppBar;
@@ -375,7 +384,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var TimePicker = _require.TimePicker;
 	var DatePicker = _require.DatePicker;
 	var Styles = _require.Styles;
-	var SildeNav = __webpack_require__(9);
+	var SildeNav = __webpack_require__(7);
 
 	var ThemeManager = new Styles.ThemeManager();
 	var WorkBench = React.createClass({
@@ -421,7 +430,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    console.log('-->', this);
 	  }
 	});
-	React.render(React.createElement(WorkBench, { title: 'Workbench Demo' }), document.body);
 	module.exports = WorkBench;
 
 /***/ }
