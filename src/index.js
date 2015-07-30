@@ -1,9 +1,10 @@
 /*@MODULE_GENERATOR@*/
-/*Wed, 29 Jul 2015 16:28:26 GMT*/
+/*Thu, 30 Jul 2015 10:04:49 GMT*/
 module.exports={
-	Doc: require('./doc/doc'),
-	Layout: require('./layout/layout'),
-	Tt: require('./tt/tt'),
-	Nav: require('./nav/nav'),
-	Workbench: require('./workbench/workbench')
+    Ccc: require('./ccc'),
+    Doc: require('./doc/doc'),
+    Layout: require('./layout/layout'),
+    Nav: require('./nav/nav'),
+    Tt: require('./tt/tt'),
+    Workbench: require('./workbench/workbench')
 };

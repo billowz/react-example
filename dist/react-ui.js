@@ -7,7 +7,7 @@
 		exports["RUI"] = factory(require("react"), require("material-ui"));
 	else
 		root["RUI"] = factory(root["React"], root["MaterialUI"]);
-})(this, function(__WEBPACK_EXTERNAL_MODULE_4__, __WEBPACK_EXTERNAL_MODULE_5__) {
+})(this, function(__WEBPACK_EXTERNAL_MODULE_3__, __WEBPACK_EXTERNAL_MODULE_4__) {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -55,44 +55,123 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	/*@MODULE_GENERATOR@*/
-	/*Wed, 29 Jul 2015 07:57:09 GMT*/
+	/*Thu, 30 Jul 2015 10:04:39 GMT*/
 	'use strict';
 
 	module.exports = {
-		Ccc: __webpack_require__(1),
-		Layout: __webpack_require__(2),
-		Nav: __webpack_require__(6),
-		Tt: __webpack_require__(8),
-		Workbench: __webpack_require__(10)
+	    Ccc: __webpack_require__(6),
+	    Doc: __webpack_require__(7),
+	    Layout: __webpack_require__(8),
+	    Nav: __webpack_require__(1),
+	    Tt: __webpack_require__(9),
+	    Workbench: __webpack_require__(11)
 	};
 
 /***/ },
 /* 1 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
-	"use strict";
+	/*@MODULE_GENERATOR@*/
+	/*Thu, 30 Jul 2015 03:30:46 GMT*/
+	'use strict';
+
+	module.exports = {
+	    SideNav: __webpack_require__(2)
+	};
 
 /***/ },
 /* 2 */
 /***/ function(module, exports, __webpack_require__) {
 
-	/*@MODULE_GENERATOR@*/
-	/*Wed, 29 Jul 2015 07:57:09 GMT*/
 	'use strict';
 
-	module.exports = {
-		Side: __webpack_require__(3)
-	};
+	var React = __webpack_require__(3);
+
+	var _require = __webpack_require__(4);
+
+	var MenuItem = _require.MenuItem;
+	var LeftNav = _require.LeftNav;
+	var Styles = _require.Styles;
+	var Colors = Styles.Colors;
+	var Spacing = Styles.Spacing;
+	var Typography = Styles.Typography;
+	var Side = __webpack_require__(5);
+	var SildeNav = React.createClass({
+	  displayName: 'SildeNav',
+
+	  getInitialState: function getInitialState() {
+	    return {
+	      menuItems: [{ route: 'get-started', text: 'Get Started' }, { route: 'customization', text: 'Customization' }, { route: 'components', text: 'Components' }, { type: MenuItem.Types.SUBHEADER, text: 'Resources' }, { type: MenuItem.Types.LINK, payload: 'https://github.com/callemall/material-ui', text: 'GitHub' }, { type: MenuItem.Types.LINK, payload: 'http://facebook.github.io/react', text: 'React' }, { type: MenuItem.Types.LINK, payload: 'https://www.google.com/design/spec/material-design/introduction.html', text: 'Material Design' }]
+	    };
+	  },
+	  getStyles: function getStyles() {
+	    return {
+	      cursor: 'pointer',
+	      //.mui-font-style-headline
+	      fontSize: '24px',
+	      color: Typography.textFullWhite,
+	      lineHeight: Spacing.desktopKeylineIncrement + 'px',
+	      fontWeight: Typography.fontWeightLight,
+	      backgroundColor: Colors.cyan500,
+	      paddingLeft: Spacing.desktopGutter,
+	      paddingTop: '0px',
+	      marginBottom: '8px'
+	    };
+	  },
+	  render: function render() {
+	    var header = React.createElement(
+	      'div',
+	      { style: this.getStyles(), onTouchTap: this._onHeaderClick },
+	      this.props.title
+	    );
+
+	    return React.createElement(
+	      Side,
+	      { ref: 'nav' },
+	      React.createElement(
+	        'div',
+	        { style: this.getStyles(), onTouchTap: this._onHeaderClick },
+	        this.props.title
+	      )
+	    );
+	  },
+	  toggle: function toggle() {
+	    this.refs.nav.toggle();
+	  },
+	  _getSelectedIndex: function _getSelectedIndex() {
+	    return 0;
+	  },
+	  _onNavChange: function _onNavChange(e, key, payload) {},
+	  _onHeaderClick: function _onHeaderClick() {
+	    //this.context.router.transitionTo('root');
+	    this.refs.nav.close();
+	  }
+	});
+	module.exports = SildeNav;
+
+	//this.context.router.transitionTo(payload.route);
 
 /***/ },
 /* 3 */
+/***/ function(module, exports) {
+
+	module.exports = __WEBPACK_EXTERNAL_MODULE_3__;
+
+/***/ },
+/* 4 */
+/***/ function(module, exports) {
+
+	module.exports = __WEBPACK_EXTERNAL_MODULE_4__;
+
+/***/ },
+/* 5 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var React = __webpack_require__(4);
+	var React = __webpack_require__(3);
 
-	var _require = __webpack_require__(5);
+	var _require = __webpack_require__(4);
 
 	var Utils = _require.Utils;
 	var Mixins = _require.Mixins;
@@ -249,111 +328,31 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = Side;
 
 /***/ },
-/* 4 */
-/***/ function(module, exports) {
-
-	module.exports = __WEBPACK_EXTERNAL_MODULE_4__;
-
-/***/ },
-/* 5 */
-/***/ function(module, exports) {
-
-	module.exports = __WEBPACK_EXTERNAL_MODULE_5__;
-
-/***/ },
 /* 6 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
-	/*@MODULE_GENERATOR@*/
-	/*Wed, 29 Jul 2015 07:57:09 GMT*/
-	'use strict';
-
-	module.exports = {
-		SideNav: __webpack_require__(7)
-	};
+	"use strict";
 
 /***/ },
 /* 7 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
-	'use strict';
+	/*@MODULE_GENERATOR@*/
+	/*Thu, 30 Jul 2015 10:04:39 GMT*/
+	"use strict";
 
-	var React = __webpack_require__(4);
-
-	var _require = __webpack_require__(5);
-
-	var MenuItem = _require.MenuItem;
-	var LeftNav = _require.LeftNav;
-	var Styles = _require.Styles;
-	var Colors = Styles.Colors;
-	var Spacing = Styles.Spacing;
-	var Typography = Styles.Typography;
-	var Side = __webpack_require__(3);
-	var SildeNav = React.createClass({
-	  displayName: 'SildeNav',
-
-	  getInitialState: function getInitialState() {
-	    return {
-	      menuItems: [{ route: 'get-started', text: 'Get Started' }, { route: 'customization', text: 'Customization' }, { route: 'components', text: 'Components' }, { type: MenuItem.Types.SUBHEADER, text: 'Resources' }, { type: MenuItem.Types.LINK, payload: 'https://github.com/callemall/material-ui', text: 'GitHub' }, { type: MenuItem.Types.LINK, payload: 'http://facebook.github.io/react', text: 'React' }, { type: MenuItem.Types.LINK, payload: 'https://www.google.com/design/spec/material-design/introduction.html', text: 'Material Design' }]
-	    };
-	  },
-	  getStyles: function getStyles() {
-	    return {
-	      cursor: 'pointer',
-	      //.mui-font-style-headline
-	      fontSize: '24px',
-	      color: Typography.textFullWhite,
-	      lineHeight: Spacing.desktopKeylineIncrement + 'px',
-	      fontWeight: Typography.fontWeightLight,
-	      backgroundColor: Colors.cyan500,
-	      paddingLeft: Spacing.desktopGutter,
-	      paddingTop: '0px',
-	      marginBottom: '8px'
-	    };
-	  },
-	  render: function render() {
-	    var header = React.createElement(
-	      'div',
-	      { style: this.getStyles(), onTouchTap: this._onHeaderClick },
-	      this.props.title
-	    );
-
-	    return React.createElement(
-	      Side,
-	      { ref: 'nav' },
-	      React.createElement(
-	        'div',
-	        { style: this.getStyles(), onTouchTap: this._onHeaderClick },
-	        this.props.title
-	      )
-	    );
-	  },
-	  toggle: function toggle() {
-	    this.refs.nav.toggle();
-	  },
-	  _getSelectedIndex: function _getSelectedIndex() {
-	    return 0;
-	  },
-	  _onNavChange: function _onNavChange(e, key, payload) {},
-	  _onHeaderClick: function _onHeaderClick() {
-	    //this.context.router.transitionTo('root');
-	    this.refs.nav.close();
-	  }
-	});
-	module.exports = SildeNav;
-
-	//this.context.router.transitionTo(payload.route);
+	module.exports = {};
 
 /***/ },
 /* 8 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/*@MODULE_GENERATOR@*/
-	/*Wed, 29 Jul 2015 07:48:52 GMT*/
+	/*Thu, 30 Jul 2015 10:04:39 GMT*/
 	'use strict';
 
 	module.exports = {
-		Index: __webpack_require__(9)
+	    Side: __webpack_require__(5)
 	};
 
 /***/ },
@@ -361,22 +360,34 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	/*@MODULE_GENERATOR@*/
-	/*Mon, 27 Jul 2015 06:03:16 GMT*/
+	/*Thu, 30 Jul 2015 03:30:46 GMT*/
 	'use strict';
 
 	module.exports = {
-		Tt: __webpack_require__(8)
+	    Index: __webpack_require__(10)
 	};
 
 /***/ },
 /* 10 */
 /***/ function(module, exports, __webpack_require__) {
 
+	/*@MODULE_GENERATOR@*/
+	/*Mon, 27 Jul 2015 06:03:16 GMT*/
 	'use strict';
 
-	var React = __webpack_require__(4);
+	module.exports = {
+		Tt: __webpack_require__(9)
+	};
 
-	var _require = __webpack_require__(5);
+/***/ },
+/* 11 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var React = __webpack_require__(3);
+
+	var _require = __webpack_require__(4);
 
 	var AppCanvas = _require.AppCanvas;
 	var AppBar = _require.AppBar;
@@ -384,7 +395,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var TimePicker = _require.TimePicker;
 	var DatePicker = _require.DatePicker;
 	var Styles = _require.Styles;
-	var SildeNav = __webpack_require__(7);
+	var SildeNav = __webpack_require__(2);
 
 	var ThemeManager = new Styles.ThemeManager();
 	var WorkBench = React.createClass({
