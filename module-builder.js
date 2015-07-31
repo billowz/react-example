@@ -3,10 +3,22 @@ var path = require('path'),
     through = require('through2'),
     fs = require('fs'),
     ejs = require('ejs'),
-    is = require('is');
+    is = require('is'),
+    beautify = require('js-beautify').js_beautify;
 
 var builder = {
-
+    fileStat: function(path, callback) {
+        if (callback) {
+            fs.stat(path, function(err, stat) {
+                if (err) {
+                    throw new Error(err);
+                }
+                callback(stat);
+            });
+        } else {
+            return fs.statSync(path);
+        }
+    },
     scanFiles: function(dir, dirFilter, callback, end) {
         fs.readdir(dir, function(err, files) {
             if (files.length === 0) {
@@ -22,23 +34,19 @@ var builder = {
             }
             files.forEach(function(f) {
                 var fpath = path.join(dir, f);
-                fs.stat(fpath, function(err, stats) {
-                    if (err) {
-                        console.log('scan dir with error.');
-                    } else {
-                        if (stats.isDirectory()) {
-                            if (!dirFilter || dirFilter(fpath) !== false) {
-                                builder.scanFiles(fpath, dirFilter, callback, function() {
-                                    callback(fpath, true, _end);
-                                });
-                            } else {
+                builder.fileStat(fpath, function(stat) {
+                    if (stat.isDirectory()) {
+                        if (!dirFilter || dirFilter(fpath) !== false) {
+                            builder.scanFiles(fpath, dirFilter, callback, function() {
                                 callback(fpath, true, _end);
-                            }
+                            });
                         } else {
-                            callback(fpath, false, _end);
+                            callback(fpath, true, _end);
                         }
+                    } else {
+                        callback(fpath, false, _end);
                     }
-                })
+                });
             });
         });
     },
@@ -176,22 +184,46 @@ function _scanDir(rootPath, basePath, dirPath, callback, end) {
         return false
     }, function(filePath, isDir, c) {
         var relativePath = filePath.substr(basePath.length + 1).replace(/[\\]/g, '/'),
-            absPath = filePath.substr(rootPath.length + 1).replace(/[\\]/g, '/');
-        callback(absPath, relativePath, isDir, c);
+            rootRelativePath = filePath.substr(rootPath.length + 1).replace(/[\\]/g, '/');
+        callback(rootRelativePath, relativePath, filePath, isDir, c);
     }, function() {
         end();
     });
 }
 
+function _moduleObj(moduleName, basepath, relativePath) {
+    var obj = {
+        name: moduleName,
+        path: relativePath,
+        _content: null
+    }
+    obj.getContent = function() {
+        if (this._content === null) {
+            var absPath = path.join(basepath, relativePath + '.js');
+            if (!fs.existsSync(absPath)) {
+                absPath = path.join(basepath, relativePath + '.jsx');
+                if (!fs.existsSync(absPath)) {
+                    throw new Error('file is undefined ' + absPath);
+                }
+            }
+            this._content = fs.readFileSync(absPath).toString();
+        }
+        return this._content;
+    }.bind(obj);
+
+    obj.getFormatContent = function(){
+        return beautify(this.getContent());
+    }.bind(obj);
+    return obj;
+}
+
 function _buildModule(rootPath, basePath, dirPath, cascade, includeDir, includes, excludes, end) {
     var modules = [];
-    _scanDir(rootPath, basePath, dirPath, function(absPath, relativePath, isDir, c) {
+    _scanDir(rootPath, basePath, dirPath, function(rootRelativePath, relativePath, absPath, isDir, c) {
         if (!isDir) {
-            if (checkReg(absPath, includes, excludes)) {
-                modules.push({
-                    name: _parseModuleName(relativePath.replace(/[/]/g, '_').replace(/\.[^\.]*$/, '')),
-                    path: './' + relativePath.replace(/\.[^\.]*$/, '')
-                });
+            if (checkReg(rootRelativePath, includes, excludes)) {
+                var moduleName = _parseModuleName(relativePath.replace(/[/]/g, '_').replace(/\.[^\.]*$/, ''));
+                modules.push(_moduleObj(moduleName, basePath, './' + relativePath.replace(/\.[^\.]*$/, '')));
             }
             c();
         } else {
@@ -204,15 +236,13 @@ function _buildModule(rootPath, basePath, dirPath, cascade, includeDir, includes
                 } else {
                     dirModuleFile = relativePath.replace(/.*\//g, '')
                 }
-                if (checkReg(absPath + '/' + dirModuleFile + '.js', includes, excludes)) {
-                    modules.push({
-                        name: _parseModuleName(relativePath.replace(/[/]/g, '_').replace(/\.[^\.]*$/, '')),
-                        path: './' + relativePath + '/' + dirModuleFile
-                    });
+                if (checkReg(rootRelativePath + '/' + dirModuleFile + '.js', includes, excludes)) {
+                    var moduleName = _parseModuleName(relativePath.replace(/[/]/g, '_').replace(/\.[^\.]*$/, ''));
+                    modules.push(_moduleObj(moduleName, basePath, './' + relativePath + '/' + dirModuleFile));
                 }
             }
             if (cascade) {
-                _buildModule(rootPath, basePath, path.join(basePath, relativePath), cascade, includeDir, includes, excludes, function(cmodules) {
+                _buildModule(rootPath, basePath, absPath, cascade, includeDir, includes, excludes, function(cmodules) {
                     Array.prototype.push.apply(modules, cmodules);
                     c();
                 });
@@ -259,8 +289,7 @@ builder.buildModule = function(option) {
         excludes = (option.excludes || []).concat([]);
     return through.obj(function(dir, e, c) {
         var _build = function(_path, out, c) {
-            if ((out.existing && fs.readFileSync(out.path, 'utf-8').indexOf(builder._MODULE_GENERATOR) !== 0)
-                || !checkReg(out.path.substr(dir.path.length + 1).replace(/[\\]/g, '/'), includes, excludes)) {
+            if ((out.existing && fs.readFileSync(out.path, 'utf-8').indexOf(builder._MODULE_GENERATOR) !== 0) || !checkReg(out.path.substr(dir.path.length + 1).replace(/[\\]/g, '/'), includes, excludes)) {
                 c();
                 return;
             }
