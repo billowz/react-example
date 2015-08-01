@@ -1,5 +1,5 @@
 /*@MODULE_GENERATOR@*/
-/*Fri, 31 Jul 2015 06:06:48 GMT*/
+/*Sat, 01 Aug 2015 03:49:08 GMT*/
 let React = require('react'),
   Router = require('react-router'),
   {Routes, Route} = Router,

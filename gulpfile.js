@@ -137,12 +137,12 @@ gulp.task('clean:doc', function() {
 });
 
 gulp.task('clean:dist', function() {
-    return gulp.src(['dist/**'])
+    return gulp.src(['./dist'])
         .pipe(clean());
 });
 
 gulp.task('clean:dependency', function() {
-    return gulp.src(['dependency/**'])
+    return gulp.src(['./dependency'])
         .pipe(clean());
 });
 
