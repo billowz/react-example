@@ -1,11 +1,11 @@
 /*@MODULE_GENERATOR@*/
-/*Sat, 01 Aug 2015 03:49:08 GMT*/
+/*Sun, 02 Aug 2015 10:23:41 GMT*/
 let React = require('react'),
   Router = require('react-router'),
   {Routes, Route} = Router,
   rui = require('react-ui'),
   Workbench = rui.Workbench,
-  Doc;
+  Doc={};
   Doc.Compontent = {
       LayoutDocDemo : {
         main: require('./layout/doc/demo'),

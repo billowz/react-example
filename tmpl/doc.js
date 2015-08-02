@@ -3,7 +3,7 @@ let React = require('react'),
   {Routes, Route} = Router,
   rui = require('react-ui'),
   Workbench = rui.Workbench,
-  Doc;
+  Doc={};
   Doc.Compontent = {<% for (var i = 0; i < modules.length; i++) { %>
       <%= modules[i].name %> : {
         main: require('<%=modules[i].path%>'),

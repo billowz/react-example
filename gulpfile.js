@@ -1,261 +1,263 @@
 var gulp = require('gulp'),
-    gutil = require('gulp-util'),
-    path = require('path'),
-    fs = require('fs'),
-    express = require('express'),
-    clean = require('gulp-clean'),
-    eslint = require('gulp-eslint'),
-    babel = require('gulp-babel'),
-    webpack = require('webpack'),
-    gulpWebpack = require('gulp-webpack'),
-    WebpackDevServer = require('webpack-dev-server'),
-    moduleBuilder = require('./module-builder.js'),
-    mkcfg = require('./make.webpack.js');
-
-var materialExternals = [{
+  gutil = require('gulp-util'),
+  path = require('path'),
+  fs = require('fs'),
+  express = require('express'),
+  clean = require('gulp-clean'),
+  eslint = require('gulp-eslint'),
+  babel = require('gulp-babel'),
+  webpack = require('webpack'),
+  gulpWebpack = require('gulp-webpack'),
+  WebpackDevServer = require('webpack-dev-server'),
+  moduleBuilder = require('./module-builder.js'),
+  mkcfg = require('./make.webpack.js'),
+  library = 'RUI',
+  requireLibrary = 'react-ui',
+  externalReact = [{
     path: 'react',
     root: 'React',
     lib: 'react'
-}, {
+  }, {
     path: 'react/addons',
     root: 'React',
     lib: 'react'
-}];
-var libExternals = [{
-    path: 'react',
-    root: 'React',
-    lib: 'react'
-}, {
-    path: 'react/addons',
-    root: 'React',
-    lib: 'react'
-}, {
-    path:'react-router',
-    root:'ReactRouter',
-    lib:'react-router'
-}, {
+  }],
+  externals = externalReact.concat([{
+    path: 'react-router',
+    root: 'ReactRouter',
+    lib: 'react-router'
+  }, {
     path: 'material-ui',
     root: 'MaterialUI',
     lib: 'material-ui'
-}, {
+  }, {
     path: 'react-bootstrap',
     root: 'ReactBootstrap',
     lib: 'react-bootstrap'
-}];
-var docExternals = libExternals.concat({
-    path: 'react-ui',
-    root: 'RUI',
-    lib: 'react-ui'
-});
-gulp.task('build:material', function() {
-    if (!fs.existsSync('./dependency/material-ui.js')) {
-        var src = './node_modules/material-ui/lib',
-            library = 'MaterialUI',
-            output = path.join(__dirname, 'dependency/material-ui.js'),
-            cfg = mkcfg({
-                entry: src,
-                output: output,
-                library: library,
-                externals: materialExternals
-            }),
-            miniCfg = mkcfg({
-                entry: src,
-                output: output.replace(/js$/, 'min.js'),
-                library: library,
-                externals: materialExternals,
-                plugins: [new webpack.optimize.UglifyJsPlugin({
-                    compress: {
-                        warnings: false
-                    }
-                })]
-            });
-        return gulp.src('./')
-            .pipe(gulpWebpack(cfg))
-            .pipe(gulp.dest('./dependency'))
-            .pipe(gulpWebpack(miniCfg))
-            .pipe(gulp.dest('./dependency'));
+  }]),
+  appCfg = {
+    depDir: './dependency',
+    distDir: './dist',
+    scriptDir: './src/script',
+    libDir: './lib',
+    docLibDir: './doc',
+    compontentMain: 'index.js',
+    docMain: 'doc.js',
+    docSrcDir: 'doc',
+    host: 'localhost',
+    port: 8089,
+    material: {
+      src: './node_modules/material-ui/lib',
+      library: 'MaterialUI',
+      require: 'material-ui',
+      filename: 'material-ui.js',
+      externals: externalReact
+    },
+    react: {
+      src: './react-with-tap.js',
+      library: 'React',
+      require: 'react',
+      filename: 'react-with-tap.js',
+    },
+    compontent: {
+      src: './src/script/index.js',
+      library: library,
+      require: requireLibrary,
+      filename: requireLibrary + '.js',
+      externals: externals
+    },
+    doc: {
+      src: './src/script/doc.js',
+      library: library,
+      require: requireLibrary,
+      filename: requireLibrary + '.doc.js',
+      externals: externals.concat({
+        path: requireLibrary,
+        root: library,
+        lib: requireLibrary
+      })
     }
-});
+  }
+
+function _buildCompontent(dir, option, checFile) {
+  var output = path.join(__dirname, dir, option.filename);
+  if (!checFile && fs.existsSync(output)) {
+    return;
+  }
+  var cfg = {
+      entry: option.src,
+      output: output,
+      library: option.library,
+      externals: option.externals || [],
+      plugins: option.plugins || []
+    },
+    miniCfg = {
+      entry: option.src,
+      output: output.replace(/js$/, 'min.js'),
+      library: option.library,
+      externals: option.externals || [],
+      plugins: (option.plugins || []).concat(new webpack.optimize.UglifyJsPlugin({
+        compress: {
+          warnings: false
+        }
+      }))
+    }
+  return gulp.src('./')
+    .pipe(gulpWebpack(mkcfg(cfg)))
+    .pipe(gulp.dest(dir))
+    .pipe(gulpWebpack(mkcfg(miniCfg)))
+    .pipe(gulp.dest(dir));
+}
 
 gulp.task('build:react', function() {
-    if (!fs.existsSync('./dependency/react-with-tap.js')) {
-        var src = './react-with-tap.js',
-            library = 'React',
-            output = path.join(__dirname, 'dependency/react-with-tap.js'),
-            cfg = mkcfg({
-                entry: src,
-                output: output,
-                library: library
-            }),
-            miniCfg = mkcfg({
-                entry: src,
-                output: output.replace(/js$/, 'min.js'),
-                library: library,
-                plugins: [new webpack.optimize.UglifyJsPlugin({
-                    compress: {
-                        warnings: false
-                    }
-                })]
-            });
-        return gulp.src('./')
-            .pipe(gulpWebpack(cfg))
-            .pipe(gulp.dest('./dependency'))
-            .pipe(gulpWebpack(miniCfg))
-            .pipe(gulp.dest('./dependency'));
-    }
+  return _buildCompontent(appCfg.depDir, appCfg.react);
 });
 
+gulp.task('build:material', function() {
+  return _buildCompontent(appCfg.depDir, appCfg.material);
+});
+
+gulp.task('build:lib', ['eslint:lib', 'build:module', 'clean:lib'], function() {
+  return gulp.src([appCfg.scriptDir + '/**/*.jsx', appCfg.scriptDir + '/**/*.js', '!' + appCfg.scriptDir + '/' + appCfg.docMain, '!' + appCfg.scriptDir + '/**/' + appCfg.docSrcDir + '/*'])
+    .pipe(babel())
+    .pipe(gulp.dest(appCfg.libDir));
+});
+
+gulp.task('build:lib:doc', ['eslint:doc', 'build:module:doc', 'clean:doc'], function() {
+  return gulp.src([appCfg.scriptDir + '/' + appCfg.docMain, appCfg.scriptDir + '/**/' + appCfg.docSrcDir + '/*.js', appCfg.scriptDir + '/**/' + appCfg.docSrcDir + '/*.jsx'])
+    .pipe(babel())
+    .pipe(gulp.dest(appCfg.docLibDir));
+});
+
+gulp.task('build:compontent', ['build:module'], function() {
+  return _buildCompontent(appCfg.distDir, appCfg.compontent, true);
+});
+
+gulp.task('build:doc', ['build:module:doc'], function() {
+  return _buildCompontent(appCfg.distDir, appCfg.doc, true);
+});
+
+gulp.task('build:dist', ['clean:dist'], function() {
+  return gulp.start(['build:compontent', 'build:doc']);
+});
+
+
+gulp.task('build', ['build:lib', 'build:lib:doc', 'build:dist', 'build:react', 'build:material']);
+
+
+gulp.task('build:module', function() {
+  return gulp.src(appCfg.scriptDir)
+    .pipe(moduleBuilder.buildModule({
+      excludes: [/^doc\.js$/, /\/doc\/.*$/, /_[^/]*\.jsx?$/],
+      out: function(dir) {
+        if (dir === path.join(__dirname, appCfg.scriptDir)) {
+          return appCfg.compontentMain.replace(/\.js$/, '');
+        }
+        return dir.replace(/.*[\\/]/g, '');
+      },
+      tpl: fs.readFileSync('./tmpl/index.js').toString()
+    }))
+    .pipe(gulp.dest(appCfg.scriptDir));
+});
+
+gulp.task('build:module:doc', function() {
+  return gulp.src(appCfg.scriptDir)
+    .pipe(moduleBuilder.buildDoc({
+      out: appCfg.docMain.replace(/\.js$/, ''),
+      includes: [/\/doc\/[^/]*$/],
+      excludes: [/_[^/]*\.jsx?$/],
+      tpl: fs.readFileSync('./tmpl/doc.js').toString()
+    }))
+    .pipe(gulp.dest(appCfg.scriptDir));
+});
+
+
 gulp.task('eslint', function() {
-    return gulp.src(['src/**/*.js', 'src/**/*.jsx'])
-        .pipe(eslint())
-        .pipe(eslint.format())
-        .pipe(eslint.failOnError());
+  return gulp.src([appCfg.scriptDir + '/**/*.js', appCfg.scriptDir + '/**/*.jsx'])
+    .pipe(eslint())
+    .pipe(eslint.format())
+    .pipe(eslint.failOnError());
 });
 
 gulp.task('eslint:lib', function() {
-    return gulp.src(['src/**/*.js', 'src/**/*.jsx', '!src/**/docs/*', '!src/**/test/*'])
-        .pipe(eslint())
-        .pipe(eslint.format())
-        .pipe(eslint.failOnError());
+  return gulp.src([appCfg.scriptDir + '/**/*.js', appCfg.scriptDir + '/**/*.jsx', '!' + appCfg.scriptDir + '/**/' + appCfg.docSrcDir + '/*'])
+    .pipe(eslint())
+    .pipe(eslint.format())
+    .pipe(eslint.failOnError());
 });
 
 gulp.task('eslint:doc', function() {
-    return gulp.src(['src/**/doc/*.js', 'src/**/doc/*.jsx'])
-        .pipe(eslint())
-        .pipe(eslint.format())
-        .pipe(eslint.failOnError());
+  return gulp.src([appCfg.scriptDir + '/**/' + appCfg.docSrcDir + '/*.js', appCfg.scriptDir + '/**/' + appCfg.docSrcDir + '/*.jsx'])
+    .pipe(eslint())
+    .pipe(eslint.format())
+    .pipe(eslint.failOnError());
 });
 
 gulp.task('clean:lib', function() {
-    return gulp.src('./lib')
-        .pipe(clean());
+  return gulp.src(appCfg.libDir)
+    .pipe(clean());
 });
 
 gulp.task('clean:doc', function() {
-    return gulp.src('./doc')
-        .pipe(clean());
+  return gulp.src(appCfg.docLibDir)
+    .pipe(clean());
 });
 
 gulp.task('clean:dist', function() {
-    return gulp.src(['./dist'])
-        .pipe(clean());
+  return gulp.src([appCfg.distDir])
+    .pipe(clean());
 });
 
 gulp.task('clean:dependency', function() {
-    return gulp.src(['./dependency'])
-        .pipe(clean());
+  return gulp.src([appCfg.depDir])
+    .pipe(clean());
 });
 
 gulp.task('clean', ['clean:dist', 'clean:lib', 'clean:doc', 'clean:dependency']);
 
-gulp.task('build:module', function() {
-    return gulp.src('./src')
-        .pipe(moduleBuilder.buildModule({
-            excludes: [/^doc\.js$/, /\/doc\/.*$/],
-            out: function(dir) {
-                if (dir === path.join(__dirname, 'src')) {
-                    return 'index';
-                }
-                return dir.replace(/.*[\\/]/g, '');
-            },
-            tpl: fs.readFileSync('./tmpl/index.js').toString()
-        }))
-        .pipe(gulp.dest('src'));
-});
+gulp.task('server', ['build:module', 'build:module:doc', 'build:react', 'build:material'], function() {
+  var cfg = {
+    entry: {},
+    publicPath: '/assets/',
+    output: path.join(__dirname, '[name]'),
+    library: library,
+    externals: appCfg.doc.externals,
+    hot: true,
+    devtool: 'source-map',
+    plugins: [new webpack.HotModuleReplacementPlugin(), new webpack.NoErrorsPlugin()]
+  };
+  cfg.entry[appCfg.compontent.filename] = appCfg.compontent.src;
+  cfg.entry[appCfg.doc.filename] = appCfg.doc.src;
+  cfg.entry['server.js'] = ['webpack-dev-server/client?http://' + appCfg.host + ':' + appCfg.port, 'webpack/hot/only-dev-server'];
 
-gulp.task('build:docmodule', function() {
-    return gulp.src('./src')
-        .pipe(moduleBuilder.buildDoc({
-            out: 'doc',
-            includes: [/\/doc\/[^/]*$/],
-            tpl: fs.readFileSync('./tmpl/doc.js').toString()
-        }))
-        .pipe(gulp.dest('src'));
-});
-gulp.task('build:lib', ['eslint:lib', 'build:module'], function() {
-    return gulp.src(['src/**/*.jsx', 'src/**/*.js', '!src/doc.js', '!src/**/doc/*', '!src/**/test/*'])
-        .pipe(babel())
-        .pipe(gulp.dest('lib'));
-});
-
-gulp.task('build:doc', ['eslint:doc', 'build:docmodule'], function() {
-    return gulp.src(['src/doc.js', 'src/**/doc/*.js', 'src/**/doc/*.jsx'])
-        .pipe(babel())
-        .pipe(gulp.dest('doc'));
-});
-
-gulp.task('build:dist', [], function() {
-    var src = './src/index.js',
-        library = 'RUI',
-        output = path.join(__dirname, 'dist/react-ui.js'),
-        cfg = mkcfg({
-            entry: src,
-            output: output,
-            library: library,
-            externals: libExternals
-        }),
-        miniCfg = mkcfg({
-            entry: src,
-            output: output.replace(/js$/, 'min.js'),
-            library: library,
-            externals: libExternals,
-            plugins: [new webpack.optimize.UglifyJsPlugin()]
-        });
-    return gulp.src('./')
-        .pipe(gulpWebpack(cfg))
-        .pipe(gulp.dest('./dist'))
-        .pipe(gulpWebpack(miniCfg))
-        .pipe(gulp.dest('./dist'));
-});
-
-
-gulp.task('build', ['build:lib', 'build:doc', 'build:dist', 'build:react', 'build:material']);
-
-gulp.task('server', ['build:module', 'build:docmodule', 'build:react', 'build:material'], function() {
-    var host = 'localhost',
-        port = 8089,
-        library = 'RUI',
-        cfg = mkcfg({
-            entry: {
-                'react-ui': ['./src/index.js'],
-                'doc': ['./src/doc.js', 'webpack-dev-server/client?http://' + host + ':' + port, 'webpack/hot/only-dev-server']
-            },
-            publicPath: '/assets/',
-            output: path.join(__dirname, 'dist/[name].js'),
-            library: library,
-            externals: docExternals,
-            hot: true,
-            devtool: 'source-map',
-            plugins: [new webpack.HotModuleReplacementPlugin(), new webpack.NoErrorsPlugin()]
-        });
-
-    var devServer = new WebpackDevServer(webpack(cfg), {
-        contentBase: path.join('./misc'),
-        publicPath: '/assets/',
-        hot: true,
-        noInfo: true,
-        inline: true
-    });
-    devServer.use('/dependency/', express['static'](path.resolve(process.cwd(), 'dependency')));
-    devServer.use('/dependency/', express['static'](path.resolve(process.cwd(), 'node_modules')));
-    var listeningApp = devServer.listen(port, host, function(err, result) {
-        if (err) {
-            console.log(err);
-        }
-        console.log('Listening at port ' + port);
-    });
-    gulp.watch(['src/**/*.js', 'src/**/*.jsx', '!src/doc.js', '!src/**/doc/*'], function(event) {
-        if (event.type === 'added' || event.type === 'deleted') {
-            gulp.start('build:module');
-        }
-    });
-    gulp.watch('tmpl/index.js', ['build:module']);
-    gulp.watch('src/**/doc/*', function(event) {
-        if (event.type === 'added' || event.type === 'deleted') {
-            gulp.start('build:docmodule');
-        }
-    });
-    gulp.watch('tmpl/doc.js', ['build:docmodule']);
+  var devServer = new WebpackDevServer(webpack(mkcfg(cfg)), {
+    contentBase: path.join('./misc'),
+    publicPath: cfg.publicPath,
+    hot: true,
+    noInfo: false,
+    inline: true
+  });
+  devServer.use('/dependency/', express['static'](path.resolve(process.cwd(), 'dependency')));
+  devServer.use('/dependency/', express['static'](path.resolve(process.cwd(), 'node_modules')));
+  devServer.listen(appCfg.port, appCfg.host, function(err, result) {
+    if (err) {
+      console.log(err);
+    }else{
+        console.log('Listening at port ' + appCfg.port);
+    }
+  });
+  gulp.watch(['src/**/*.js', 'src/**/*.jsx', '!src/doc.js', '!src/**/doc/*'], function(event) {
+    if (event.type === 'added' || event.type === 'deleted') {
+      gulp.start('build:module');
+    }
+  });
+  gulp.watch('tmpl/index.js', ['build:module']);
+  gulp.watch('src/**/doc/*', function(event) {
+    if (event.type === 'added' || event.type === 'deleted') {
+      gulp.start('build:module:doc');
+    }
+  });
+  gulp.watch('tmpl/doc.js', ['build:module:doc']);
 });
 
 gulp.task('default', ['build']);
