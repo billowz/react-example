@@ -24,9 +24,9 @@ let Button = Compontent('Button', {
                 primary && 'pure-button-primary'
             );
         if(href){
-            return (<a href = {href} className = {cls} {...props}/>);
+            return (<a key='link-button' href = {href} className = {cls} {...props}>{this.props.text}</a>);
         }else{
-            return (<button className = {cls} disabled = {disabled} {...props}/>);
+            return (<button key='button' className = {cls} disabled = {disabled} {...props}>{this.props.text}</button>);
         }
     }
 });
