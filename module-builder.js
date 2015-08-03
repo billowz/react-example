@@ -3,8 +3,7 @@ var path = require('path'),
     through = require('through2'),
     fs = require('fs'),
     ejs = require('ejs'),
-    is = require('is'),
-    beautify = require('js-beautify').js_beautify;
+    is = require('is');
 
 var builder = {
     fileStat: function(path, callback) {
@@ -209,10 +208,6 @@ function _moduleObj(moduleName, basepath, relativePath) {
             this._content = fs.readFileSync(absPath).toString();
         }
         return this._content;
-    }.bind(obj);
-
-    obj.getFormatContent = function(){
-        return beautify(this.getContent());
     }.bind(obj);
     return obj;
 }

@@ -117,13 +117,13 @@ gulp.task('build:material', function() {
   return _buildCompontent(appCfg.depDir, appCfg.material);
 });
 
-gulp.task('build:lib', ['eslint:lib', 'build:module', 'clean:lib'], function() {
+gulp.task('build:lib', [ 'build:module', 'clean:lib'], function() {
   return gulp.src([appCfg.scriptDir + '/**/*.jsx', appCfg.scriptDir + '/**/*.js', '!' + appCfg.scriptDir + '/' + appCfg.docMain, '!' + appCfg.scriptDir + '/**/' + appCfg.docSrcDir + '/*'])
     .pipe(babel())
     .pipe(gulp.dest(appCfg.libDir));
 });
 
-gulp.task('build:lib:doc', ['eslint:doc', 'build:module:doc', 'clean:doc'], function() {
+gulp.task('build:lib:doc', [ 'build:module:doc', 'clean:doc'], function() {
   return gulp.src([appCfg.scriptDir + '/' + appCfg.docMain, appCfg.scriptDir + '/**/' + appCfg.docSrcDir + '/*.js', appCfg.scriptDir + '/**/' + appCfg.docSrcDir + '/*.jsx'])
     .pipe(babel())
     .pipe(gulp.dest(appCfg.docLibDir));

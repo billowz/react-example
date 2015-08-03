@@ -1,7 +1,5 @@
 /*@MODULE_GENERATOR@*/
-/*Sun, 02 Aug 2015 10:23:41 GMT*/
-let RUI = {
+/*Mon, 03 Aug 2015 10:41:16 GMT*/
+module.exports = {
     Side: require('./side')
 };
-
-module.exports = RUI;

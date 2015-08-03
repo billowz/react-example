@@ -1,9 +1,11 @@
 let Compontent = require('../compontent');
-let WorkBench = Compontent('workbench', {
-  render() {
-    return (<div className="workbench container-fluid">
-
-            </div>);
-  }
+let Workbench = Compontent('Workbench', {
+    displayName: 'Workbench',
+    render() {
+        let Button = Compontent.getCompontent('Button');
+        console.log(Button)
+        return ( < div >
+            < Button active={true}> 123 < /Button> < /div > );
+    }
 });
-module.exports = WorkBench;
+module.exports = Workbench;

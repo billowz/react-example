@@ -1,5 +1,5 @@
 /*@MODULE_GENERATOR@*/
-/*Sun, 02 Aug 2015 10:23:41 GMT*/
+/*Mon, 03 Aug 2015 10:41:16 GMT*/
 let React = require('react'),
   Router = require('react-router'),
   {Routes, Route} = Router,
@@ -20,14 +20,17 @@ Doc.App = React.createClass({
   render: function(){
   }
 });
-var routes = (
+React.render(<Workbench/>, document.body);
+
+
+/*var routes = (
   <Route handler={Workbench} path="/">
   </Route>
 );
 
 Router.run(routes, function (Handler) {
   React.render(<Handler/>, document.body);
-});
+});*/
 
 rui.Doc = Doc;
 module.exports = rui;

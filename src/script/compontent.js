@@ -1,10 +1,11 @@
 let React = require('react'),
     comps = {};
-let Compontent = function(name, ...options){
+let Compontent = function(name, option){
     if(comps[name]){
         throw new Error('Compontent named[${name}] is defined.');
     }
-    comps[name] = React.createClass.apply(React, options);
+    comps[name] = React.createClass(option);
+    return comps[name];
 }
 Compontent.getCompontent = function(name){
     return comps[name];

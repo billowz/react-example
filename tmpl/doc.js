@@ -14,14 +14,17 @@ Doc.App = React.createClass({
   render: function(){
   }
 });
-var routes = (
+React.render(<Workbench/>, document.body);
+
+
+/*var routes = (
   <Route handler={Workbench} path="/">
   </Route>
 );
 
 Router.run(routes, function (Handler) {
   React.render(<Handler/>, document.body);
-});
+});*/
 
 rui.Doc = Doc;
 module.exports = rui;
