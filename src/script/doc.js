@@ -1,5 +1,4 @@
 /*@MODULE_GENERATOR@*/
-/*Mon, 03 Aug 2015 14:44:47 GMT*/
 let React = require('react'),
   Router = require('react-router'),
   {Routes, Route} = Router,

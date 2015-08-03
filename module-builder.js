@@ -267,7 +267,7 @@ builder.buildDoc = function(option) {
                     base: dir.path,
                     path: out.path,
                     contents: new Buffer(
-                        builder._MODULE_GENERATOR + '\n/*' + new Date().toGMTString() + '*/\n' + ejs.render(tpl, {
+                        builder._MODULE_GENERATOR + '\n' + ejs.render(tpl, {
                             modules: modules
                         }))
                 });
@@ -299,7 +299,7 @@ builder.buildModule = function(option) {
                         base: dir.path,
                         path: out.path,
                         contents: new Buffer(
-                            builder._MODULE_GENERATOR + '\n/*' + new Date().toGMTString() + '*/\n' + ejs.render(tpl, {
+                            builder._MODULE_GENERATOR + '\n' + ejs.render(tpl, {
                                 modules: modules
                             }))
                     });
