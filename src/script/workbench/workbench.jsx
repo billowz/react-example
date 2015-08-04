@@ -1,6 +1,5 @@
 let Compontent = require('../compontent');
 let Workbench = Compontent('Workbench', {
-  displayName: 'Workbench',
   render() {
     var comps = [];
     for(var i=0; i<1000; i++){
@@ -15,14 +14,19 @@ let Workbench = Compontent('Workbench', {
         })
     }
 
-    return ( <div>
-        {
-            comps.map(function(cfg, idx){
-                var Comp = Compontent.getCompontent(cfg.type);
-                return (<Comp key={idx} {...cfg.option}/>);
-            })
+    var Grid = {
+        type:'GridLayout',
+        children:comps,
+        option:{
+            size: function(cfg, idx){
+                if(idx%2==0){
+                    return '2-5';
+                }
+                return '1-5';
+            }
         }
-        </div> );
+    }
+    return this.renderCompontent([Grid]);
   }
 });
 module.exports = Workbench;
