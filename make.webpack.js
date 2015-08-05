@@ -25,6 +25,7 @@ module.exports = function(option) {
             return this;
         },
         resolve: {
+            modulesDirectories:['node_modules'],
             extensions: ['', '.js', '.jsx']
         },
         devtool: option.devtool,

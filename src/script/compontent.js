@@ -1,5 +1,5 @@
 let React = require('react'),
-    watch = require("watchjs"),
+    watch = require("./watch"),
     {PropTypes} = React,
     comps = {};
 let Compontent = function(name, option){
@@ -99,6 +99,7 @@ Compontent.Mixins = {
         if(!this.__compontentsWatchHandler){
             this.__compontentsWatchHandler = function(prop, func, val, oldVal){
                 console.log(self.getCompontentName(), self, this, arguments);
+                self.forceUpdate();
             }
         }else{
             this.__unwatchCompontents();

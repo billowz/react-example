@@ -240,6 +240,7 @@ gulp.task('server', ['build:module', 'build:module:doc', 'build:react', 'build:m
   });
   devServer.use('/dependency/', express['static'](path.resolve(process.cwd(), 'dependency')));
   devServer.use('/dependency/', express['static'](path.resolve(process.cwd(), 'node_modules')));
+  devServer.use('/dependency/', express['static'](path.resolve(process.cwd(), 'bower_components')));
   devServer.listen(appCfg.port, appCfg.host, function(err, result) {
     if (err) {
       console.log(err);
