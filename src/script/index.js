@@ -6,5 +6,6 @@ module.exports = {
     Nav: require('./nav/nav'),
     Tt: require('./tt/tt'),
     Util: require('./util'),
+    Watch: require('./watch'),
     Workbench: require('./workbench/workbench')
 };

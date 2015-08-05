@@ -1,32 +1,51 @@
 let Compontent = require('../compontent');
 let Workbench = Compontent('Workbench', {
-  render() {
-    var comps = [];
-    for(var i=0; i<1000; i++){
-        comps.push({
-            type:'Button',
+    getDefaultProps(){
+        var comps = [];
+        for(var i=0; i<100; i++){
+            comps.push({
+                type:'GridLayout',
+                option:{
+                    size:'1-2'
+                },
+                children:[{
+                    type:'Button',
+                    option:{
+                    text:'Test'+i,
+                    active:i%3==0,
+                    disabled:i%3==1,
+                    primary:i%3==2
+                    }
+                },{
+                    type:'Button',
+                    option:{
+                    text:'Test'+i,
+                    active:i%3==0,
+                    disabled:i%3==1,
+                    primary:i%3==2
+                    }
+                }]
+            })
+        }
+        var config = {
+            type:'GridLayout',
+            children:comps,
             option:{
-                text:'Test'+i,
-                active:i%3==0,
-                disabled:i%3==1,
-                primary:i%3==2
-            }
-        })
-    }
-
-    var Grid = {
-        type:'GridLayout',
-        children:comps,
-        option:{
-            size: function(cfg, idx){
-                if(idx%2==0){
-                    return '2-5';
+                size: function(cfg, idx){
+                    if(idx%2==0){
+                        return '8-24';
+                    }
+                    return '4-24';
                 }
-                return '1-5';
             }
         }
+        return {
+            compontents:[config]
+        }
+    },
+    render() {
+        window.Workbench = this;
+        return <div>{this.renderCompontents('main')}</div>
     }
-    return this.renderCompontent([Grid]);
-  }
 });
 module.exports = Workbench;

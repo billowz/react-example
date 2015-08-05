@@ -87,6 +87,7 @@ function _buildCompontent(dir, option, checFile) {
   var cfg = {
       entry: option.src,
       output: output,
+      devtool:'source-map',
       library: option.library,
       externals: option.externals || [],
       plugins: option.plugins || []
