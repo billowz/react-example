@@ -1,4 +1,5 @@
 {
+  "parser": "babel-eslint",
   "plugins": [
     "react"
   ],
@@ -16,6 +17,8 @@
     "no-undef":0,
     "global-strict":0,
     "no-extra-semi":1,
+    "no-extra-bind":1,
+    "no-use-before-define":1,
     "semi":1,
     "semi-spacing":0,
     "no-unused-vars":1,
@@ -23,7 +26,7 @@
     "curly": 0,
     "comma-dangle": 0,
     "comma-spacing": 0,
-    "eqeqeq": [2, "allow-null"],
+    "eqeqeq": [1, "allow-null"],
     "key-spacing": 0,
     "no-underscore-dangle": 0,
     "no-unused-expressions": 0,

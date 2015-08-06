@@ -1,7 +1,7 @@
 let React = require('react'),
     {PropTypes} = React,
     Compontent = require('../compontent'),
-    Util = require('../util');
+    Util = require('../util/util');
 const normalizeSize = (s = '') => s.toString().replace('/', '-');
 let GridCell = Compontent('GridLayoutCell', {
     propTypes:{

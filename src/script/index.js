@@ -1,12 +1,11 @@
 /*@MODULE_GENERATOR@*/
 module.exports = {
-    Button: require('./button'),
+    Button: require('./button/button'),
     Compontent: require('./compontent'),
     Layout: require('./layout/layout'),
-    Menu: require('./menu'),
+    Menu: require('./menu/menu'),
     Nav: require('./nav/nav'),
-    Tt: require('./tt/tt'),
-    Watch: require('./watch'),
-    Util: require('./util'),
+    Util: require('./util/util'),
+    Watch: require('./watch/watch'),
     Workbench: require('./workbench/workbench')
 };

@@ -1,5 +1,5 @@
 let React = require('react'),
-    watch = require("./watch"),
+    watch = require("./watch/watch"),
     {PropTypes} = React,
     comps = {};
 let Compontent = function(name, option){
@@ -40,7 +40,7 @@ function _parseCompontent(cfg, key, idx, handler){
     if(key){
         props.key = key;
     }
-    dom = (<Comp  {...props} compontents={cfg.children}></Comp>);
+    dom = (<Comp {...props} compontents={cfg.children}></Comp>);
     if(typeof handler === 'function'){
         fdom = handler.apply(this, [cfg, dom, idx]);
         if(fdom!=undefined){
@@ -76,7 +76,7 @@ Compontent.renderCompontents = function renderCompontents(cfgs, key, handler){
             return typeof cfg === 'object';
         }).map(function(cfg, idx){
             return _parseCompontent(cfg, _parseKey(key, idx), idx, handler);
-        }.bind(this));
+        });
     }else if(typeof cfgs === 'object'){
         return Object.keys(cfgs).filter(function(idx){
             return typeof cfgs[idx] === 'object';

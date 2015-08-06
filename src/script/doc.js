@@ -6,20 +6,49 @@ let React = require('react'),
   Workbench = rui.Workbench,
   Doc={};
   Doc.Compontent = {
-      LayoutDocDemo : {
-        main: require('./layout/doc/demo'),
-        content: ''
-      },
-      WorkbenchDocDemo : {
-        main: require('./workbench/doc/demo'),
-        content: 'let React = require(&#39;react&#39;),\n  {WorkBench} = require(&#39;react-ui&#39;);\nmodule.exports = React.createClass({\n  render() {\n    return (&lt;WorkBench title=&#34;Workbench Demo&#34;/&gt;);\n  }\n});\n'
-      }
+    Layout : {
+        demos : {
+            Demo : {
+                compontent : require('./layout/doc/demo'),
+                code : ''
+            }
+        },
+        readmes : {
+        }
+    },
+    Watch : {
+        demos : {
+        },
+        readmes : {
+            Readme : 'Watch\n'
+        }
+    },
+    Workbench : {
+        demos : {
+            Demo : {
+                compontent : require('./workbench/doc/demo'),
+                code : 'let React = require(&#39;react&#39;),\n  {WorkBench} = require(&#39;react-ui&#39;);\nmodule.exports = React.createClass({\n  render() {\n    return (&lt;WorkBench title=&#34;Workbench Demo&#34;/&gt;);\n  }\n});\n'
+            }
+        },
+        readmes : {
+            Readme : 'read me\n'
+        }
+    }
   };
 Doc.App = React.createClass({
   render: function(){
+    let config = {
+        type:'GridLayout',
+        option:{
+            size:'1'
+        },
+        children:[
+        ]
+    }
+    return <Workbench compontents={[config]}></Workbench>
   }
 });
-React.render(<Workbench/>, document.body);
+React.render(<Doc.App/>, document.body);
 
 
 /*var routes = (

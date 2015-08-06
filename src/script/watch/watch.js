@@ -6,7 +6,7 @@ var WatchJS = {
   callWatchers;
 
 var isFunction = function(functionToCheck) {
-  return functionToCheck && Object.prototype.toString.call(functionToCheck) == '[object Function]';
+  return functionToCheck && Object.prototype.toString.call(functionToCheck) === '[object Function]';
 };
 
 var isInt = function(x) {

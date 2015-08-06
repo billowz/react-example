@@ -1,3 +1,4 @@
+let _objectWithoutProperties = require('babel-runtime/helpers/object-without-properties')['default'];
 function _arrayEmptyFilter(v){
     return v;
 }
@@ -9,7 +10,7 @@ module.exports = {
         }
         if (Array.isArray(classNames)) {
             return classNames.join(' ');
-        } else if (typeof classNames == 'object') {
+        } else if (typeof classNames === 'object') {
             return Object.keys(classNames).filter(function(className) {
                 return classNames[className];
             }).join(' ');
@@ -44,5 +45,8 @@ module.exports = {
             iconClasses.splice(0, 0, 'fa');
         }
         return iconClasses.join(' ');
+    },
+    objectWithoutProperties: function(){
+        _objectWithoutProperties.apply(this, arguments);
     }
 }

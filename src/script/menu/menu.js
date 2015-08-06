@@ -1,4 +1,6 @@
-let Compontent = require('../compontent');
+let {PropTypes} = require('react'),
+    Compontent = require('../compontent');
+
 let Menu = Compontent('Menu', {
     propTypes : {
         horizontal: PropTypes.bool,

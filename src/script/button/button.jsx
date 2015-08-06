@@ -1,6 +1,6 @@
 let {PropTypes} = require('react'),
-    Compontent = require('./compontent'),
-    Util = require('./util');
+    Compontent = require('../compontent'),
+    Util = require('../util/util');
 
 let Button = Compontent('Button', {
     propTypes:{
