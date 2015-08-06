@@ -239,6 +239,7 @@ if (isModernBrowser()) {
 
   unwatchOne = function(obj, prop, watcher) {
     if(!obj || !obj.watchers || !obj.watchers[prop]){
+        console.warn(arguments);
         return;
     }
     for (var i in obj.watchers[prop]) {

@@ -13,6 +13,7 @@
     "es6": true
   },
   "rules": {
+    "dot-notation":1,
     "eol-last":0,
     "no-undef":0,
     "global-strict":0,

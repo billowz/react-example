@@ -289,13 +289,11 @@ function _buildDoc(rootPath, basePath, dirPath, includes, excludes, end) {
                     name = _parseModuleName(fileName);
                 if (/\.md$/.test(filePath)) {
                     module.readmes[name] = fs.readFileSync(filePath, 'utf-8').toString();
-                    gutil.log('parse readme:' + filePath);
                 } else if (/\.jsx?$/.test(filePath)) {
                     module.demos[name] = {
                         path: './' + relativePath + '/' + fileName,
                         content: fs.readFileSync(filePath, 'utf-8').toString()
                     }
-                    gutil.log('parse demo:' + filePath);
                 }
             }
             c();
