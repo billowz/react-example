@@ -1,4 +1,6 @@
 let _objectWithoutProperties = require('babel-runtime/helpers/object-without-properties')['default'];
+let q = require('q');
+let is = require('is');
 function _arrayEmptyFilter(v){
     return v;
 }
@@ -8,9 +10,9 @@ module.exports = {
         if (!classNames) {
             return '';
         }
-        if (Array.isArray(classNames)) {
+        if (is.array(classNames)) {
             return classNames.join(' ');
-        } else if (typeof classNames === 'object') {
+        } else if (is.hash(classNames)) {
             return Object.keys(classNames).filter(function(className) {
                 return classNames[className];
             }).join(' ');
@@ -25,11 +27,11 @@ module.exports = {
         if(!iconCls){
             return '';
         }
-        if (typeof iconCls === 'string') {
+        if (is.string(iconCls)) {
             iconClasses = iconCls ? iconCls.split(/\s+/g) : []
-        } else if (Array.isArray(iconCls)) {
+        } else if (is.array(iconCls)) {
             iconClasses = iconCls;
-        } else if (typeof iconCls === 'object') {
+        } else if (is.hash(iconCls)) {
             iconClasses = Object.keys(classNames).filter(function(className) {
                 return classNames[className];
             });
@@ -48,5 +50,10 @@ module.exports = {
     },
     objectWithoutProperties: function(){
         _objectWithoutProperties.apply(this, arguments);
+    },
+    promise: function(c){
+        let def = Q.defer();
+        c(def);
+        return def.promise;
     }
 }

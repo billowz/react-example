@@ -6,17 +6,6 @@ let React = require('react'),
   Workbench = rui.Workbench,
   Doc={};
   Doc.Compontent = {
-    Workbench : {
-        demos : {
-            Demo : {
-                compontent : require('./workbench/doc/demo'),
-                code : 'let React = require(&#39;react&#39;),\n  {WorkBench} = require(&#39;react-ui&#39;);\nmodule.exports = React.createClass({\n  render() {\n    return (&lt;WorkBench title=&#34;Workbench Demo&#34;/&gt;);\n  }\n});\n'
-            }
-        },
-        readmes : {
-            Readme : 'read me\n'
-        }
-    },
     Layout : {
         demos : {
             Demo : {
@@ -33,6 +22,17 @@ let React = require('react'),
         readmes : {
             Readme : 'Watch\n'
         }
+    },
+    Workbench : {
+        demos : {
+            Demo : {
+                compontent : require('./workbench/doc/demo'),
+                code : 'let React = require(&#39;react&#39;),\n  {WorkBench} = require(&#39;react-ui&#39;);\nmodule.exports = React.createClass({\n  render() {\n    return (&lt;WorkBench title=&#34;Workbench Demo&#34;/&gt;);\n  }\n});\n'
+            }
+        },
+        readmes : {
+            Readme : 'read me\n'
+        }
     }
   };
 Doc.App = React.createClass({
@@ -45,7 +45,10 @@ Doc.App = React.createClass({
         children:[{
             type:'Menu',
             option:{
-                title:'React UI'
+                title:'React UI',
+                data:[
+
+                ]
             }
         }]
     }

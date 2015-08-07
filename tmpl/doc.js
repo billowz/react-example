@@ -27,7 +27,10 @@ Doc.App = React.createClass({
         children:[{
             type:'Menu',
             option:{
-                title:'React UI'
+                title:'React UI',
+                data:[
+
+                ]
             }
         }]
     }

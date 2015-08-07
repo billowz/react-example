@@ -14,7 +14,7 @@ let Menu = Compontent('Menu', {
         }
     },
     render() {
-        const { className, horizontal, scrollable, title, titleLink,...props } = this.props;
+        const { className, horizontal, scrollable, title, titleLink, ...props } = this.props;
         const cls = Util.parseClassName(
             'pure-menu', className,
             horizontal && 'pure-menu-horizontal',
@@ -29,12 +29,13 @@ let Menu = Compontent('Menu', {
         return <div className={cls} {...props}>
                     {header}
                     <ul className='pure-menu-list'>
-                         <li className='pure-menu-item pure-menu-has-children pure-menu-allow-hover' ><a href='#' className='pure-menu-link'>Flickr
-                         <ul className="pure-menu-children">
-                            <li className="pure-menu-item"><a href="#" className="pure-menu-link">Email</a></li>
-                            <li className="pure-menu-item"><a href="#" className="pure-menu-link">Twitter</a></li>
-                            <li className="pure-menu-item"><a href="#" className="pure-menu-link">Tumblr Blog</a></li>
-                        </ul></a></li>
+                         <li className='pure-menu-item pure-menu-has-children pure-menu-allow-hover pure-menu-active' ><a href='#' className='pure-menu-link'>Flickr</a>
+                             <ul className="pure-menu-children">
+                                <li className="pure-menu-item"><a href="#" className="pure-menu-link">Email</a></li>
+                                <li className="pure-menu-item"><a href="#" className="pure-menu-link">Twitter</a></li>
+                                <li className="pure-menu-item"><a href="#" className="pure-menu-link">Tumblr Blog</a></li>
+                            </ul>
+                        </li>
                         <li className='pure-menu-item'><a href='#' className='pure-menu-link'>Messenger</a></li>
                         <li className='pure-menu-item'><a href='#' className='pure-menu-link'>Sports</a></li>
                         <li className='pure-menu-item'><a href='#' className='pure-menu-link'>Finance</a></li>

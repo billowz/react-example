@@ -191,28 +191,10 @@ function _scanDir(rootPath, basePath, dirPath, callback, end) {
 }
 
 function _moduleObj(moduleName, basepath, relativePath, isDirModule) {
-    var absPath = path.join(basepath, relativePath + '.js');
-    if (!fs.existsSync(absPath)) {
-        absPath = path.join(basepath, relativePath + '.jsx');
-        if (!fs.existsSync(absPath)) {
-            throw new Error('file is undefined ' + absPath);
-        }
-    }
     var obj = {
         name: moduleName,
-        relativePath: relativePath,
-        basepath: basepath,
-        absPath: absPath,
-        dirPath: absPath.replace(/[^\\/]*$/, ''),
-        isDirModule: isDirModule,
-        _content: null
+        relativePath: relativePath
     }
-    obj.getContent = function() {
-        if (this._content === null) {
-            this._content = fs.readFileSync(absPath).toString();
-        }
-        return this._content;
-    }.bind(obj);
     return obj;
 }
 
@@ -280,7 +262,6 @@ function _buildDoc(rootPath, basePath, dirPath, includes, excludes, end) {
             readmes: {}
         };
         modules.push(module);
-        gutil.log('parse doc:' + module.name);
         builder.scanFiles(dirPath, function() {
             return false
         }, function(filePath, isDir, c) {

@@ -2,6 +2,8 @@
 module.exports = {
     Button: require('./button/button'),
     Compontent: require('./compontent'),
+    Data: require('./data/data'),
+    Event: require('./event/event'),
     Layout: require('./layout/layout'),
     Menu: require('./menu/menu'),
     Nav: require('./nav/nav'),
