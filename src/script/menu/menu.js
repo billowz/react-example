@@ -36,7 +36,7 @@ let Menu = Compontent('Menu', {
                                 <li className="pure-menu-item"><a href="#" className="pure-menu-link">Tumblr Blog</a></li>
                             </ul>
                         </li>
-                        <li className='pure-menu-item'><a href='#' className='pure-menu-link'>Messenger</a></li>
+                        <li className='pure-menu-item pure-menu-has-children'><a href='#' className='pure-menu-link'>Messenger</a></li>
                         <li className='pure-menu-item'><a href='#' className='pure-menu-link'>Sports</a></li>
                         <li className='pure-menu-item'><a href='#' className='pure-menu-link'>Finance</a></li>
                         <li className='pure-menu-item'><a href='#' className='pure-menu-link'>Games</a></li>

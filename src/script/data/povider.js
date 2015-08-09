@@ -1,8 +1,11 @@
 let Util = require('../util/util');
+let Event = require('../event/event');
 let is = require('is');
 
-class DataPovider{
+class DataPovider extends Event{
     constructor(){
+        super();
+        this.eventTypes('progress', 'update');
     }
     _getData(def){
         throw 'abstract method';

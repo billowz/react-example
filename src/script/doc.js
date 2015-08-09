@@ -6,6 +6,13 @@ let React = require('react'),
   Workbench = rui.Workbench,
   Doc={};
   Doc.Compontent = {
+    Watch : {
+        demos : {
+        },
+        readmes : {
+            Readme : 'Watch\n'
+        }
+    },
     Layout : {
         demos : {
             Demo : {
@@ -14,13 +21,6 @@ let React = require('react'),
             }
         },
         readmes : {
-        }
-    },
-    Watch : {
-        demos : {
-        },
-        readmes : {
-            Readme : 'Watch\n'
         }
     },
     Workbench : {

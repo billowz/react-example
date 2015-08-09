@@ -1,7 +1,8 @@
 let React = require('react'),
     {PropTypes} = React,
     Compontent = require('../compontent'),
-    Util = require('../util/util');
+    Util = require('../util/util'),
+    is = require('is');
 const normalizeSize = (s = '') => s.toString().replace('/', '-');
 let GridCell = Compontent('GridLayoutCell', {
     propTypes:{
@@ -42,11 +43,11 @@ let Grid = Compontent('GridLayout', {
         xl: sizePropType
     },
     parseSize(size, cfg, idx){
-        if(typeof size === 'string'){
+        if(is.string(size)){
             return size;
-        }else if(typeof size === 'function'){
+        }else if(is.fn(size)){
             return size(cfg, idx);
-        }else if(typeof size === 'object'){
+        }else if(is.hash(size)){
             return this.parseSize(size[idx], cfg, idx);
         }else{
             return null;
