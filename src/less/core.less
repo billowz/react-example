@@ -3,11 +3,21 @@
 @color-menu-border: #ccc;
 @color-menu-child-border: #eee;
 @color-menu-children-split-border: #eee;
-@color-menu-link:#777;
-@color-menu-link-selected:#000;
+@color-menu-link: #777;
+@color-menu-link-selected: #000;
 body {
     line-height: 1.6;
 }
+
+.user-select(@user-select-status: none) {
+    -moz-user-select: @user-select-status;
+    -o-user-select: @user-select-status;
+    -khtml-user-select: @user-select-status;
+    -webkit-user-select: @user-select-status;
+    -ms-user-select: @user-select-status;
+    user-select: @user-select-status;
+}
+
 .workbench {
     position: absolute;
     left: 0;
@@ -15,16 +25,11 @@ body {
     right: 0;
     buttom: 0;
 }
+
 .pure-menu {
-    .pure-menu-children {
-        border: 1px solid @color-menu-child-border;
-        .pure-menu-item {
-            border-top: 1px solid @color-menu-children-split-border;
-            margin-top: -1px;
-        }
-    }
-    .pure-menu-link{
-        cursor:pointer;
+    .user-select;
+    .pure-menu-link {
+        cursor: pointer;
     }
     .pure-menu-selected .pure-menu-link,
     .pure-menu-selected .pure-menu-link:visited {
@@ -34,12 +39,40 @@ body {
     .pure-menu-selected>.pure-menu-link:visited {
         color: @color-menu-link-selected;
     }
-    .pure-menu-heading, pure-menu-list {} .pure-menu-link, .pure-menu-disabled, .pure-menu-heading {} .pure-menu-item {}
 }
+
 .pure-menu-horizontal {
     border-bottom: 1px solid @color-menu-border;
     .pure-menu-children {
+        border: 1px solid @color-menu-child-border;
         border-top-color: @color-menu-border;
         overflow: hidden;
+        .pure-menu-item {
+            border-top: 1px solid @color-menu-children-split-border;
+            margin-top: -1px;
+        }
     }
+}
+
+.pure-menu-vertical {
+    .pure-menu-children {
+        position: static;
+        >.pure-menu-item{
+          >.pure-menu-link{
+            padding-left:1.5em;
+          }
+        }
+    }
+    .pure-menu-has-children > .pure-menu-link:after{
+      content: "\25BE";
+    }
+
+}
+.example-enter {
+  opacity: 0.01;
+  transition: opacity 5s ease-in;
+}
+
+.example-enter.example-enter-active {
+  opacity: 1;
 }

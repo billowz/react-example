@@ -10,11 +10,11 @@ let React = require('react'),
         demos : {<% Object.keys(modules[i].demos).forEach(function(demoName, idx){ %>
             <%=demoName%> : {
                 compontent : require('<%=modules[i].demos[demoName].path%>'),
-                code : '<%=modules[i].demos[demoName].content.replace(/[\r\n]/g, '\\n').replace(/\t/g, '    ')%>'
+                code : '<%=modules[i].demos[demoName].content.replace(/[\r\n]/g, '\\n').replace(/\t/g, '  ')%>'
             }<%= idx < modules[i].demos.length - 1 ? "," : "" %><%})%>
         },
         readmes : {<% Object.keys(modules[i].readmes).forEach(function(readmeName, idx){ %>
-            <%=readmeName%> : '<%=modules[i].readmes[readmeName].replace(/\n/g, '\\n').replace(/\t/g, '    ')%>'<%= idx < modules[i].readmes.length - 1 ? "," : "" %><%})%>
+            <%=readmeName%> : '<%=modules[i].readmes[readmeName].replace(/\n/g, '\\n').replace(/\t/g, '  ')%>'<%= idx < modules[i].readmes.length - 1 ? "," : "" %><%})%>
         }
     }<%= i < modules.length - 1 ? "," : "" %><% } %>
   };
@@ -45,7 +45,14 @@ Doc.App = React.createClass({
                     return {
                         text:key,
                         href:'#',
-                        target: '_blank'
+                        target: '_blank',
+                        children:[{
+                              text:'Introducation',
+                              href:'#'
+                          },{
+                              text:'Getting Started',
+                              href:'#'
+                          }]
                     }
                 })
             },{

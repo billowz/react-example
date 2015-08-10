@@ -8,7 +8,7 @@ module.exports = {
     Layout: require('./layout/layout'),
     Menu: require('./menu/menu'),
     Nav: require('./nav/nav'),
-    Util: require('./util/util'),
     Watch: require('./watch/watch'),
-    Workbench: require('./workbench/workbench')
+    Workbench: require('./workbench/workbench'),
+    Util: require('./util/util')
 };

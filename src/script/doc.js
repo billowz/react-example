@@ -63,7 +63,14 @@ Doc.App = React.createClass({
                     return {
                         text:key,
                         href:'#',
-                        target: '_blank'
+                        target: '_blank',
+                        children:[{
+                              text:'Introducation',
+                              href:'#'
+                          },{
+                              text:'Getting Started',
+                              href:'#'
+                          }]
                     }
                 })
             },{
