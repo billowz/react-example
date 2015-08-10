@@ -3,6 +3,7 @@ module.exports = {
     Button: require('./button/button'),
     Compontent: require('./compontent'),
     Data: require('./data/data'),
+    Dropdown: require('./dropdown/dropdown'),
     Event: require('./event/event'),
     Layout: require('./layout/layout'),
     Menu: require('./menu/menu'),

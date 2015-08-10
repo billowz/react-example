@@ -26,7 +26,7 @@ let GridCell = Compontent('GridLayoutCell', {
                 xl && 'pure-u-xl-' + normalizeSize(xl),
                 className
             );
-        return <div className={cls} {...props} />;
+        return <div {...props} className={cls} />;
     }
 });
 let sizePropType = PropTypes.oneOfType([

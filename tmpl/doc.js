@@ -3,6 +3,7 @@ let React = require('react'),
   {Routes, Route} = Router,
   rui = require('react-ui'),
   Workbench = rui.Workbench,
+  MemoryDataPovider = rui.Data.MemoryPovider,
   Doc={};
   Doc.Compontent = {<% for (var i = 0; i < modules.length; i++) { %>
     <%= modules[i].name %> : {
@@ -17,21 +18,40 @@ let React = require('react'),
         }
     }<%= i < modules.length - 1 ? "," : "" %><% } %>
   };
+
 Doc.App = React.createClass({
   render: function(){
     let config = {
         type:'GridLayout',
         option:{
-            size:'1'
+            size:'1-12'
         },
         children:[{
             type:'Menu',
             option:{
-                title:'React UI',
-                data:[
-
-                ]
-            }
+                horizontal:false,
+                title:'React UI'
+            },
+            dataPovider: new MemoryDataPovider([{
+                text:'Introducation',
+                href:'#'
+            },{
+                text:'Getting Started',
+                href:'#'
+            },{
+                text:'Compontents',
+                href:'#',
+                children:Object.keys(Doc.Compontent).map(function(key){
+                    return {
+                        text:key,
+                        href:'#',
+                        target: '_blank'
+                    }
+                })
+            },{
+                text:'GitHub',
+                href:'https://github.com/tao-zeng/react-example'
+            }])
         }]
     }
     return <Workbench compontents={[config]}></Workbench>

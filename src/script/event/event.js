@@ -1,9 +1,17 @@
 let is = require('is');
 class Event {
-    constructor() {
+    constructor(opt) {
         this._listeners = {};
         this._eventTypes = [];
         this.__scope__ = this;
+        if(opt){
+            if(opt.eventTypes){
+                this.eventTypes(opt.eventTypes);
+            }
+            if(opt.listeners){
+                this.on(opt.listeners);
+            }
+        }
     }
 
     eventTypes() {
@@ -54,21 +62,37 @@ class Event {
                 if (!is.array(this._listeners[evt])) {
                     this._listeners[evt] = [];
                 }
-                this._listeners[evt].push(callback);
+                let idx = this._listeners[evt].indexOf(callback);
+                if (idx === -1) {
+                    this._listeners[evt].push(callback);
+                }
             }
         } else {
             console.warn('Invalid param', arguments);
         }
     }
 
-    un(evt, callback){
+    un(evtname, callback) {
+        let handlers = this._listeners[evtname],
+            idx;
+        if (is.array(handlers) && (idx = handlers.indexOf(callback) !== -1)) {
+            handlers.splice(idx, 1);
+        }
+    }
 
+    hasListener(evtname, callback){
+        let handlers = this._listeners[evtname],
+            idx;
+        if (is.array(handlers) && (idx = handlers.indexOf(callback) !== -1)) {
+            return true;
+        }
+        return false;
     }
 
     fire(evtname, ...args) {
         let handlers = this._listeners[evtname];
-        if(is.array(handlers)){
-            handlers.forEach(function(h){
+        if (is.array(handlers)) {
+            handlers.forEach(function(h) {
                 h.apply(this.__scope__, args);
             }.bind(this));
         }

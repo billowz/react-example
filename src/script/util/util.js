@@ -55,5 +55,18 @@ module.exports = {
         let def = Q.defer();
         c(def);
         return def.promise;
+    },
+    chainedFunc: function(...funcs){
+      return funcs
+        .filter(f => is.fn(f))
+        .reduce((acc, f) => {
+          if (acc === null) {
+            return f;
+          }
+          return function chainedFunction(...args) {
+            acc.apply(this, args);
+            f.apply(this, args);
+          };
+        }, null);
     }
 }

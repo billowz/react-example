@@ -3,6 +3,8 @@
 @color-menu-border: #ccc;
 @color-menu-child-border: #eee;
 @color-menu-children-split-border: #eee;
+@color-menu-link:#777;
+@color-menu-link-selected:#000;
 body {
     line-height: 1.6;
 }
@@ -20,6 +22,17 @@ body {
             border-top: 1px solid @color-menu-children-split-border;
             margin-top: -1px;
         }
+    }
+    .pure-menu-link{
+        cursor:pointer;
+    }
+    .pure-menu-selected .pure-menu-link,
+    .pure-menu-selected .pure-menu-link:visited {
+        color: @color-menu-link;
+    }
+    .pure-menu-selected>.pure-menu-link,
+    .pure-menu-selected>.pure-menu-link:visited {
+        color: @color-menu-link-selected;
     }
     .pure-menu-heading, pure-menu-list {} .pure-menu-link, .pure-menu-disabled, .pure-menu-heading {} .pure-menu-item {}
 }

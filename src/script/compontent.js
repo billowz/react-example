@@ -1,5 +1,6 @@
 let React = require('react'),
     watch = require("./watch/watch"),
+    DataPovider = require('./data/povider'),
     {PropTypes} = React,
     comps = {};
 let Compontent = function(name, option){
@@ -40,7 +41,7 @@ function _parseCompontent(cfg, key, idx, handler){
     if(key){
         props.key = key;
     }
-    dom = (<Comp {...props} compontents={cfg.children}></Comp>);
+    dom = (<Comp {...props} compontents={cfg.children} dataPovider={cfg.dataPovider}></Comp>);
     if(typeof handler === 'function'){
         fdom = handler.apply(this, [cfg, dom, idx]);
         if(fdom!=undefined){
@@ -89,10 +90,27 @@ Compontent.renderCompontents = function renderCompontents(cfgs, key, handler){
 }
 Compontent.Mixins = {
     propTypes:{
-        compontents: PropTypes.array
+        compontents: PropTypes.array,
+        dataPovider: PropTypes.instanceOf(DataPovider)
+    },
+    getInitialState(){
+        if(this.props.dataPovider){
+            this.props.dataPovider.subscribe(function(data){
+                this.setState({
+                    data:data
+                });
+            }.bind(this), function(updated){
+
+            }.bind(this), function(){
+                this.console.error(arrguments);
+            });
+        }
+        return {
+            data:null
+        };
     },
     componentWillUnmount(){
-        this.__unwatchCompontents();
+        //this.__unwatchCompontents();
     },
     __watchCompontents(){
         let self = this;
@@ -114,7 +132,7 @@ Compontent.Mixins = {
     renderCompontents(key){
         // reset this.props.compontents
         // change compontents
-        this.__watchCompontents();
+        //this.__watchCompontents();
         return Compontent.renderCompontents(this.props.compontents, key, this.compontentHandler);
     }
 }
