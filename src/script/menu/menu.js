@@ -21,7 +21,7 @@ let MenuItem = React.createClass({
       dropdownAnimation: {
         dropdown:{
             true: 'fadeInDown',
-            false: 'fadeInup'
+            false: 'fadeOutUp'
         }
       }
     }

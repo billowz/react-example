@@ -17,13 +17,6 @@ let React = require('react'),
         readmes : {
         }
     },
-    Watch : {
-        demos : {
-        },
-        readmes : {
-            Readme : 'Watch\n'
-        }
-    },
     Workbench : {
         demos : {
             Demo : {
@@ -34,6 +27,13 @@ let React = require('react'),
         readmes : {
             Readme : 'read me\n'
         }
+    },
+    Watch : {
+        demos : {
+        },
+        readmes : {
+            Readme : 'Watch\n'
+        }
     }
   };
 
@@ -42,12 +42,12 @@ Doc.App = React.createClass({
     let config = {
         type:'GridLayout',
         option:{
-            size:'1-12'
+            size:'1'
         },
         children:[{
             type:'Menu',
             option:{
-                horizontal:false,
+                horizontal:true,
                 title:'React UI'
             },
             dataPovider: new MemoryDataPovider([{

@@ -1,12 +1,12 @@
 /*@MODULE_GENERATOR@*/
 module.exports = {
     Button: require('./button/button'),
-    Compontent: require('./compontent'),
     Data: require('./data/data'),
+    Compontent: require('./compontent'),
     Dropdown: require('./dropdown/dropdown'),
     Event: require('./event/event'),
-    Layout: require('./layout/layout'),
     Menu: require('./menu/menu'),
+    Layout: require('./layout/layout'),
     Nav: require('./nav/nav'),
     Transition: require('./transition/transition'),
     Util: require('./util/util'),

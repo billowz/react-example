@@ -1,6 +1,6 @@
 let is = require('is');
 function clsReg(cls) {
-  return new RegExp('(\\s|^)' + cls + '(\\s|$)');
+  return new RegExp('(\\s+|^)' + cls + '(\\s+|$)');
 }
 function checkEl(el) {
   if (!is.element(el)) {
@@ -9,12 +9,15 @@ function checkEl(el) {
 }
 let Dom = {
   on(el, evt, callback) {
-    checkEl(el);
+    if (!is.element(el) && !(el instanceof Document) && !(el instanceof Window)) {
+      throw 'Invalid Element ' + el;
+    }
+    let _c = callback;
     callback = function(event) {
       if (!event) {
         event = window.event;
       }
-      callback(event);
+      _c(event);
     }
     if (el.addEventListener) {
       el.addEventListener(evt, callback, false);
@@ -65,7 +68,7 @@ let Dom = {
         Dom.addCls(el, c);
       }).length > 0;
     } else if (is.string(cls) && !Dom.hasCls(el, cls)) {
-      el.className += " " + cls;
+      el.className += ' ' + cls;
     }
   },
   removeCls(el, cls) {

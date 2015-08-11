@@ -32,8 +32,11 @@ function transition(el, trigger) {
       if (supportCss) {
         cssAni();
         Util.dom.addCls(el, trigger);
+        def.promise.then(function() {
+          Util.dom.removeCls(el, trigger);
+        });
       } else {
-        err = ('Transition unsupported');
+        err = 'Transition unsupported';
       }
     } else if (is.fn(trigger)) {
       trigger(el, def);
@@ -41,21 +44,27 @@ function transition(el, trigger) {
       if (supportCss) {
         cssAni();
         el.css(el, trigger);
+        def.promise.then(function() {
+          Util.dom.removeCls(el, trigger);
+        });
       } else {
-        err = ('Transition unsupported');
+        err = 'Transition unsupported';
       }
     } else {
-      err = ('Invalid Transition');
+      err = 'Invalid Transition';
     }
     if (err) {
-      setTimeout(def.reject.bind(def, err), 0);
+      //def.reject(err)
+      setTimeout(def.resolve.bind(def, err), 0);
       def.promise.cancel = function() {}
     } else {
       def.promise.cancel = function() {
-        if (transitionEndHandler)
-          transitionEndHandler.remove();
-        def.reject('Transition cancelled');
-      };
+        if (this.promise.isPending()) {
+          if (transitionEndHandler)
+            transitionEndHandler.remove();
+          this.resolve('Transition cancelled');
+        }
+      }.bind(def);
     }
   });
 }
@@ -84,67 +93,77 @@ let Transition = React.createClass({
       onEnd: function() {}
     };
   },
+  /*
   transition(animationType, val) {
-    let node = React.findDOMNode(this),
-      props = this.props,
-      ani = props.animation[animationType];
+    let ani = this.props.animation[animationType];
     if (arguments.length > 1 && animationType !== 'enter' && animationType !== 'leave') {
       ani = ani[val];
     }
     this.stop();
-    let prom = transition(node, ani);
-    this.stopper = {
-      stop: prom.cancel
-    }
-    prom.done(function() {
-      this.stopper = null;
-      if (is.fn(props.onEnd)) {
-        props.onEnd(animationType, val);
-      }
-    });
+
+    this.promise = transition(React.findDOMNode(this), ani);
+    this.promise.then(this._endTransition(animationType, val));
   },
-  /*
-    transition(animationType, val) {
-      let node = React.findDOMNode(this),
-        props = this.props,
-        ani = props.animation[animationType],
-        end = function(animationType, val) {
-          this.stopper = null;
-          if (is.fn(props.onEnd)) {
-            props.onEnd(animationType, val);
-          }
-        }.bind(this, animationType, val);
-      if (arguments.length > 1 && animationType !== 'enter' && animationType !== 'leave') {
-        ani = ani[val];
+  _endTransition(animationType, val){
+    return function(err){
+      this.promise = null;
+      if(is.fn(this.props.onEnd)){
+        this.props.onEnd(animationType, val);
       }
-      this.stop();
-      if (CssAnimate.isCssAnimationSupported) {
-        if (is.string(ani)) {
-          this.stopper = CssAnimate(node, ani, end);
-          return;
-        } else if (is.fn(ani)) {
-          this.stopper = ani(node, end);
-          return;
+    }.bind(this);
+  },
+  stop() {
+    if (this.promise) {
+      this.promise.cancel();
+      this.promise = null;
+      return true;
+    }
+    return false;
+  },*/
+
+  transition(animationType, val) {
+    let node = React.findDOMNode(this),
+      props = this.props,
+      ani = props.animation[animationType],
+      end = function(animationType, val) {
+        this.stopper = null;
+        if (is.fn(props.onEnd)) {
+          props.onEnd(animationType, val);
         }
+      }.bind(this, animationType, val);
+    if (arguments.length > 1 && animationType !== 'enter' && animationType !== 'leave') {
+      ani = ani[val];
+    }
+    this.stop();
+    if (is.string(ani)) {
+      if (CssAnimate.isCssAnimationSupported) {
+        this.stopper = CssAnimate(node, ani, end);
+      } else {
+        end();
       }
+    } else if (is.fn(ani)) {
+      this.stopper = ani(node, end);
+    } else {
       end();
-    },*/
+    }
+  },
 
   stop() {
-    if (this.stopper) {
+    if (this.promise) {
       this.stopper.stop();
       this.stopper = null;
+      return true;
     }
+    return false;
   },
+
 
   componentWillReceiveProps(nextProps) {
     Object.keys(this.props.animation).forEach(function(type) {
       if (this.props[type] != nextProps[type]) {
         this.transition(type, nextProps[type]);
-        console.log('--->>', type, nextProps[type])
       }
     }.bind(this))
-    console.log(nextProps, this.props)
   },
 
   componentWillUnmount() {

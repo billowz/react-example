@@ -44,12 +44,19 @@ body {
 .pure-menu-horizontal {
     border-bottom: 1px solid @color-menu-border;
     .pure-menu-children {
+        .pure-menu-children {
+            left: 100%;
+            top: 0;
+        }
+        .pure-menu-has-children>.pure-menu-link:after {
+            content: "\25B8";
+        }
         border: 1px solid @color-menu-child-border;
-        border-top-color: @color-menu-border;
-        overflow: hidden;
         .pure-menu-item {
             border-top: 1px solid @color-menu-children-split-border;
-            margin-top: -1px;
+        }
+        :first-child{
+          border-top:none;
         }
     }
 }
@@ -57,22 +64,13 @@ body {
 .pure-menu-vertical {
     .pure-menu-children {
         position: static;
-        >.pure-menu-item{
-          >.pure-menu-link{
-            padding-left:1.5em;
-          }
+        >.pure-menu-item {
+            >.pure-menu-link {
+                padding-left: 1.5em;
+            }
         }
     }
-    .pure-menu-has-children > .pure-menu-link:after{
-      content: "\25BE";
+    .pure-menu-has-children > .pure-menu-link:after {
+        content: "\25BE";
     }
-
-}
-.example-enter {
-  opacity: 0.01;
-  transition: opacity .5s ease-in;
-}
-
-.example-enter.example-enter-active {
-  opacity: 1;
 }
