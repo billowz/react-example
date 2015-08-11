@@ -3,7 +3,8 @@ let React = require('react'),
   Compontent = require('../compontent'),
   Util = require('../util/util'),
   DropdownMixins = require('../dropdown/dropdown-mixins'),
-  ReactCSSTransitionGroup = React.addons.CSSTransitionGroup;;
+  Transition = require('../transition/transition'),
+  ReactCSSTransitionGroup = React.addons.CSSTransitionGroup;
 
 let MenuItem = React.createClass({
   mixins: [DropdownMixins],
@@ -12,7 +13,18 @@ let MenuItem = React.createClass({
     href: PropTypes.string,
     target: PropTypes.string,
     onSelect: PropTypes.func,
-    children: PropTypes.array
+    children: PropTypes.array,
+    dropdownAnimation: PropTypes.object
+  },
+  getDefaultProps() {
+    return {
+      dropdownAnimation: {
+        dropdown:{
+            true: 'fadeInDown',
+            false: 'fadeInup'
+        }
+      }
+    }
   },
   getInitialState() {
     return {
@@ -33,7 +45,6 @@ let MenuItem = React.createClass({
       return <a className='pure-menu-link' onTouchTap={this.onClickLink} href={this.props.href}>
                 {this.props.text}
             </a>;
-
     } else {
       return <span className='pure-menu-link' onTouchTap={this.onClickLink}>
                 {this.props.text}
@@ -41,11 +52,13 @@ let MenuItem = React.createClass({
     }
   },
   renderSubs() {
-    if (this.hasSub() && this.state.isDropdown) {
+    if (this.hasSub()) {
       let subItems = this.props.children.map(function(c, idx) {
-        return <MenuItem {...c} ref={idx} key={idx} onSelect={this.onSelectSub} autoCloseDropdown={this.props.autoCloseDropdown}></MenuItem>
+        return <MenuItem {...c} ref={idx} key={idx} onSelect={this.onSelectSub}
+                autoCloseDropdown={this.props.autoCloseDropdown}></MenuItem>
       }.bind(this));
-      return <ul className="pure-menu-children" >{subItems}</ul>
+      return <Transition component='ul' className="pure-menu-children" dropdown={this.state.isDropdown}
+                animation={this.props.dropdownAnimation}>{subItems}</Transition>
     }
   },
   onSelectSub(hierarchy) {
@@ -83,6 +96,7 @@ let MenuItem = React.createClass({
     return this.props.children && this.props.children.length > 0;
   }
 });
+
 const MENU_ITEM_PREFIX = 'menu-item';
 let Menu = Compontent('Menu', {
   mixins: [DropdownMixins],
@@ -92,7 +106,11 @@ let Menu = Compontent('Menu', {
   },
   getDefaultProps() {
     return {
-      horizontal: true
+      horizontal: true,
+      menuAnimation: {
+        enter:'fadeInDown',
+        leave:'fadeOutDown'
+      }
     }
   },
   render() {
@@ -102,10 +120,9 @@ let Menu = Compontent('Menu', {
       horizontal && 'pure-menu-horizontal',
       !horizontal && 'pure-menu-vertical'
     );
-
     return <div className={cls} {...this.props}>
               {this.renderHeader()}
-              <ul className='pure-menu-list'>{this.renderMenu()}</ul>
+              <Transition component="ul" className='pure-menu-list' animation={this.props.menuAnimation}>{this.renderMenu()}</Transition>
           </div>;
   },
   renderHeader() {
@@ -120,7 +137,8 @@ let Menu = Compontent('Menu', {
   renderMenu() {
     if (this.state.data) {
       return this.state.data.map(function(c, idx) {
-        return <MenuItem {...c} ref={MENU_ITEM_PREFIX + idx} key={idx} onSelect={this.onMenuSelect} autoCloseDropdown={this.props.horizontal}></MenuItem>;
+        return <MenuItem {...c} ref={MENU_ITEM_PREFIX + idx} key={idx}
+                 onSelect={this.onMenuSelect} autoCloseDropdown={this.props.horizontal}></MenuItem>;
       }.bind(this));
     }
   },

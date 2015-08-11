@@ -1,4 +1,5 @@
-let {PropTypes} = require('react');
+let {PropTypes} = require('react'),
+  DomUtil = require('../util/dom');
 /**
  * Checks whether a node is within
  * a root nodes tree
@@ -75,9 +76,8 @@ const DropdownStateMixin = {
     if (!this.props.autoCloseDropdown) {
       return;
     }
-    let doc = window.document;
-    this._onDocumentClickListener = this.listen(doc, 'click', this.handleDocumentClick);
-    this._onDocumentKeyupListener = this.listen(doc, 'keyup', this.handleDocumentKeyUp);
+    this._onDocumentClickListener = DomUtil.on(window.document, 'click', this.handleDocumentClick);
+    this._onDocumentKeyupListener = DomUtil.on(window.document, 'keyup', this.handleDocumentKeyUp);
   },
 
   unbindRootCloseHandlers() {
@@ -87,23 +87,6 @@ const DropdownStateMixin = {
 
     if (this._onDocumentKeyupListener) {
       this._onDocumentKeyupListener.remove();
-    }
-  },
-  listen(target, eventType, callback) {
-    if (target.addEventListener) {
-      target.addEventListener(eventType, callback, false);
-      return {
-        remove() {
-          target.removeEventListener(eventType, callback, false);
-        }
-      };
-    } else if (target.attachEvent) {
-      target.attachEvent('on' + eventType, callback);
-      return {
-        remove() {
-          target.detachEvent('on' + eventType, callback);
-        }
-      };
     }
   },
   componentWillUnmount() {

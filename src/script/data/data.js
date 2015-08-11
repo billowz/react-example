@@ -1,5 +1,6 @@
 /*@MODULE_GENERATOR@*/
 module.exports = {
-    Povider: require('./povider'),
-    MemoryPovider: require('./memory-povider')
+    Adapter: require('./adapter'),
+    MemoryPovider: require('./memory-povider'),
+    Povider: require('./povider')
 };

@@ -5,6 +5,7 @@ function _arrayEmptyFilter(v) {
   return v;
 }
 module.exports = {
+  dom: require('./dom'),
   arrayEmptyFilter: _arrayEmptyFilter,
   parseClassName: function parseClassName(classNames) {
     if (!classNames) {
