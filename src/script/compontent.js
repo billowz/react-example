@@ -1,5 +1,5 @@
 let React = require('react'),
-  watch = require("./watch/watch"),
+  {watch} = require("./util/util"),
   DataPovider = require('./data/povider'),
   {PropTypes} = React,
   comps = {};

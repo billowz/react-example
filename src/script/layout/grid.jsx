@@ -2,8 +2,10 @@ let React = require('react'),
   {PropTypes} = React,
   Compontent = require('../compontent'),
   Util = require('../util/util'),
-  is = require('is');
+  {is} = Util;
+
 const normalizeSize = (s = '') => s.toString().replace('/', '-');
+
 let GridCell = Compontent('GridLayoutCell', {
   propTypes: {
     size: PropTypes.string,

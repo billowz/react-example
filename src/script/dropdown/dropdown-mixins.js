@@ -1,13 +1,6 @@
 let {PropTypes} = require('react'),
   DomUtil = require('../util/dom');
-/**
- * Checks whether a node is within
- * a root nodes tree
- *
- * @param {DOMElement} node
- * @param {DOMElement} root
- * @returns {boolean}
- */
+
 function isNodeInRoot(node, root) {
   while (node) {
     if (node === root) {
@@ -15,7 +8,6 @@ function isNodeInRoot(node, root) {
     }
     node = node.parentNode;
   }
-
   return false;
 }
 
@@ -50,7 +42,7 @@ const DropdownStateMixin = {
     return this.state.isDropdown;
   },
 
-  isAutoCloseDropdown(){
+  isAutoCloseDropdown() {
     return this.props.autoCloseDropdown;
   },
 
@@ -61,9 +53,6 @@ const DropdownStateMixin = {
   },
 
   handleDocumentClick(e) {
-    // If the click originated from within this component
-    // don't do anything.
-    // e.srcElement is required for IE8 as e.target is undefined
     let target = e.target || e.srcElement;
     if (isNodeInRoot(target, React.findDOMNode(this))) {
       return;

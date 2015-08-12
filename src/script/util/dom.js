@@ -1,4 +1,5 @@
-let is = require('is');
+let is = require('is'),
+  Util = require('./core');
 function clsReg(cls) {
   return new RegExp('(\\s+|^)' + cls + '(\\s+|$)');
 }
@@ -7,85 +8,101 @@ function checkEl(el) {
     throw 'Invalid Element ' + el;
   }
 }
+function checkHtml(el){
+  if (!is.element(el) && !(el instanceof Document) && !(el instanceof Window)) {
+    throw 'Invalid Element ' + el;
+  }
+}
 let Dom = {
   on(el, evt, callback) {
-    if (!is.element(el) && !(el instanceof Document) && !(el instanceof Window)) {
-      throw 'Invalid Element ' + el;
-    }
-    let _c = callback;
-    callback = function(event) {
-      if (!event) {
-        event = window.event;
-      }
-      _c(event);
-    }
+    checkHtml(el);
     if (el.addEventListener) {
       el.addEventListener(evt, callback, false);
-      return {
-        remove() {
-          el.removeEventListener(evt, callback, false);
-        }
-      };
     } else if (el.attachEvent) {
       el.attachEvent('on' + evt, callback);
-      return {
-        remove() {
-          el.detachEvent('on' + evt, callback);
-        }
-      };
+    }
+  },
+  un(el, evt, callback) {
+    checkHtml(el);
+    if (el.addEventListener) {
+      el.removeEventListener(evt, callback, false);
+    } else if (el.attachEvent) {
+      el.detachEvent('on' + evt, callback);
     }
   },
   css(el, attr, value) {
     checkEl(el);
     if (arguments.length === 2) {
-      if(is.hash(attr)){
-        Object.keys(attr).forEach(function(att){
-          Dom.css(el, att, attr[att]);
+      if (is.hash(attr)) {
+        Object.keys(attr).forEach(function(att) {
+          el.style[att] = attr[att];
         });
-      }else if(is.string(attr)){
-        return el.style[attr];
+      } else if (is.string(attr)) {
+        return el.currentStyle ? el.currentStyle[attr] : getComputedStyle(el, null)[attr];
       }
     } else if (arguments.length === 3) {
       el.style[attr] = value;
     }
   },
-  hasCls(el, cls) {
+  cleanInnerCss(el, ...attrNames) {
     checkEl(el);
-    if (is.array(cls)) {
-      return cls.filter(function(c) {
-          return Dom.hasCls(el, c);
-        }).length > 0;
+    if (arguments.length == 2) {
+      attrNames = attrNames[0];
     }
-    if (!is.string(cls)) {
+    if (is.array(attrNames)) {
+      attrNames.forEach(function(attr) {
+        el.style[attr] = undefined;
+      });
+    } else if (is.string(attrNames)) {
+      el.style[attrNames] = undefined;
+    } else {
+      throw 'Invalid Css Name';
+    }
+  },
+  hasCls(el, ...cls) {
+    checkEl(el);
+    if (arguments.length == 2) {
+      cls = cls[0];
+    }
+    if (is.array(cls)) {
+      let clsNames = el.className;
+      for (let i = 0; i < cls.length; i++) {
+        if (clsNames.match(clsReg(cls.trim()))) {
+          return true;
+        }
+      }
+      return false;
+    } else if (is.string(cls)) {
+      return el.className.match(clsReg(cls.trim()));
+    } else {
       throw 'Invalid ClassName'
     }
-    return el.className.match(clsReg(cls));
   },
-  addCls(el, cls) {
+  addCls(el, ...cls) {
     checkEl(el);
-    if (is.array(cls)) {
-      cls.forEach(function(c) {
-        Dom.addCls(el, c);
-      }).length > 0;
-    } else if (is.string(cls) && !Dom.hasCls(el, cls)) {
-      el.className += ' ' + cls;
+    if (arguments.length == 2) {
+      cls = cls[0];
     }
+    let clss = el.className ? el.className.split(/\s+/g) : [];
+    Util.pushDistinctArray(clss, cls);
+    el.className = clss.join(' ');
   },
-  removeCls(el, cls) {
+  removeCls(el, ...cls) {
     checkEl(el);
-    if (is.array(cls)) {
-      cls.forEach(function(c) {
-        Dom.removeCls(el, c);
-      }).length > 0;
-    } else if (is.string(cls) && Dom.hasCls(el, cls)) {
-      el.className = el.className.replace(clsReg(cls), ' ');
+    if (arguments.length == 2) {
+      cls = cls[0];
+    }
+    if (el.className) {
+      let clss = el.className.split(/\s+/g);
+      Util.removeArrayValues(clss, cls);
+      el.className = clss.join(' ');
     }
   },
   toggleClass(el, cls) {
-    if(Dom.hasCls(el, cls)){
-      Dom.removeCls(cls);
-    }else{
-      Dom.addCls(cls);
+    if (Dom.hasCls(el, cls)) {
+      Dom.removeCls(el, cls);
+    } else {
+      Dom.addCls(el, cls);
     }
   }
 }

@@ -3,8 +3,7 @@ let React = require('react'),
   Compontent = require('../compontent'),
   Util = require('../util/util'),
   DropdownMixins = require('../dropdown/dropdown-mixins'),
-  Transition = require('../transition/transition'),
-  ReactCSSTransitionGroup = React.addons.CSSTransitionGroup;
+  Transition = require('../transition/transition');
 
 let MenuItem = React.createClass({
   mixins: [DropdownMixins],
@@ -20,8 +19,8 @@ let MenuItem = React.createClass({
     return {
       dropdownAnimation: {
         dropdown:{
-            true: 'fadeInDown',
-            false: 'fadeOutUp'
+            true: ['animated','fadeInDown'],
+            false: ['animated','fadeOutUp']
         }
       }
     }

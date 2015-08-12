@@ -11,7 +11,6 @@
     "lib/"
   ],
   "dependencies": {
-    "css-animation": "",
     "q": "^1.4.1",
     "reqwest": "^2.0.1",
     "es5-shim": "^4.1.10",

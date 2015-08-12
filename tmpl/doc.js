@@ -24,12 +24,12 @@ Doc.App = React.createClass({
     let config = {
         type:'GridLayout',
         option:{
-            size:'1'
+            size:'1-12'
         },
         children:[{
             type:'Menu',
             option:{
-                horizontal:true,
+                horizontal:false,
                 title:'React UI'
             },
             dataPovider: new MemoryDataPovider([{

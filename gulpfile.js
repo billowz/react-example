@@ -39,6 +39,10 @@ var fs = require('fs'),
     path: 'react-bootstrap',
     root: 'ReactBootstrap',
     lib: 'react-bootstrap'
+  }, {
+    path: 'q',
+    root: 'Q',
+    lib: 'q'
   }]),
   appCfg = {
     depDir: './dependency',
