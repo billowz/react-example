@@ -2,9 +2,9 @@
 let React = require('react'),
   Router = require('react-router'),
   {Routes, Route} = Router,
-  rui = require('react-ui'),
-  Workbench = rui.Workbench,
-  MemoryDataPovider = rui.Data.MemoryPovider,
+  RUI = require('react-ui'),
+  {Workbench} = RUI,
+  MemoryDataPovider = RUI.Data.MemoryPovider,
   Doc={};
   Doc.Compontent = {
     Layout : {
@@ -87,5 +87,5 @@ Router.run(routes, function (Handler) {
   React.render(<Handler/>, document.body);
 });*/
 
-rui.Doc = Doc;
-module.exports = rui;
+RUI.Doc = Doc;
+module.exports = RUI;
