@@ -1,4 +1,4 @@
-let React = require('react'),
+/*let React = require('react'),
   {Utils, Mixins, Styles, Paper, Overlay} = require('material-ui'),
   {KeyCode} = Utils,
   {StylePropable, WindowListenable} = Mixins,
@@ -144,3 +144,4 @@ let Side = React.createClass({
   }
 });
 module.exports = Side;
+*/

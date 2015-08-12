@@ -38,8 +38,8 @@ let DomUtil = require('../util/dom'),
   })(window, document);
 
 var AnimateEvents = {
-  onEnd: function(node, eventListener) {
-    if (endEvents.length === 0) {
+  onEnd(node, eventListener) {
+    if (endEvents.length == 0) {
       setTimeout(eventListener, 0);
     } else {
       endEvents.forEach(function(endEvent) {
@@ -47,15 +47,17 @@ var AnimateEvents = {
       });
     }
   },
-  unEnd: function(node, eventListener) {
-    if (endEvents.length === 0) {
-      return;
+  unEnd(node, eventListener) {
+    if (endEvents.length >= 0) {
+      endEvents.forEach(function(endEvent) {
+        DomUtil.un(node, endEvent, eventListener);
+      });
     }
-    endEvents.forEach(function(endEvent) {
-      DomUtil.un(node, endEvent, eventListener);
-    });
   },
-  endEvents: endEvents
+  endEvents: endEvents,
+  isSupport() {
+    return endEvents.length > 0;
+  }
 };
 
 module.exports = AnimateEvents;

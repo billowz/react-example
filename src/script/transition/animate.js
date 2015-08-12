@@ -19,24 +19,29 @@ class CssAnimateProcessor extends AnimateProcessor {
     super(option);
     this._endListen = null;
   }
-  run() {
-    if (this._endListen) {
-      this._endListen();
+  _end() {
+    this.end.call(this, this);
+    if (is.fn(this.onEnd)) {
+      this.onEnd();
     }
-    let _self = this;
-    this._endListen = function(e) {
-      if (_self !== this || (e && e.target !== this.el)) {
-        return;
-      }
-      Event.unEnd(this.el, this._endListen);
-      this._endListen = null;
-      this.end.call(this, this);
-      if (is.fn(this.onEnd)) {
-        this.onEnd();
-      }
-    }.bind(this);
-    Event.onEnd(this.el, this._endListen);
-    this.start.call(this);
+  }
+  run() {
+    this.stop();
+    if (!Event.isSupport()) {
+      setTimeout(this._end.bind(this), 0);
+    } else {
+      let _self = this;
+      this._endListen = function(e) {
+        if (_self !== this || (e && e.target !== this.el)) {
+          return;
+        }
+        Event.unEnd(this.el, this._endListen);
+        this._endListen = null;
+        this._end();
+      }.bind(this);
+      Event.onEnd(this.el, this._endListen);
+      this.start.call(this);
+    }
   }
   stop() {
     if (this._endListen) {
@@ -60,7 +65,8 @@ let transitionDefine = {
     },
     option: {
       start() {
-        setTimeout(dom.addCls.bind(dom, this.el, this.transition), 0);
+        dom.addCls(this.el, this.transition);
+      //setTimeout(dom.addCls.bind(dom, this.el, this.transition), 0);
       },
       end() {
         dom.removeCls(this.el, this.transition);
@@ -74,7 +80,8 @@ let transitionDefine = {
     },
     option: {
       start() {
-        setTimeout(dom.css.bind(dom, this.el, this.transition), 0);
+        dom.css(this.el, this.transition);
+      //setTimeout(dom.css.bind(dom, this.el, this.transition), 0);
       },
       end() {
         dom.cleanInnerCss(this.el, Object.keys(this.transition));

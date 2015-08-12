@@ -5,6 +5,6 @@
  */
 
 module.exports = {
-    Grid: require('./grid'),
-    Side: require('./side')
+  Grid: require('./grid'),
+  Side: require('./side')
 };

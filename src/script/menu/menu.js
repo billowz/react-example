@@ -18,9 +18,9 @@ let MenuItem = React.createClass({
   getDefaultProps() {
     return {
       dropdownAnimation: {
-        dropdown:{
-            true: ['animated','fadeInDown'],
-            false: ['animated','fadeOutUp']
+        dropdown: {
+          true: ['animated', 'fadeInDown'],
+          false: ['animated', 'fadeOutUp']
         }
       }
     }
@@ -51,13 +51,17 @@ let MenuItem = React.createClass({
     }
   },
   renderSubs() {
+    if (!this.id) {
+
+      this.id = new Date().toString();
+    }
     if (this.hasSub()) {
       let subItems = this.props.children.map(function(c, idx) {
         return <MenuItem {...c} ref={idx} key={idx} onSelect={this.onSelectSub}
-                autoCloseDropdown={this.props.autoCloseDropdown}></MenuItem>
+          autoCloseDropdown={this.props.autoCloseDropdown}></MenuItem>
       }.bind(this));
-      return <Transition component='ul' className="pure-menu-children" dropdown={this.state.isDropdown}
-                animation={this.props.dropdownAnimation}>{subItems}</Transition>
+      return <Transition id={this.id} component='ul' className="pure-menu-children" dropdown={this.state.isDropdown}
+        animation={this.props.dropdownAnimation}>{subItems}</Transition>
     }
   },
   onSelectSub(hierarchy) {
@@ -87,6 +91,7 @@ let MenuItem = React.createClass({
     e.preventDefault();
     if (this.hasSub()) {
       this.setDropdownState(!this.isDropdown());
+      console.log(this.id, this.isDropdown())
     } else {
       this.props.onSelect([this]);
     }
@@ -107,8 +112,8 @@ let Menu = Compontent('Menu', {
     return {
       horizontal: true,
       menuAnimation: {
-        enter:'fadeInDown',
-        leave:'fadeOutDown'
+        enter: 'fadeInDown',
+        leave: 'fadeOutDown'
       }
     }
   },
@@ -137,13 +142,14 @@ let Menu = Compontent('Menu', {
     if (this.state.data) {
       return this.state.data.map(function(c, idx) {
         return <MenuItem {...c} ref={MENU_ITEM_PREFIX + idx} key={idx}
-                 onSelect={this.onMenuSelect} autoCloseDropdown={this.props.horizontal}></MenuItem>;
+          onSelect={this.onMenuSelect} autoCloseDropdown={this.props.horizontal}></MenuItem>;
       }.bind(this));
     }
   },
   onMenuSelect(hierarchy) {
     Object.keys(this.refs).forEach(function(key) {
-      if (key.startsWith(MENU_ITEM_PREFIX)) {
+      console.log(typeof key, ' ', key)
+      if (key.indexOf(MENU_ITEM_PREFIX) == 0) {
         this.refs[key].unSelect();
       }
     }.bind(this));

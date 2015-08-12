@@ -45,7 +45,6 @@ let Transition = React.createClass({
     Object.keys(this.props.animation).forEach(function(type) {
       if (this.props[type] != nextProps[type]) {
         this.transition(type, nextProps[type]);
-        console.log('--->>', type, this.props[type], nextProps[type])
       }
     }.bind(this))
   },

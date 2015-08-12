@@ -32,7 +32,6 @@ const DropdownStateMixin = {
     } else {
       this.unbindRootCloseHandlers();
     }
-
     this.setState({
       isDropdown: newState
     }, onStateChangeComplete);

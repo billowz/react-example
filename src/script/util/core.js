@@ -81,7 +81,7 @@ let core = {
       throw new Error('Invalid param', arguments);
     }
     for (i = 0; i < iconClasses.length; i++) {
-      if (iconClasses[i].startsWith('fa-')) {
+      if (iconClasses[i].indexOf('fa-') == 0) {
         isFa = true;
       }
     }
