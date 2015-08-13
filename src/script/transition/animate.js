@@ -1,7 +1,6 @@
 let Event = require('./animate-event'),
   Util = require('../util/util'),
-  {is, dom} = Util,
-  BindEndListenName = 'cssAnimationEndListener';
+  {is, dom} = Util;
 
 class AnimateProcessor {
   constructor(option) {
@@ -9,106 +8,121 @@ class AnimateProcessor {
     if (!is.element(this.el)) {
       throw 'Invalid Element';
     }
-  }
-  run() {}
-  stop() {}
-}
-;
-class CssAnimateProcessor extends AnimateProcessor {
-  constructor(option) {
-    super(option);
-    this._endListen = null;
-  }
-  _end() {
-    this.end.call(this, this);
-    if (is.fn(this.onEnd)) {
-      this.onEnd();
-    }
+    this.el.__transition = this.el.__transition || new Map();
   }
   run() {
-    this.stop();
-    if (!Event.isSupport()) {
-      setTimeout(this._end.bind(this), 0);
-    } else {
-      let _self = this;
-      this._endListen = function(e) {
-        if (_self !== this || (e && e.target !== this.el)) {
-          return;
-        }
-        Event.unEnd(this.el, this._endListen);
-        this._endListen = null;
-        this._end();
-      }.bind(this);
-      Event.onEnd(this.el, this._endListen);
-      this.start.call(this);
-    }
+    throw 'Abstract Method run';
   }
   stop() {
-    if (this._endListen) {
-      this._endListen();
+    let listen;
+    if ( (listen = this.getEndListen()) ) {
+      listen();
     }
+  }
+  setEndListen(listen) {
+    this.el.__transition.set(this.transition, listen);
+  }
+  getEndListen() {
+    return this.el.__transition.get(this.transition);
   }
 }
 
-let transitionDefine = {
-  cls: {
-    processor: CssAnimateProcessor,
-    is(transitionName) {
-      if (is.string(transitionName) && transitionName.trim()) {
-        return true;
-      } else if (is.array(transitionName)) {
-        return transitionName.filter(function(n) {
-            return is.string(n) && n.trim();
-          }).length > 0;
+class AbstractCssAnimateProcessor extends AnimateProcessor {
+  constructor(option) {
+    super(option);
+  }
+  run() {
+    this.stop();
+    return new Promise(function(resolve, reject) {
+      if (!Event.isSupport()) {
+        setTimeout(reject.bind(null, this, 'CSS Transition is Not Supported'), 0);
+      } else {
+        let listen = function(e) {
+          if (e && e.target !== this.el) {
+            return;
+          }
+          if (listen._timeout) {
+            clearTimeout(listen._timeout);
+          }
+          this._endTransition();
+          resolve(this);
+        }.bind(this);
+
+        listen._timeout = setTimeout(function() {
+          this._endTransition();
+          reject('CSS Transition Timeout');
+        }.bind(this), 30000);
+
+        this.setEndListen(listen);
+        Event.onEnd(this.el, listen);
+        this.start();
       }
-      return false;
-    },
-    option: {
-      start() {
-        dom.addCls(this.el, this.transition);
-      //setTimeout(dom.addCls.bind(dom, this.el, this.transition), 0);
-      },
-      end() {
-        dom.removeCls(this.el, this.transition);
-      }
+    }.bind(this));
+  }
+  _endTransition() {
+    let listen = this.getEndListen();
+    if (listen) {
+      Event.unEnd(this.el, listen);
+      this.setEndListen(undefined);
     }
-  },
-  css: {
-    processor: CssAnimateProcessor,
-    is(css) {
-      return is.hash(css) && Object.keys(css).length > 0;
-    },
-    option: {
-      start() {
-        dom.css(this.el, this.transition);
-      //setTimeout(dom.css.bind(dom, this.el, this.transition), 0);
-      },
-      end() {
-        dom.cleanInnerCss(this.el, Object.keys(this.transition));
-      }
-    }
+    this.end();
+  }
+  start() {
+    throw 'Abstract Method start';
+  }
+  end() {
+    throw 'Abstract Method end';
   }
 }
-function registerAnimate(name, processor, isFn, option) {
-  if (!name) {
-    throw 'Invalid Animate Name';
+
+
+let transitionDefines = [],
+  transitionProcessorDefined = [];
+function registerAnimate(processor, parseTransition, option) {
+  if (arguments.length === 1) {
+    if (is.array(processor)) {
+      processor.forEach(function(pro) {
+        registerAnimate(pro);
+      })
+    } else if (is.hash(processor)) {
+      registerAnimate(processor.processor, processor.parseTransition, processor.option);
+    } else {
+      throw 'Invalid Param'
+    }
+  } else {
+    if (!(AnimateProcessor.isPrototypeOf(processor))) {
+      throw 'Invalid Processor';
+    }
+    if (transitionProcessorDefined.indexOf(processor) != -1) {
+      throw 'Animate is Registered ' + processor;
+    }
+    if (!is.fn(parseTransition)) {
+      throw 'Invalid Animate parseTransition';
+    }
+    transitionDefines.push({
+      processor: processor,
+      parseTransition: parseTransition,
+      option: option
+    });
+    transitionProcessorDefined.push(processor);
   }
-  if (name in transitionDefine) {
-    throw 'Animate is Registered ' + name;
-  }
-  if (!(processor instanceof AnimateProcessor)) {
-    throw 'Invalid Processor';
-  }
-  if (!is.fn(isFn)) {
-    throw 'Invalid Animate is'
-  }
-  transitionDefine[name] = {
-    processor: processor,
-    is: isFn,
-    option: option
-  };
 }
+
 class Animate {
+  /**
+   * Animate Constructor
+   * @param  {[Element]}   el         element
+   * @param  {[Object]}   transition
+   *         transition description
+   *         transition = {
+   *           class:'transitionClass',
+   *           css:{
+   *             color:'red'
+   *           }
+   *         }
+   * @param  {Function} callback   callback on Animate End
+   * @return {[Animate]}              Animate
+   */
   constructor(el, transition, callback) {
     if (!is.element(el)) {
       throw 'Invalid Element';
@@ -116,58 +130,131 @@ class Animate {
     if (!transition) {
       throw 'Invalid Transition';
     }
+    if (!is.array(transition)) {
+      transition = [transition];
+    }
     this._executed = [];
     this.el = el;
     this.transition = transition;
     this.onEnd = callback;
-    this.AnimateProcessors = Object.keys(transitionDefine)
-      .map(function(key) {
-        let define = transitionDefine[key],
-          tran = this.transition;
-        if (!define.is(tran)) {
-          if (tran[key]) {
-            tran = tran[key];
-            if (!define.is(tran)) {
-              return null;
-            }
-          }
+    let processors = [],
+      processorEnd = this.processorEnd.bind(this);
+    transition.forEach(function(transitionItem) {
+      let trans = [];
+      transitionDefines.forEach(function(define) {
+        let tran,
+          Processor = define.processor,
+          option = define.option || {};
+        if ( (tran = define.parseTransition.call(define, transitionItem)) ) {
+          option = Util.assign({}, option, {
+            transition: tran,
+            el: el,
+            onEnd: processorEnd
+          });
+          trans.push(new Processor(option));
         }
-        let option = Util.assign({}, define.option || {}, {
-          transition: tran,
-          el: this.el,
-          onEnd: this.processorEnd.bind(this)
-        });
-        return new define.processor(option);
-      }.bind(this)).filter(function(c) {
-      return !!c;
+      });
+      processors.push.apply(processors, trans);
     });
-    if (this.AnimateProcessors.length == 0) {
+    if (processors.length == 0) {
       throw 'Invalid Transition';
     }
+    this.animateProcessors = processors;
   }
   processorEnd(processor) {
     this._executed.push(processor);
-    if (this._executed.length == this.AnimateProcessors.length) {
+    if (this._executed.length == this.animateProcessors.length) {
       if (this.onEnd) {
         this.onEnd();
       }
     }
   }
   run() {
-    this.AnimateProcessors.forEach(function(pro) {
+    this.animateProcessors.forEach(function(pro) {
       pro.run();
     });
   }
   stop() {
-    this.AnimateProcessors.forEach(function(pro) {
+    this.animateProcessors.forEach(function(pro) {
       pro.stop();
     });
     this._executed = [];
   }
 }
 
-Animate.isCssAnimateSupported = Event.endEvents.length !== 0;
-Animate.registerAnimate = registerAnimate;
-Animate.AnimateProcessor = AnimateProcessor;
-Animate.CssAnimateProcessor = CssAnimateProcessor;
+
+class ClassNameAnimateProcessor extends AbstractCssAnimateProcessor {
+  constructor(option) {
+    super(option);
+  }
+  start() {
+    dom.addCls(this.el, this.transition);
+  }
+  end() {
+    dom.removeCls(this.el, this.transition);
+  }
+}
+
+class CssAnimateProcessor extends AbstractCssAnimateProcessor {
+  constructor(option) {
+    super(option);
+  }
+  start() {
+    dom.css(this.el, this.transition);
+  }
+  end() {
+    dom.cleanInnerCss(this.el, Object.keys(this.transition));
+  }
+}
+
+class CapacityAnimateProcessor extends AnimateProcessor {
+  constructor(option) {
+    super(option);
+  }
+  run() {
+    this.stop();
+    this.transition
+  }
+}
+
+registerAnimate([{
+  processor: ClassNameAnimateProcessor,
+  parseTransition(tran) {
+    if (is.string(tran) && tran.trim()) {
+      return tran;
+    } else if (is.array(tran) &&
+      tran.filter(function(n) {
+        return is.string(n) && n.trim();
+      }).length > 0) {
+      return tran;
+    } else if (is.hash(tran) && tran['class']) {
+      return this.parseTransition(tran['class']);
+    }
+    return false;
+  }
+}, {
+  processor: CssAnimateProcessor,
+  parseTransition(tran) {
+    if (is.hash(tran) && is.hash(tran['css']) && Object.keys(tran['css']).length > 0) {
+      return tran['css'];
+    }
+  }
+}, {
+  processor: CapacityAnimateProcessor,
+  parseTransition(tran) {
+    if (is.hash(tran) && is.hash(tran['capacity'])) {
+      return tran['capacity'];
+    }
+  }
+}]);
+
+Util.assign(Animate, {
+  isCssAnimateSupported: Event.endEvents.length > 0,
+  registerAnimate: registerAnimate,
+  AnimateProcessor: AnimateProcessor,
+  AbstractCssAnimateProcessor: AbstractCssAnimateProcessor,
+  ClassNameAnimateProcessor: ClassNameAnimateProcessor,
+  CssAnimateProcessor: CssAnimateProcessor,
+  CapacityAnimateProcessor: CapacityAnimateProcessor
+});
 module.exports = Animate;

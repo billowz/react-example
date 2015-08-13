@@ -1,9 +1,7 @@
 let React = require('react'),
-  Router = require('react-router'),
-  {Routes, Route} = Router,
   RUI = require('react-ui'),
-  {Workbench} = RUI,
-  MemoryDataPovider = RUI.Data.MemoryPovider,
+  {Workbench, Data} = RUI,
+  MemoryDataPovider = Data.MemoryPovider,
   Doc={};
   Doc.Compontent = {<% for (var i = 0; i < modules.length; i++) { %>
     <%= modules[i].name %> : {

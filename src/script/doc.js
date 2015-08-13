@@ -1,22 +1,10 @@
 /*@MODULE_GENERATOR@*/
 let React = require('react'),
-  Router = require('react-router'),
-  {Routes, Route} = Router,
   RUI = require('react-ui'),
-  {Workbench} = RUI,
-  MemoryDataPovider = RUI.Data.MemoryPovider,
+  {Workbench, Data} = RUI,
+  MemoryDataPovider = Data.MemoryPovider,
   Doc={};
   Doc.Compontent = {
-    Layout : {
-        demos : {
-            Demo : {
-                compontent : require('./layout/doc/demo'),
-                code : ''
-            }
-        },
-        readmes : {
-        }
-    },
     Workbench : {
         demos : {
             Demo : {
@@ -26,6 +14,16 @@ let React = require('react'),
         },
         readmes : {
             Readme : 'read me\n'
+        }
+    },
+    Layout : {
+        demos : {
+            Demo : {
+                compontent : require('./layout/doc/demo'),
+                code : ''
+            }
+        },
+        readmes : {
         }
     }
   };

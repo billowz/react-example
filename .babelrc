@@ -1,8 +1,10 @@
 {
+  "stage": 0,
+  "loose": true,
+  "blacklist": [
+    "es6.tailCall"
+  ],
   "optional": [
-    "es7.classProperties",
-    "es7.exportExtensions",
-    "es7.objectRestSpread",
     "runtime"
   ]
 }

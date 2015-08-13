@@ -19,8 +19,12 @@ let MenuItem = React.createClass({
     return {
       dropdownAnimation: {
         dropdown: {
-          true: ['animated', 'fadeInDown'],
-          false: ['animated', 'fadeOutUp']
+          true: {
+            class: ['animated', 'fadeInDown']
+          },
+          false: {
+            class: ['animated', 'fadeOutUp']
+          }
         }
       }
     }
@@ -112,8 +116,12 @@ let Menu = Compontent('Menu', {
     return {
       horizontal: true,
       menuAnimation: {
-        enter: 'fadeInDown',
-        leave: 'fadeOutDown'
+        enter: {
+          class: ['animated', 'fadeInDown']
+        },
+        leave: {
+          class: ['animated', 'fadeOutDown']
+        }
       }
     }
   },

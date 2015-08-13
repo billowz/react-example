@@ -10,8 +10,8 @@
 
 module.exports = {
   Button: require('./button/button'),
-  Data: require('./data/data'),
   Compontent: require('./compontent'),
+  Data: require('./data/data'),
   Dropdown: require('./dropdown/dropdown'),
   Event: require('./event/event'),
   Layout: require('./layout/layout'),
