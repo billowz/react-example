@@ -6,7 +6,6 @@ let React = require('react'),
 let Transition = React.createClass({
   protoTypes: {
     animation: React.PropTypes.object,
-    onEnd: React.PropTypes.func,
     component: React.PropTypes.string
   },
 
@@ -17,28 +16,43 @@ let Transition = React.createClass({
       onEnd: function() {}
     };
   },
-  transition(animationType, val) {
-    let node = React.findDOMNode(this),
-      ani = this.props.animation[animationType],
-      end = function(animationType, val) {
-        this._currentAnimate = null;
-        if (is.fn(this.props.onEnd)) {
-          this.props.onEnd(animationType, val);
-        }
-      }.bind(this, animationType, val);
-    if (arguments.length > 1 && animationType !== 'enter' && animationType !== 'leave') {
-      ani = ani[val];
+
+  getAnimate(opt) {
+    let el = React.findDOMNode(this),
+      animate;
+    if (opt) {
+      if (!this.__animates) {
+        this.__animates = new Map();
+      }
+      animate = this.__animates.get(opt);
+      if (!animate) {
+        animate = new Animate(el, opt);
+        this.__animates.set(opt, animate);
+      }
+    } else {
+      throw 'Invalid Transition';
     }
-    this.stop();
-    this._currentAnimate = new Animate(node, ani, end);
-    this._currentAnimate.run();
+    return animate;
   },
 
-  stop() {
-    if (this._currentAnimate) {
-      this._currentAnimate.stop();
-      this._currentAnimate = null;
+  stopTransition() {
+    if (this.__animates) {
+      let animate;
+      for (animate of this.__animates.values()) {
+        animate.stop();
+      }
     }
+  },
+
+  transition(animationType, val) {
+    let opt = this.props.animation[animationType];
+    if (opt && animationType !== 'enter' && animationType !== 'leave') {
+      opt = opt[val];
+    }
+    if (!opt) {
+      throw 'Transition is undefined';
+    }
+    return getAnimate(opt).run();
   },
 
   componentWillReceiveProps(nextProps) {

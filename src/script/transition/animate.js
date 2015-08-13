@@ -123,7 +123,7 @@ class Animate {
    * @param  {Function} callback   callback on Animate End
    * @return {[Animate]}              Animate
    */
-  constructor(el, transition, callback) {
+  constructor(el, transition) {
     if (!is.element(el)) {
       throw 'Invalid Element';
     }
@@ -133,12 +133,9 @@ class Animate {
     if (!is.array(transition)) {
       transition = [transition];
     }
-    this._executed = [];
     this.el = el;
     this.transition = transition;
-    this.onEnd = callback;
-    let processors = [],
-      processorEnd = this.processorEnd.bind(this);
+    let processors = [];
     transition.forEach(function(transitionItem) {
       let trans = [];
       transitionDefines.forEach(function(define) {
@@ -148,8 +145,7 @@ class Animate {
         if ( (tran = define.parseTransition.call(define, transitionItem)) ) {
           option = Util.assign({}, option, {
             transition: tran,
-            el: el,
-            onEnd: processorEnd
+            el: el
           });
           trans.push(new Processor(option));
         }
@@ -161,24 +157,15 @@ class Animate {
     }
     this.animateProcessors = processors;
   }
-  processorEnd(processor) {
-    this._executed.push(processor);
-    if (this._executed.length == this.animateProcessors.length) {
-      if (this.onEnd) {
-        this.onEnd();
-      }
-    }
-  }
   run() {
-    this.animateProcessors.forEach(function(pro) {
-      pro.run();
-    });
+    return Promise.all(this.animateProcessors.map(function(pro) {
+      return pro.run();
+    }));
   }
   stop() {
     this.animateProcessors.forEach(function(pro) {
       pro.stop();
     });
-    this._executed = [];
   }
 }
 
@@ -419,6 +406,7 @@ var Tween = {
     }
   }
 }
+
 class RequestAnimationFrameProcessor extends AnimateProcessor {
   constructor(option) {
     super(option);

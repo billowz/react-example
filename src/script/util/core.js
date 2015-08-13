@@ -1,5 +1,4 @@
-let q = require('q'),
-  is = require('is');
+let is = require('is');
 function _arrayEmptyFilter(v) {
   return v;
 }
@@ -93,12 +92,6 @@ let core = {
 
   objectWithoutProperties() {
     return _objectWithoutProperties.apply(this, arguments);
-  },
-
-  promise(c) {
-    let def = Q.defer();
-    c(def);
-    return def.promise;
   },
 
   chainedFunc(...funcs) {

@@ -5,6 +5,16 @@ let React = require('react'),
   MemoryDataPovider = Data.MemoryPovider,
   Doc={};
   Doc.Compontent = {
+    Layout : {
+        demos : {
+            Demo : {
+                compontent : require('./layout/doc/demo'),
+                code : ''
+            }
+        },
+        readmes : {
+        }
+    },
     Workbench : {
         demos : {
             Demo : {
@@ -14,16 +24,6 @@ let React = require('react'),
         },
         readmes : {
             Readme : 'read me\n'
-        }
-    },
-    Layout : {
-        demos : {
-            Demo : {
-                compontent : require('./layout/doc/demo'),
-                code : ''
-            }
-        },
-        readmes : {
         }
     }
   };
