@@ -172,6 +172,15 @@ let core = {
       }
     }
     return assign.apply(this, [target, keyFilter].concat(srouces));
+  },
+
+  upperFirst(str) {
+    if (is.string(str)) {
+      return str.replace(/^[a-z]/, function(w) {
+        return w.toUpperCase();
+      });
+    }
+    return str;
   }
 }
 module.exports = core;
