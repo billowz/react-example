@@ -39,7 +39,7 @@ let Transition = React.createClass({
     if (this.__animates) {
       let animate;
       for (animate of this.__animates.values()) {
-        animate.stop();
+      animate.stop();
       }
     }
   },
@@ -52,7 +52,7 @@ let Transition = React.createClass({
     if (!opt) {
       throw 'Transition is undefined';
     }
-    return getAnimate(opt).run();
+    return this.getAnimate(opt).run();
   },
 
   componentWillReceiveProps(nextProps) {

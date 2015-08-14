@@ -1,4 +1,5 @@
-let is = require('is');
+let q = require('q'),
+  is = require('is');
 function _arrayEmptyFilter(v) {
   return v;
 }
@@ -43,6 +44,20 @@ let core = {
   },
   err(...args) {
     callconsole('error', args);
+  },
+  promise(c) {
+    let def = Q.defer();
+    c(def);
+    return def.promise;
+  },
+  promiseAll(promises) {
+    if (!is.array(promises)) {
+      promises = [];
+      for (var i = 0; i < arguments.length; i++) {
+        promises[i] = arguments[i];
+      }
+    }
+    return Q.promise.all(promises);
   },
   arrayEmptyFilter: _arrayEmptyFilter,
   emptyFn() {},
@@ -123,6 +138,7 @@ let core = {
         array.push(val);
       }
     });
+    return array;
   },
 
   removeArrayValues(array, ...remVals) {

@@ -14,9 +14,9 @@ module.exports = {
   Data: require('./data/data'),
   Dropdown: require('./dropdown/dropdown'),
   Event: require('./event/event'),
-  Layout: require('./layout/layout'),
-  Menu: require('./menu/menu'),
   Nav: require('./nav/nav'),
+  Menu: require('./menu/menu'),
+  Layout: require('./layout/layout'),
   Transition: require('./transition/transition'),
   Util: require('./util/util'),
   Workbench: require('./workbench/workbench')

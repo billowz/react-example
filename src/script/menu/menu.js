@@ -20,6 +20,13 @@ let MenuItem = React.createClass({
       dropdownAnimation: {
         dropdown: {
           true: {
+            tween: {
+              from: {
+                height: '200px',
+                border: '2px solid #ccc;'
+              },
+              height: '500px'
+            },
             class: ['animated', 'fadeInDown']
           },
           false: {

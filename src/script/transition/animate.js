@@ -1,5 +1,7 @@
 let Event = require('./animate-event'),
   Util = require('../util/util'),
+  Effects = require('./animate-effects'),
+  AnimationFrame = require('./animation-frame'),
   {is, dom} = Util;
 
 class AnimateProcessor {
@@ -8,34 +10,25 @@ class AnimateProcessor {
     if (!is.element(this.el)) {
       throw 'Invalid Element';
     }
-    this.el.__transition = this.el.__transition || new Map();
   }
   run() {
     throw 'Abstract Method run';
   }
   stop() {
-    let listen;
-    if ( (listen = this.getEndListen()) ) {
-      listen();
-    }
-  }
-  setEndListen(listen) {
-    this.el.__transition.set(this.transition, listen);
-  }
-  getEndListen() {
-    return this.el.__transition.get(this.transition);
+    throw 'Abstract Method stop';
   }
 }
 
 class AbstractCssAnimateProcessor extends AnimateProcessor {
   constructor(option) {
     super(option);
+    this.el.__transition = this.el.__transition || new Map();
   }
   run() {
     this.stop();
-    return new Promise(function(resolve, reject) {
+    return Util.promise(function(def) {
       if (!Event.isSupport()) {
-        setTimeout(reject.bind(null, this, 'CSS Transition is Not Supported'), 0);
+        setTimeout(def.reject.bind(def, this, 'CSS Transition is Not Supported'), 0);
       } else {
         let listen = function(e) {
           if (e && e.target !== this.el) {
@@ -45,32 +38,44 @@ class AbstractCssAnimateProcessor extends AnimateProcessor {
             clearTimeout(listen._timeout);
           }
           this._endTransition();
-          resolve(this);
+          def.resolve(this);
         }.bind(this);
 
         listen._timeout = setTimeout(function() {
           this._endTransition();
-          reject('CSS Transition Timeout');
+          def.reject(this, 'CSS Transition Timeout');
         }.bind(this), 30000);
 
-        this.setEndListen(listen);
+        this._setEndListen(listen);
         Event.onEnd(this.el, listen);
-        this.start();
+        this._start();
       }
     }.bind(this));
   }
+  stop() {
+    let listen;
+    if ( (listen = this._getEndListen()) ) {
+      listen();
+    }
+  }
+  _setEndListen(listen) {
+    this.el.__transition.set(this.transition, listen);
+  }
+  _getEndListen() {
+    return this.el.__transition.get(this.transition);
+  }
   _endTransition() {
-    let listen = this.getEndListen();
+    let listen = this._getEndListen();
     if (listen) {
       Event.unEnd(this.el, listen);
-      this.setEndListen(undefined);
+      this._setEndListen(undefined);
     }
-    this.end();
+    this._end();
   }
-  start() {
+  _start() {
     throw 'Abstract Method start';
   }
-  end() {
+  _end() {
     throw 'Abstract Method end';
   }
 }
@@ -158,7 +163,7 @@ class Animate {
     this.animateProcessors = processors;
   }
   run() {
-    return Promise.all(this.animateProcessors.map(function(pro) {
+    return Util.promiseAll(this.animateProcessors.map(function(pro) {
       return pro.run();
     }));
   }
@@ -174,10 +179,10 @@ class ClassNameAnimateProcessor extends AbstractCssAnimateProcessor {
   constructor(option) {
     super(option);
   }
-  start() {
+  _start() {
     dom.addCls(this.el, this.transition);
   }
-  end() {
+  _end() {
     dom.removeCls(this.el, this.transition);
   }
 }
@@ -185,235 +190,95 @@ class ClassNameAnimateProcessor extends AbstractCssAnimateProcessor {
 class CssAnimateProcessor extends AbstractCssAnimateProcessor {
   constructor(option) {
     super(option);
+    this._cssNames = Object.keys(this.transition);
   }
-  start() {
+  _start() {
+    this._oldCss = dom.innerCss(this.el, this._cssNames);
     dom.css(this.el, this.transition);
   }
-  end() {
-    dom.cleanInnerCss(this.el, Object.keys(this.transition));
+  _end() {
+    dom.css(this.el, this._oldCss);
   }
 }
 
-function getWindowProp(prop, defaultVal) {
-  let val = window[prop];
-  if (val) {
-    return val;
-  }
-  let prefixes = 'webkit moz ms o'.split(' '), i;
-  for (i = 0; i < prefixes.length; i++) {
-    if( (val = window[prefixes[i] + Util.upperFirst(prop)]) ) {
-      return val;
-    }
-  }
-  return defaultVal;
-}
-
-var lastTime = 0;
-let requestAnimationFrame = getWindowProp('requestAnimationFrame', function(callback) {
-    let currTime = new Date().getTime(),
-      timeToCall = Math.max(0, 16 - (currTime - lastTime)),
-      id = setTimeout(function() {
-        callback(currTime + timeToCall);
-      }, timeToCall);
-    lastTime = currTime + timeToCall;
-    return id;
-  }),
-  cancelAnimationFrame = getWindowProp('cancelAnimationFrame', function(reqId) {
-    clearTimeout(id);
-  });
-
-
-/*
- * Tween.js
- * t: current time（当前时间）
- * b: beginning value（初始值）
- * c: change in value（变化量）
- * d: duration（持续时间）
-*/
-var Tween = {
-  Linear: function(t, b, c, d) {
-    return c * t / d + b;
-  },
-  Quad: {
-    easeIn: function(t, b, c, d) {
-      return c * (t /= d) * t + b;
-    },
-    easeOut: function(t, b, c, d) {
-      return -c * (t /= d) * (t - 2) + b;
-    },
-    easeInOut: function(t, b, c, d) {
-      if ((t /= d / 2) < 1) return c / 2 * t * t + b;
-      return -c / 2 * ((--t) * (t - 2) - 1) + b;
-    }
-  },
-  Cubic: {
-    easeIn: function(t, b, c, d) {
-      return c * (t /= d) * t * t + b;
-    },
-    easeOut: function(t, b, c, d) {
-      return c * ((t = t / d - 1) * t * t + 1) + b;
-    },
-    easeInOut: function(t, b, c, d) {
-      if ((t /= d / 2) < 1) return c / 2 * t * t * t + b;
-      return c / 2 * ((t -= 2) * t * t + 2) + b;
-    }
-  },
-  Quart: {
-    easeIn: function(t, b, c, d) {
-      return c * (t /= d) * t * t * t + b;
-    },
-    easeOut: function(t, b, c, d) {
-      return -c * ((t = t / d - 1) * t * t * t - 1) + b;
-    },
-    easeInOut: function(t, b, c, d) {
-      if ((t /= d / 2) < 1) return c / 2 * t * t * t * t + b;
-      return -c / 2 * ((t -= 2) * t * t * t - 2) + b;
-    }
-  },
-  Quint: {
-    easeIn: function(t, b, c, d) {
-      return c * (t /= d) * t * t * t * t + b;
-    },
-    easeOut: function(t, b, c, d) {
-      return c * ((t = t / d - 1) * t * t * t * t + 1) + b;
-    },
-    easeInOut: function(t, b, c, d) {
-      if ((t /= d / 2) < 1) return c / 2 * t * t * t * t * t + b;
-      return c / 2 * ((t -= 2) * t * t * t * t + 2) + b;
-    }
-  },
-  Sine: {
-    easeIn: function(t, b, c, d) {
-      return -c * Math.cos(t / d * (Math.PI / 2)) + c + b;
-    },
-    easeOut: function(t, b, c, d) {
-      return c * Math.sin(t / d * (Math.PI / 2)) + b;
-    },
-    easeInOut: function(t, b, c, d) {
-      return -c / 2 * (Math.cos(Math.PI * t / d) - 1) + b;
-    }
-  },
-  Expo: {
-    easeIn: function(t, b, c, d) {
-      return (t == 0) ? b : c * Math.pow(2, 10 * (t / d - 1)) + b;
-    },
-    easeOut: function(t, b, c, d) {
-      return (t == d) ? b + c : c * (-Math.pow(2, -10 * t / d) + 1) + b;
-    },
-    easeInOut: function(t, b, c, d) {
-      if (t == 0) return b;
-      if (t == d) return b + c;
-      if ((t /= d / 2) < 1) return c / 2 * Math.pow(2, 10 * (t - 1)) + b;
-      return c / 2 * (-Math.pow(2, -10 * --t) + 2) + b;
-    }
-  },
-  Circ: {
-    easeIn: function(t, b, c, d) {
-      return -c * (Math.sqrt(1 - (t /= d) * t) - 1) + b;
-    },
-    easeOut: function(t, b, c, d) {
-      return c * Math.sqrt(1 - (t = t / d - 1) * t) + b;
-    },
-    easeInOut: function(t, b, c, d) {
-      if ((t /= d / 2) < 1) return -c / 2 * (Math.sqrt(1 - t * t) - 1) + b;
-      return c / 2 * (Math.sqrt(1 - (t -= 2) * t) + 1) + b;
-    }
-  },
-  Elastic: {
-    easeIn: function(t, b, c, d, a, p) {
-      var s;
-      if (t == 0) return b;
-      if ((t /= d) == 1) return b + c;
-      if (typeof p == "undefined")
-        p = d * .3;
-      if (!a || a < Math.abs(c)) {
-        s = p / 4;
-        a = c;
-      } else {
-        s = p / (2 * Math.PI) * Math.asin(c / a);
-      }
-      return -(a * Math.pow(2, 10 * (t -= 1)) * Math.sin((t * d - s) * (2 * Math.PI) / p)) + b;
-    },
-    easeOut: function(t, b, c, d, a, p) {
-      var s;
-      if (t == 0) return b;
-      if ((t /= d) == 1) return b + c;
-      if (typeof p == "undefined")
-        p = d * .3;
-      if (!a || a < Math.abs(c)) {
-        a = c;
-        s = p / 4;
-      } else {
-        s = p / (2 * Math.PI) * Math.asin(c / a);
-      }
-      return (a * Math.pow(2, -10 * t) * Math.sin((t * d - s) * (2 * Math.PI) / p) + c + b);
-    },
-    easeInOut: function(t, b, c, d, a, p) {
-      var s;
-      if (t == 0) return b;
-      if ((t /= d / 2) == 2) return b + c;
-      if (typeof p == "undefined")
-        p = d * (.3 * 1.5);
-      if (!a || a < Math.abs(c)) {
-        a = c;
-        s = p / 4;
-      } else {
-        s = p / (2 * Math.PI) * Math.asin(c / a);
-      }
-      if (t < 1) return -.5 * (a * Math.pow(2, 10 * (t -= 1)) * Math.sin((t * d - s) * (2 * Math.PI) / p)) + b;
-      return a * Math.pow(2, -10 * (t -= 1)) * Math.sin((t * d - s) * (2 * Math.PI) / p) * .5 + c + b;
-    }
-  },
-  Back: {
-    easeIn: function(t, b, c, d, s) {
-      if (typeof s == "undefined")
-        s = 1.70158;
-      return c * (t /= d) * t * ((s + 1) * t - s) + b;
-    },
-    easeOut: function(t, b, c, d, s) {
-      if (typeof s == "undefined")
-        s = 1.70158;
-      return c * ((t = t / d - 1) * t * ((s + 1) * t + s) + 1) + b;
-    },
-    easeInOut: function(t, b, c, d, s) {
-      if (typeof s == "undefined")
-        s = 1.70158;
-      if ((t /= d / 2) < 1) return c / 2 * (t * t * (((s *= (1.525)) + 1) * t - s)) + b;
-      return c / 2 * ((t -= 2) * t * (((s *= (1.525)) + 1) * t + s) + 2) + b;
-    }
-  },
-  Bounce: {
-    easeIn: function(t, b, c, d) {
-      return c - Tween.Bounce.easeOut(d - t, 0, c, d) + b;
-    },
-    easeOut: function(t, b, c, d) {
-      if ((t /= d) < (1 / 2.75)) {
-        return c * (7.5625 * t * t) + b;
-      } else if (t < (2 / 2.75)) {
-        return c * (7.5625 * (t -= (1.5 / 2.75)) * t + .75) + b;
-      } else if (t < (2.5 / 2.75)) {
-        return c * (7.5625 * (t -= (2.25 / 2.75)) * t + .9375) + b;
-      } else {
-        return c * (7.5625 * (t -= (2.625 / 2.75)) * t + .984375) + b;
-      }
-    },
-    easeInOut: function(t, b, c, d) {
-      if (t < d / 2) {
-        return Tween.Bounce.easeIn(t * 2, 0, c, d) * .5 + b;
-      } else {
-        return Tween.Bounce.easeOut(t * 2 - d, 0, c, d) * .5 + c * .5 + b;
-      }
-    }
-  }
-}
-
-class RequestAnimationFrameProcessor extends AnimateProcessor {
+class TweenFrameProcessor extends AnimateProcessor {
   constructor(option) {
     super(option);
+    this.effect = this.transition.effect || 'linear';
+    if (is.string(this.effect)) {
+      this.effect = Effects[this.effect];
+    }
+    if (!is.fn(this.effect)) {
+      throw 'Invalid effect ' + this.transition.effect;
+    }
+    this.duration = this.transition.duration || 500;
+    if (!is.number(this.duration)) {
+      throw 'Invalid duration ' + this.transition.duration;
+    }
+    this.from = this.transition.from || {};
+    this.keepTarget = this.transition.keepTarget === true;
+    this.target = this.transition.target || Util.assignWithout(this.transition, ['effect', 'duration', 'from']);
+    this._targetCssNames = Object.keys(this.target);
+    this._fromCssNames = Object.keys(this.from);
+    this._cssNames = Util.pushDistinctArray([].concat(this._targetCssNames), this._fromCssNames);
   }
   run() {
-    this.stop();
+    stop();
+    return Util.promise(function(def) {
+      this._beforeTransition();
 
+      this.endListen = function() {
+        if (this._AnimationFrameId) {
+          AnimationFrame.cancel(this._AnimationFrameId)
+          this._AnimationFrameId = null;
+        }
+        def.resolve(this);
+      }
+      this._transition(function() {
+        this._endTransition();
+        this.endListen();
+        this.endListen = null;
+        def.resolve(this);
+      }.bind(this));
+    }.bind(this));
+  }
+  stop() {
+    if (this.endListen) {
+      this.endListen();
+    }
+  }
+  _transition(callback) {
+    let t = new Date(),
+      duration = this.duration,
+      step = 0,
+      calc = function() {
+        if ((step = (new Date - t) / duration) >= 1) {
+          dom.css(this.el, this.target);
+          this._AnimationFrameId = null;
+          callback();
+        } else {
+          this._calStyles(step);
+          this._AnimationFrameId = AnimationFrame.request(calc);
+        }
+      }.bind(this);
+    calc();
+  }
+  _calStyles(step) {
+    this._targetCssNames.forEach(function(name) {});
+  }
+  _beforeTransition() {
+    this._oldCss = dom.innerCss(this.el, this._cssNames);
+    if (is.hash(this.from)) {
+      dom.css(this.el, this.from);
+    }
+    this._target$from = dom.css(this.el, this._targetCssNames);
+  }
+  _endTransition() {
+    if (!this.keepTarget) {
+      dom.css(this.el, this._oldCss);
+    }
+    this._oldCss = null;
+    this._target$from = null;
   }
 }
 
@@ -435,15 +300,15 @@ registerAnimate([{
 }, {
   processor: CssAnimateProcessor,
   parseTransition(tran) {
-    if (is.hash(tran) && is.hash(tran['css']) && Object.keys(tran['css']).length > 0) {
+    if (is.hash(tran) && is.hash(tran['css'])) {
       return tran['css'];
     }
   }
 }, {
-  processor: CapacityAnimateProcessor,
+  processor: TweenFrameProcessor,
   parseTransition(tran) {
-    if (is.hash(tran) && is.hash(tran['capacity'])) {
-      return tran['capacity'];
+    if (is.hash(tran) && is.hash(tran['tween'])) {
+      return tran['tween'];
     }
   }
 }]);
@@ -455,6 +320,8 @@ Util.assign(Animate, {
   AbstractCssAnimateProcessor: AbstractCssAnimateProcessor,
   ClassNameAnimateProcessor: ClassNameAnimateProcessor,
   CssAnimateProcessor: CssAnimateProcessor,
-  CapacityAnimateProcessor: RequestAnimationFrameProcessor
+  TweenFrameProcessor: TweenFrameProcessor,
+  AnimationFrame: AnimationFrame,
+  AnimateEffects: Effects
 });
 module.exports = Animate;
