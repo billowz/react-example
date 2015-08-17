@@ -6,7 +6,8 @@ let React = require('react'),
 
 const normalizeSize = (s = '') => s.toString().replace('/', '-');
 
-let GridCell = Compontent('GridLayoutCell', {
+let GridCell = React.createClass({
+  displayName: 'GridLayoutCell',
   propTypes: {
     size: PropTypes.string,
     sm: PropTypes.string,
@@ -67,7 +68,8 @@ let Grid = Compontent('GridLayout', {
     return <GridCell {...props}>{dom}</GridCell>;
   },
   render() {
-    return <div className='pure-g'>{this.renderCompontents()}</div>;
+    let cls = Util.parseClassName('pure-g', this.props.className)
+    return <div className={cls}>{this.renderCompontents()}</div>;
   }
 });
 module.exports = Grid;

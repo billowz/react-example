@@ -14,9 +14,10 @@ module.exports = {
   Data: require('./data/data'),
   Dropdown: require('./dropdown/dropdown'),
   Event: require('./event/event'),
-  Nav: require('./nav/nav'),
-  Menu: require('./menu/menu'),
   Layout: require('./layout/layout'),
+  Menu: require('./menu/menu'),
+  Mixins: require('./mixins/mixins'),
+  Nav: require('./nav/nav'),
   Transition: require('./transition/transition'),
   Util: require('./util/util'),
   Workbench: require('./workbench/workbench')

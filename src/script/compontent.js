@@ -1,5 +1,5 @@
 let React = require('react'),
-  {watch} = require("./util/util"),
+  {watch, is} = require("./util/util"),
   DataPovider = require('./data/povider'),
   {PropTypes} = React,
   comps = {};
@@ -34,17 +34,14 @@ Compontent.getCompontentNames = function(reg) {
   return names;
 }
 
-function _parseCompontent(cfg, key, idx, handler) {
+function _parseCompontent(cfg, idx, handler) {
   let Comp = cfg.type, dom, fdom,
     props = cfg.option || {};
-  if (typeof Comp === 'string') {
+  if (is.string(Comp)) {
     Comp = Compontent.getCompontent(cfg.type);
   }
-  if (key) {
-    props.key = key;
-  }
-  dom = (<Comp {...props} compontents={cfg.children} dataPovider={cfg.dataPovider}></Comp>);
-  if (typeof handler === 'function') {
+  dom = (<Comp {...props} compontents={cfg.children} dataPovider={cfg.dataPovider} key={idx} ref={idx}></Comp>);
+  if (is.fn(handler)) {
     fdom = handler.apply(this, [cfg, dom, idx]);
     if (fdom != undefined) {
       dom = fdom;
@@ -52,47 +49,30 @@ function _parseCompontent(cfg, key, idx, handler) {
   }
   return dom;
 }
-function _parseKey(key, idx) {
-  let useKey = false;
-  if (key) {
-    if (typeof key === 'string') {
-      if (idx)
-        useKey = key + '-' + idx;
-      else
-        useKey = key;
-    } else {
-      useKey = idx;
-    }
-  }
-  return useKey;
-}
-Compontent.renderCompontent = function(cfg, key, handler) {
-  return _parseCompontent(cfg, _parseKey(key, 0), 0, handler);
+
+Compontent.renderCompontent = function(cfg, handler) {
+  return _parseCompontent(cfg, 0, handler);
 }
 Compontent.renderCompontents = function renderCompontents(cfgs, key, handler) {
-  if (typeof key === 'function') {
+  if (is.fn(key)) {
     handler = key;
     key = null;
   }
   if (Array.isArray(cfgs)) {
     return cfgs.filter(function(cfg) {
-      return typeof cfg === 'object';
+      return is.hash(cfg);
     }).map(function(cfg, idx) {
-      return _parseCompontent(cfg, _parseKey(key, idx), idx, handler);
+      return _parseCompontent(cfg, idx, handler);
     });
-  } else if (typeof cfgs === 'object') {
-    return Object.keys(cfgs).filter(function(idx) {
-      return typeof cfgs[idx] === 'object';
-    }).map(function(idx) {
-      return _parseCompontent(cfg[key], _parseKey(key, idx), idx, handler);
-    });
+  } else if (is.hash(cfgs)) {
+    return _parseCompontent(cfgs, 0, handler);
   } else {
     throw new Error('Invalid param 0, need object or array', cfg);
   }
 }
 Compontent.Mixins = {
   propTypes: {
-    compontents: PropTypes.array,
+    compontents: PropTypes.oneOfType([PropTypes.array, PropTypes.object]),
     dataPovider: PropTypes.instanceOf(DataPovider)
   },
   getInitialState() {
@@ -129,11 +109,14 @@ Compontent.Mixins = {
       watch.unwatch(this.props, 'compontents', this.__compontentsWatchHandler);
     }
   },
-  renderCompontents(key) {
+  renderCompontents() {
     // reset this.props.compontents
     // change compontents
     //this.__watchCompontents();
-    return Compontent.renderCompontents(this.props.compontents, key, this.compontentHandler);
+    return Compontent.renderCompontents(this.props.compontents, this.compontentHandler);
+  },
+  getCompontent(idx) {
+    return this.refs[idx];
   }
 }
 module.exports = Compontent;

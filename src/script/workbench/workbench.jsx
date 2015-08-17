@@ -3,7 +3,7 @@ let Compontent = require('../compontent'),
 let Workbench = Compontent('Workbench', {
   render() {
     let cls = Util.parseClassName('workbench', this.props.className);
-    return <div className={cls}>{this.renderCompontents('main')}</div>
+    return <div className={cls}>{this.renderCompontents()}</div>
   }
 });
 module.exports = Workbench;

@@ -20,10 +20,7 @@ let React = require('react'),
 Doc.App = React.createClass({
   render: function(){
     let config = {
-        type:'GridLayout',
-        option:{
-            size:'1-12'
-        },
+        type:'SideLayout',
         children:[{
             type:'Menu',
             option:{
@@ -57,9 +54,24 @@ Doc.App = React.createClass({
                 text:'GitHub',
                 href:'https://github.com/tao-zeng/react-example'
             }])
+        },{
+          type:'GridLayout',
+          option:{
+            size:'1-2'
+          },
+          children:[{
+            type:'Button',
+            text:'Btn1'
+          },{
+            type:'Button',
+            text:'Btn2'
+          },{
+            type:'Button',
+            text:'Btn3'
+          }]
         }]
     }
-    return <Workbench compontents={[config]}></Workbench>
+    return <Workbench compontents={config}></Workbench>
   }
 });
 React.render(<Doc.App/>, document.body);

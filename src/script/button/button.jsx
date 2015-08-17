@@ -7,7 +7,8 @@ let Button = Compontent('Button', {
     active: PropTypes.bool,
     disabled: PropTypes.bool,
     primary: PropTypes.bool,
-    iconCls: PropTypes.string
+    iconCls: PropTypes.string,
+    text: PropTypes.string
   },
   getDefaultProps() {
     return {
