@@ -22,15 +22,20 @@ let MenuItem = React.createClass({
           true: {
             tween: {
               from: {
-                height: '200px',
-                border: '2px solid #ccc;'
+                overflow: 'hidden',
+                height: '0px'
               },
-              height: '500px'
-            },
-            class: ['animated', 'fadeInDown']
+              height: 'auto'
+            }
           },
           false: {
-            class: ['animated', 'fadeOutUp']
+            tween: {
+              from: {
+                overflow: 'hidden',
+                display: 'inline-block'
+              },
+              height: '0px'
+            }
           }
         }
       }

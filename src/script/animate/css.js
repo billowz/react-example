@@ -1,7 +1,7 @@
-let Event = require('./animate-event'),
+let CssEvent = require('./css-event'),
   Util = require('../util/util'),
-  Effects = require('./animate-effects'),
-  AnimationFrame = require('./animation-frame'),
+  Effects = require('./effects'),
+  AnimationFrame = require('./frame'),
   {is, dom} = Util;
 
 class AnimateProcessor {
@@ -16,67 +16,6 @@ class AnimateProcessor {
   }
   stop() {
     throw 'Abstract Method stop';
-  }
-}
-
-class AbstractCssAnimateProcessor extends AnimateProcessor {
-  constructor(option) {
-    super(option);
-    this.el.__transition = this.el.__transition || new Map();
-  }
-  run() {
-    this.stop();
-    return Util.promise(function(def) {
-      if (!Event.isSupport()) {
-        setTimeout(def.reject.bind(def, this, 'CSS Transition is Not Supported'), 0);
-      } else {
-        let listen = function(e) {
-          if (e && e.target !== this.el) {
-            return;
-          }
-          if (listen._timeout) {
-            clearTimeout(listen._timeout);
-          }
-          this._endTransition();
-          def.resolve(this);
-        }.bind(this);
-
-        listen._timeout = setTimeout(function() {
-          this._endTransition();
-          def.reject(this, 'CSS Transition Timeout');
-        }.bind(this), 30000);
-
-        this._setEndListen(listen);
-        Event.onEnd(this.el, listen);
-        this._start();
-      }
-    }.bind(this));
-  }
-  stop() {
-    let listen;
-    if ( (listen = this._getEndListen()) ) {
-      listen();
-    }
-  }
-  _setEndListen(listen) {
-    this.el.__transition.set(this.transition, listen);
-  }
-  _getEndListen() {
-    return this.el.__transition.get(this.transition);
-  }
-  _endTransition() {
-    let listen = this._getEndListen();
-    if (listen) {
-      Event.unEnd(this.el, listen);
-      this._setEndListen(undefined);
-    }
-    this._end();
-  }
-  _start() {
-    throw 'Abstract Method start';
-  }
-  _end() {
-    throw 'Abstract Method end';
   }
 }
 
@@ -175,6 +114,67 @@ class Animate {
 }
 
 
+class AbstractCssAnimateProcessor extends AnimateProcessor {
+  constructor(option) {
+    super(option);
+    this.el.__transition = this.el.__transition || new Map();
+  }
+  run() {
+    this.stop();
+    return Util.promise(function(def) {
+      if (!CssEvent.isSupport()) {
+        setTimeout(def.reject.bind(def, this, 'CSS Transition is Not Supported'), 0);
+      } else {
+        let listen = function(e) {
+          if (e && e.target !== this.el) {
+            return;
+          }
+          if (listen._timeout) {
+            clearTimeout(listen._timeout);
+          }
+          this._endTransition();
+          def.resolve(this);
+        }.bind(this);
+
+        listen._timeout = setTimeout(function() {
+          this._endTransition();
+          def.reject(this, 'CSS Transition Timeout');
+        }.bind(this), 30000);
+
+        this._setEndListen(listen);
+        CssEvent.onEnd(this.el, listen);
+        this._start();
+      }
+    }.bind(this));
+  }
+  stop() {
+    let listen;
+    if ( (listen = this._getEndListen()) ) {
+      listen();
+    }
+  }
+  _setEndListen(listen) {
+    this.el.__transition.set(this.transition, listen);
+  }
+  _getEndListen() {
+    return this.el.__transition.get(this.transition);
+  }
+  _endTransition() {
+    let listen = this._getEndListen();
+    if (listen) {
+      CssEvent.unEnd(this.el, listen);
+      this._setEndListen(undefined);
+    }
+    this._end();
+  }
+  _start() {
+    throw 'Abstract Method start';
+  }
+  _end() {
+    throw 'Abstract Method end';
+  }
+}
+
 class ClassNameAnimateProcessor extends AbstractCssAnimateProcessor {
   constructor(option) {
     super(option);
@@ -187,7 +187,7 @@ class ClassNameAnimateProcessor extends AbstractCssAnimateProcessor {
   }
 }
 
-class CssAnimateProcessor extends AbstractCssAnimateProcessor {
+class StyleAnimateProcessor extends AbstractCssAnimateProcessor {
   constructor(option) {
     super(option);
     this._cssNames = Object.keys(this.transition);
@@ -217,68 +217,69 @@ class TweenFrameProcessor extends AnimateProcessor {
     }
     this.from = this.transition.from || {};
     this.keepTarget = this.transition.keepTarget === true;
-    this.target = this.transition.target || Util.assignWithout(this.transition, ['effect', 'duration', 'from']);
+    this.target = this.transition.target || Util.assignWithout({}, ['effect', 'duration', 'from'], this.transition);
     this._targetCssNames = Object.keys(this.target);
     this._fromCssNames = Object.keys(this.from);
     this._cssNames = Util.pushDistinctArray([].concat(this._targetCssNames), this._fromCssNames);
   }
   run() {
-    stop();
+    this.stop();
+    this._beforeTransition();
     return Util.promise(function(def) {
-      this._beforeTransition();
-
-      this.endListen = function() {
-        if (this._AnimationFrameId) {
-          AnimationFrame.cancel(this._AnimationFrameId)
-          this._AnimationFrameId = null;
-        }
-        def.resolve(this);
-      }
-      this._transition(function() {
-        this._endTransition();
-        this.endListen();
-        this.endListen = null;
-        def.resolve(this);
-      }.bind(this));
+      this._animate = AnimationFrame.doAnimate(this.duration,
+        this._calStyles.bind(this), function(err) {
+          this._animate = null;
+          this._endTransition();
+          if (err) {
+            def.reject(err);
+          } else {
+            def.resolve();
+          }
+        }.bind(this));
     }.bind(this));
   }
   stop() {
-    if (this.endListen) {
-      this.endListen();
+    if (this._animate) {
+      this._animate();
     }
   }
-  _transition(callback) {
-    let t = new Date(),
-      duration = this.duration,
-      step = 0,
-      calc = function() {
-        if ((step = (new Date - t) / duration) >= 1) {
-          dom.css(this.el, this.target);
-          this._AnimationFrameId = null;
-          callback();
-        } else {
-          this._calStyles(step);
-          this._AnimationFrameId = AnimationFrame.request(calc);
-        }
-      }.bind(this);
-    calc();
-  }
   _calStyles(step) {
-    this._targetCssNames.forEach(function(name) {});
+    Object.keys(this._animateObj).forEach(function(name) {
+      let ani = this._animateObj[name],
+        style = this.effect(step, ani.from, ani.variation, this.duration) + ani.unit;
+      console.log(name, style)
+      dom.css(this.el, name, style);
+    }.bind(this));
   }
   _beforeTransition() {
     this._oldCss = dom.innerCss(this.el, this._cssNames);
-    if (is.hash(this.from)) {
-      dom.css(this.el, this.from);
-    }
-    this._target$from = dom.css(this.el, this._targetCssNames);
+    let fromCss, targetCss;
+    dom.css(this.el, this.target);
+    targetCss = dom.css(this.el, this._targetCssNames);
+    dom.css(this.el, Util.assign({}, this._oldCss, this.from || {}));
+    fromCss = dom.css(this.el, this._targetCssNames);
+
+    this._animateObj = {};
+    this._targetCssNames.forEach(function(name) {
+      let from = parseFloat(fromCss[name]),
+        to = parseFloat(targetCss[name]),
+        unit = name === 'opacity' ? '' : 'px',
+        variation = to - from;
+      this._animateObj[name] = {
+        from: from,
+        end: to,
+        variation: variation,
+        unit: unit
+      }
+    }.bind(this));
+    console.log(this._animateObj, this._target$from);
   }
   _endTransition() {
+    this.promise = null;
     if (!this.keepTarget) {
       dom.css(this.el, this._oldCss);
     }
     this._oldCss = null;
-    this._target$from = null;
   }
 }
 
@@ -298,7 +299,7 @@ registerAnimate([{
     return false;
   }
 }, {
-  processor: CssAnimateProcessor,
+  processor: StyleAnimateProcessor,
   parseTransition(tran) {
     if (is.hash(tran) && is.hash(tran['css'])) {
       return tran['css'];
@@ -314,14 +315,11 @@ registerAnimate([{
 }]);
 
 Util.assign(Animate, {
-  isCssAnimateSupported: Event.endEvents.length > 0,
   registerAnimate: registerAnimate,
   AnimateProcessor: AnimateProcessor,
   AbstractCssAnimateProcessor: AbstractCssAnimateProcessor,
   ClassNameAnimateProcessor: ClassNameAnimateProcessor,
-  CssAnimateProcessor: CssAnimateProcessor,
-  TweenFrameProcessor: TweenFrameProcessor,
-  AnimationFrame: AnimationFrame,
-  AnimateEffects: Effects
+  StyleAnimateProcessor: StyleAnimateProcessor,
+  TweenFrameProcessor: TweenFrameProcessor
 });
 module.exports = Animate;

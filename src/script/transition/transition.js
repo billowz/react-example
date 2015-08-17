@@ -1,5 +1,5 @@
 let React = require('react'),
-  Animate = require('./animate'),
+  CssAnimate = require('../animate/css'),
   Util = require('../util/util'),
   {is} = Util;
 
@@ -26,7 +26,7 @@ let Transition = React.createClass({
       }
       animate = this.__animates.get(opt);
       if (!animate) {
-        animate = new Animate(el, opt);
+        animate = new CssAnimate(el, opt);
         this.__animates.set(opt, animate);
       }
     } else {
@@ -77,5 +77,4 @@ let Transition = React.createClass({
     return <Component {...props}>{this.props.children}</Component>;
   }
 });
-Transition.Animate = Animate;
 module.exports = Transition;
