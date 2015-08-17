@@ -11,13 +11,15 @@ function callconsole(fn, ...args) {
 function assign(target, keyFilter, ...sources) {
   target = target || {};
   sources.forEach(function(source) {
-    let keys = Object.keys(source);
-    if (keyFilter) {
-      keys = keys.filter(keyFilter);
+    if (is.hash(source)) {
+      let keys = Object.keys(source);
+      if (keyFilter) {
+        keys = keys.filter(keyFilter);
+      }
+      keys.forEach(function(key) {
+        target[key] = source[key];
+      });
     }
-    keys.forEach(function(key) {
-      target[key] = source[key];
-    });
   });
   return target;
 }

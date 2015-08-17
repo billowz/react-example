@@ -14,6 +14,7 @@ module.exports = {
   Data: require('./data/data'),
   Dropdown: require('./dropdown/dropdown'),
   Event: require('./event/event'),
+  Http: require('./http/http'),
   Layout: require('./layout/layout'),
   Menu: require('./menu/menu'),
   Mixins: require('./mixins/mixins'),
