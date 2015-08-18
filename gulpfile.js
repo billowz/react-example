@@ -43,6 +43,10 @@ var fs = require('fs'),
     path: 'q',
     root: 'Q',
     lib: 'q'
+  }, {
+    path: 'reqwest',
+    root: 'reqwest',
+    lib: 'reqwest'
   }]),
   appCfg = {
     depDir: './dependency',
