@@ -1,10 +1,5 @@
 {
   "stage": 0,
-  "loose": true,
-  "blacklist": [
-    "es6.tailCall"
-  ],
-  "optional": [
-    "runtime"
-  ]
+  loose: "all",
+  "optional": ["runtime"]
 }

@@ -4,7 +4,7 @@
 let base = require('./core');
 base.assign(base, {
   dom: require('./dom'),
-  watch: require('./watch'),
+  observe: require('./observe'),
   cookie: require('./cookie')
 });
 module.exports = base;

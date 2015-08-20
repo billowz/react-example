@@ -1,5 +1,5 @@
-let Util = require('./core');
-var pluses = /\+/g;
+let Util = require('./core'),
+  pluses = /\+/g;
 
 function raw(s) {
   return s;
@@ -14,20 +14,17 @@ function converted(s) {
     // This is a quoted cookie as according to RFC2068, unescape
     s = s.slice(1, -1).replace(/\\"/g, '"').replace(/\\\\/g, '\\');
   }
-  try {
-    return config.json ? JSON.parse(s) : s;
-  } catch (er) {}
+  return config.json ? JSON.parse(s) : s;
 }
-
-var config, cookie;
-config = cookie = function(key, value, options) {
+let config, cookie;
+config = cookie = function cookie(key, value, options) {
 
   // write
   if (value !== undefined) {
     options = Util.assign({}, config.defaults, options || {});
 
     if (typeof options.expires === 'number') {
-      var days = options.expires,
+      let days = options.expires,
         t = options.expires = new Date();
       t.setDate(t.getDate() + days);
     }
@@ -46,13 +43,13 @@ config = cookie = function(key, value, options) {
   }
 
   // read
-  var decode = config.raw ? raw : decoded;
-  var cookies = document.cookie.split('; ');
-  var result = key ? undefined : {};
-  for (var i = 0, l = cookies.length; i < l; i++) {
-    var parts = cookies[i].split('=');
-    var name = decode(parts.shift());
-    var cookie = decode(parts.join('='));
+  let decode = config.raw ? raw : decoded,
+    cookies = document.cookie.split('; '),
+    result = key ? undefined : {};
+  for (let i = 0, l = cookies.length; i < l; i++) {
+    let parts = cookies[i].split('='),
+      name = decode(parts.shift()),
+      cookie = decode(parts.join('='));
 
     if (key && key === name) {
       result = converted(cookie);

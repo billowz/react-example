@@ -1,4 +1,4 @@
-let org_cometd = require('cometd-cjs'),
+let Cometd = require('cometd-cjs'),
   ajax = require('reqwest');
 function _setHeaders(xhr, headers) {
   if (headers) {
@@ -11,8 +11,8 @@ function _setHeaders(xhr, headers) {
   }
 }
 function LongPollingTransport() {
-  var _super = new org_cometd.LongPollingTransport();
-  var that = org_cometd.Transport.derive(_super);
+  var _super = new Cometd.LongPollingTransport();
+  var that = Cometd.Transport.derive(_super);
 
   that.xhrSend = function(packet) {
     return ajax({
@@ -28,28 +28,6 @@ function LongPollingTransport() {
         packet.onError(xhr.statusText, xhr.response);
       }
     });
-  /*
-  return ajax({
-    url: packet.url,
-    async: packet.sync !== true,
-    type: 'POST',
-    contentType: 'application/json;charset=UTF-8',
-    data: packet.body,
-    xhrFields: {
-      // Has no effect if the request is not cross domain
-      // but if it is, allows cookies to be sent to the server
-      withCredentials: true
-    },
-    beforeSend: function(xhr) {
-      _setHeaders(xhr, packet.headers);
-      // Returning false will abort the XHR send
-      return true;
-    },
-    success: packet.onSuccess,
-    error: function(xhr, reason, exception) {
-      packet.onError(reason, exception);
-    }
-  });*/
   };
   return that;
 }
@@ -57,46 +35,37 @@ function LongPollingTransport() {
 
 
 function CallbackPollingTransport() {
-  var _super = new org_cometd.CallbackPollingTransport();
-  var that = org_cometd.Transport.derive(_super);
+  var _super = new Cometd.CallbackPollingTransport();
+  var that = Cometd.Transport.derive(_super);
   that.jsonpSend = function(packet) {
-    ajax({
+    return ajax({
       url: packet.url,
-      async: packet.sync !== true,
-      type: 'GET',
-      dataType: 'jsonp',
-      jsonp: 'jsonp',
+      method: 'POST',
+      type: 'jsonp',
       data: {
-        // In callback-polling, the content must be sent via the 'message' parameter
         message: packet.body
       },
-      beforeSend: function(xhr) {
-        _setHeaders(xhr, packet.headers);
-        // Returning false will abort the XHR send
-        return true;
-      },
+      headers: packet.headers,
       success: packet.onSuccess,
-      error: function(xhr, reason, exception) {
-        packet.onError(reason, exception);
+      error: function(xhr) {
+        packet.onError(xhr.statusText, xhr.response);
       }
     });
   };
   return that;
 }
 module.exports = function(name, extensions) {
-  var cometd = new org_cometd.Cometd(name);
-
+  var cometd = new Cometd.CometD(name);
+  extensions = extensions ? is.array(extensions) ? extensions : [extensions] : [];
   // Registration order is important
-  if (org_cometd.WebSocket) {
-    cometd.registerTransport('websocket', new org_cometd.WebSocketTransport());
+  if (Cometd.WebSocket) {
+    cometd.registerTransport('websocket', new Cometd.WebSocketTransport());
   }
   cometd.registerTransport('long-polling', new LongPollingTransport());
   cometd.registerTransport('callback-polling', new CallbackPollingTransport());
-  if (extensions) {
-    extensions.forEach(function(ext) {
-      cometd.registerExtension(ext.name, ext)
-    });
-  }
+  extensions.forEach(function(ext) {
+    cometd.registerExtension(ext.name, ext)
+  });
   return cometd;
 };
 

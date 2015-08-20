@@ -36,7 +36,7 @@ module.exports = (function(window) {
           try {
             if (stoped) {
               onEnd('cancel');
-            } else if ((step = new Date - t) >= duration) {
+            } else if ((step = new Date() - t) >= duration) {
               onEnd();
             } else {
               onStep(step);

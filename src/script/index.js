@@ -11,16 +11,16 @@
 module.exports = {
   Animate: require('./animate/animate'),
   Button: require('./button/button'),
-  Data: require('./data/data'),
   Compontent: require('./compontent'),
+  Data: require('./data/data'),
+  Dropdown: require('./dropdown/dropdown'),
+  Event: require('./event/event'),
   Http: require('./http/http'),
   Layout: require('./layout/layout'),
-  Dropdown: require('./dropdown/dropdown'),
   Menu: require('./menu/menu'),
   Mixins: require('./mixins/mixins'),
   Nav: require('./nav/nav'),
   Transition: require('./transition/transition'),
-  Event: require('./event/event'),
   Util: require('./util/util'),
   Workbench: require('./workbench/workbench')
 };

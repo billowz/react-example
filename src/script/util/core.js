@@ -8,7 +8,7 @@ function callconsole(fn, ...args) {
     return console[fn].apply(console, args);
   }
 }
-function assign(target, keyFilter, ...sources) {
+function _assign(target, keyFilter, ...sources) {
   target = target || {};
   sources.forEach(function(source) {
     if (is.hash(source)) {
@@ -162,7 +162,7 @@ let core = {
   },
 
   assign(target, ...sources) {
-    return assign.apply(this, [target, null].concat(sources));
+    return _assign.apply(this, [target, null].concat(sources));
   },
 
   assignWith(target, includes, ...srouces) {
@@ -172,7 +172,7 @@ let core = {
         return includes.indexOf(key) != -1;
       }
     }
-    return assign.apply(this, [target, keyFilter].concat(sources));
+    return _assign.apply(this, [target, keyFilter].concat(sources));
   },
 
   assignWithout(target, excludes, ...srouces) {
@@ -182,7 +182,7 @@ let core = {
         return excludes.indexOf(key) == -1;
       }
     }
-    return assign.apply(this, [target, keyFilter].concat(srouces));
+    return _assign.apply(this, [target, keyFilter].concat(srouces));
   },
 
   upperFirst(str) {
@@ -192,6 +192,10 @@ let core = {
       });
     }
     return str;
+  },
+
+  observe() {
+    Object.observe();
   }
 }
 module.exports = core;

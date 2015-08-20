@@ -3,6 +3,7 @@ let React = require('react'),
   DataPovider = require('./data/povider'),
   {PropTypes} = React,
   comps = {};
+
 let Compontent = function(name, option) {
   if (comps[name]) {
     throw new Error('Compontent named[${name}] is defined.');
@@ -14,10 +15,12 @@ let Compontent = function(name, option) {
   option.mixins = [Compontent.Mixins].concat(option.mixins || []);
   comps[name] = React.createClass(option);
   return comps[name];
-}
+};
+
 Compontent.getCompontent = function(name) {
   return comps[name];
-}
+};
+
 Compontent.getCompontentNames = function(reg) {
   if (reg) {
     reg = new RegExp(reg);
@@ -32,7 +35,7 @@ Compontent.getCompontentNames = function(reg) {
     }
   }
   return names;
-}
+};
 
 function _parseCompontent(cfg, idx, handler) {
   let Comp = cfg.type, dom, fdom,
@@ -52,7 +55,8 @@ function _parseCompontent(cfg, idx, handler) {
 
 Compontent.renderCompontent = function(cfg, handler) {
   return _parseCompontent(cfg, 0, handler);
-}
+};
+
 Compontent.renderCompontents = function renderCompontents(cfgs, key, handler) {
   if (is.fn(key)) {
     handler = key;
@@ -69,7 +73,8 @@ Compontent.renderCompontents = function renderCompontents(cfgs, key, handler) {
   } else {
     throw new Error('Invalid param 0, need object or array', cfg);
   }
-}
+};
+
 Compontent.Mixins = {
   propTypes: {
     compontents: PropTypes.oneOfType([PropTypes.array, PropTypes.object]),
@@ -98,7 +103,7 @@ Compontent.Mixins = {
       this.__compontentsWatchHandler = function(prop, func, val, oldVal) {
         console.log(self.getCompontentName(), self, this, arguments);
         self.forceUpdate();
-      }
+      };
     } else {
       this.__unwatchCompontents();
     }
@@ -118,5 +123,5 @@ Compontent.Mixins = {
   getCompontent(idx) {
     return this.refs[idx];
   }
-}
+};
 module.exports = Compontent;
