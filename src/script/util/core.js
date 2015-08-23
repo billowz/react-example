@@ -125,42 +125,6 @@ let core = {
       }, null);
   },
 
-  pushDistinctArray(array, ...vals) {
-    if (!is.array(array)) {
-      throw 'Invalid Array';
-    }
-    if (arguments.length == 2) {
-      vals = vals[0];
-    }
-    if (!is.array(vals)) {
-      vals = [vals];
-    }
-    vals.forEach(function(val) {
-      if (array.indexOf(val) == -1) {
-        array.push(val);
-      }
-    });
-    return array;
-  },
-
-  removeArrayValues(array, ...remVals) {
-    if (!is.array(array)) {
-      throw 'Invalid Array';
-    }
-    if (arguments.length == 2) {
-      remVals = remVals[0];
-    }
-    if (!is.array(remVals)) {
-      remVals = [remVals];
-    }
-    remVals.forEach(function(val) {
-      let idx;
-      while ((idx = array.indexOf(val)) != -1) {
-        array.splice(idx, 1);
-      }
-    });
-  },
-
   assign(target, ...sources) {
     return _assign.apply(this, [target, null].concat(sources));
   },

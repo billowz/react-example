@@ -12,7 +12,7 @@ var Effect = {
   'quad-in': function(t, b, c, d) {
     return c * (t /= d) * t + b;
   },
-  'quad--out': function(t, b, c, d) {
+  'quad-out': function(t, b, c, d) {
     return -c * (t /= d) * (t - 2) + b;
   },
   'quad-in-out': function(t, b, c, d) {
@@ -22,7 +22,7 @@ var Effect = {
   'cubic-in': function(t, b, c, d) {
     return c * (t /= d) * t * t + b;
   },
-  'cubic--out': function(t, b, c, d) {
+  'cubic-out': function(t, b, c, d) {
     return c * ((t = t / d - 1) * t * t + 1) + b;
   },
   'cubic-in-out': function(t, b, c, d) {
@@ -32,7 +32,7 @@ var Effect = {
   'quart-in': function(t, b, c, d) {
     return c * (t /= d) * t * t * t + b;
   },
-  'quart--out': function(t, b, c, d) {
+  'quart-out': function(t, b, c, d) {
     return -c * ((t = t / d - 1) * t * t * t - 1) + b;
   },
   'quart-in-out': function(t, b, c, d) {
@@ -42,7 +42,7 @@ var Effect = {
   'quint-in': function(t, b, c, d) {
     return c * (t /= d) * t * t * t * t + b;
   },
-  'quint--out': function(t, b, c, d) {
+  'quint-out': function(t, b, c, d) {
     return c * ((t = t / d - 1) * t * t * t * t + 1) + b;
   },
   'quint-in-out': function(t, b, c, d) {
@@ -52,7 +52,7 @@ var Effect = {
   'sine-in': function(t, b, c, d) {
     return -c * Math.cos(t / d * (Math.PI / 2)) + c + b;
   },
-  'sine--out': function(t, b, c, d) {
+  'sine-out': function(t, b, c, d) {
     return c * Math.sin(t / d * (Math.PI / 2)) + b;
   },
   'sine-in-out': function(t, b, c, d) {
@@ -61,7 +61,7 @@ var Effect = {
   'expo-in': function(t, b, c, d) {
     return (t == 0) ? b : c * Math.pow(2, 10 * (t / d - 1)) + b;
   },
-  'expo--out': function(t, b, c, d) {
+  'expo-out': function(t, b, c, d) {
     return (t == d) ? b + c : c * (-Math.pow(2, -10 * t / d) + 1) + b;
   },
   'expo-in-out': function(t, b, c, d) {
@@ -73,7 +73,7 @@ var Effect = {
   'circ-in': function(t, b, c, d) {
     return -c * (Math.sqrt(1 - (t /= d) * t) - 1) + b;
   },
-  'circ--out': function(t, b, c, d) {
+  'circ-out': function(t, b, c, d) {
     return c * Math.sqrt(1 - (t = t / d - 1) * t) + b;
   },
   'circ-in-out': function(t, b, c, d) {
@@ -94,7 +94,7 @@ var Effect = {
     }
     return -(a * Math.pow(2, 10 * (t -= 1)) * Math.sin((t * d - s) * (2 * Math.PI) / p)) + b;
   },
-  'elastic--out': function(t, b, c, d, a, p) {
+  'elastic-out': function(t, b, c, d, a, p) {
     var s;
     if (t == 0) return b;
     if ((t /= d) == 1) return b + c;
@@ -128,7 +128,7 @@ var Effect = {
       s = 1.70158;
     return c * (t /= d) * t * ((s + 1) * t - s) + b;
   },
-  'back--out': function(t, b, c, d, s) {
+  'back-out': function(t, b, c, d, s) {
     if (typeof s == "undefined")
       s = 1.70158;
     return c * ((t = t / d - 1) * t * ((s + 1) * t + s) + 1) + b;
@@ -142,7 +142,7 @@ var Effect = {
   'bounce-in': function(t, b, c, d) {
     return c - Effect['bounce-out'](d - t, 0, c, d) + b;
   },
-  'bounce--out': function(t, b, c, d) {
+  'bounce-out': function(t, b, c, d) {
     if ((t /= d) < (1 / 2.75)) {
       return c * (7.5625 * t * t) + b;
     } else if (t < (2 / 2.75)) {

@@ -1,5 +1,5 @@
-let is = require('is'),
-  Util = require('./core');
+let {is} = require('./core'),
+  array = require('./array');
 function clsReg(cls) {
   return new RegExp('(\\s+|^)' + cls + '(\\s+|$)');
 }
@@ -174,7 +174,7 @@ let Dom = {
       cls = cls.split(/\s+/g);
     }
     let clss = el.className ? el.className.split(/\s+/g) : [];
-    Util.pushDistinctArray(clss, cls);
+    array.uniquePush(clss, cls);
     el.className = clss.join(' ');
   },
   removeCls(el, ...cls) {
@@ -187,7 +187,7 @@ let Dom = {
     }
     if (el.className) {
       let clss = el.className.split(/\s+/g);
-      Util.removeArrayValues(clss, cls);
+      array.removes(clss, cls);
       el.className = clss.join(' ');
     }
   },

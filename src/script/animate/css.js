@@ -1,7 +1,7 @@
 let CssEvent = require('./css-event'),
   Util = require('../util/util'),
   Effects = require('./effects'),
-  AnimationFrame = require('./frame'),
+  AnimationFrame = Util.requestFrame,
   {is, dom} = Util;
 
 class AnimateProcessor {
@@ -34,9 +34,9 @@ function registerAnimate(processor, parseTransition, option) {
       throw 'Invalid Param'
     }
   } else {
-    if (!(AnimateProcessor.isPrototypeOf(processor))) {
+    /*if (!(AnimateProcessor.isPrototypeOf(processor))) {
       throw 'Invalid Processor';
-    }
+    }*/
     if (transitionProcessorDefined.indexOf(processor) != -1) {
       throw 'Animate is Registered ' + processor;
     }
@@ -220,13 +220,13 @@ class TweenFrameProcessor extends AnimateProcessor {
     this.target = this.transition.target || Util.assignWithout({}, ['effect', 'duration', 'from'], this.transition);
     this._targetCssNames = Object.keys(this.target);
     this._fromCssNames = Object.keys(this.from);
-    this._cssNames = Util.pushDistinctArray([].concat(this._targetCssNames), this._fromCssNames);
+    this._cssNames = Util.array.uniquePush([].concat(this._targetCssNames), this._fromCssNames);
   }
   run() {
     this.stop();
     this._beforeTransition();
     return Util.promise(function(def) {
-      this._animate = AnimationFrame.doAnimate(this.duration,
+      this._animate = AnimationFrame.duration(this.duration,
         this._calStyles.bind(this), function(err) {
           this._animate = null;
           this._endTransition();

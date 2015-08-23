@@ -1,4 +1,4 @@
-let Util = require('../util/util');
+let Util = require('./core');
 module.exports = (function(window) {
   let prefixes = 'webkit moz ms o'.split(' ');
   function getFrame(prop, defaultVal) {
@@ -28,7 +28,7 @@ module.exports = (function(window) {
     cancel = getFrame('cancelAnimationFrame', function cancelAnimationFrame(reqId) {
       clearTimeout(id);
     }).bind(window),
-    doAnimate = function(duration, onStep, onEnd) {
+    duration = function(duration, onStep, onEnd) {
       let stoped = false,
         t = new Date(),
         step = 0,
@@ -55,6 +55,6 @@ module.exports = (function(window) {
   return {
     request: request,
     cancel: cancel,
-    doAnimate: doAnimate
+    duration: duration
   };
 })(window);

@@ -16,7 +16,28 @@ let React = require('react'),
         }
     }<%= i < modules.length - 1 ? "," : "" %><% } %>
   };
-
+class MenuDataPovider extends MemoryDataPovider{
+  constructor() {
+    super({});
+    let Compontents = []
+    Object.keys(Doc.Compontent).forEach(compName=>{
+      Compontents.push({
+        text:compName
+      });
+    });
+    this.data = [{
+        text:'Introducation'
+    },{
+        text:'Getting Started'
+    },{
+        text:'Compontents',
+        children:Compontents
+      },{
+        text:'GitHub',
+        href:'https://github.com/tao-zeng/react-example'
+    }];
+  }
+}
 Doc.App = React.createClass({
   render: function(){
     let config = {
@@ -27,33 +48,7 @@ Doc.App = React.createClass({
                 horizontal:false,
                 title:'React UI'
             },
-            dataPovider: new MemoryDataPovider([{
-                text:'Introducation',
-                href:'#'
-            },{
-                text:'Getting Started',
-                href:'#'
-            },{
-                text:'Compontents',
-                href:'#',
-                children:Object.keys(Doc.Compontent).map(function(key){
-                    return {
-                        text:key,
-                        href:'#',
-                        target: '_blank',
-                        children:[{
-                              text:'Introducation',
-                              href:'#'
-                          },{
-                              text:'Getting Started',
-                              href:'#'
-                          }]
-                    }
-                })
-            },{
-                text:'GitHub',
-                href:'https://github.com/tao-zeng/react-example'
-            }])
+            dataPovider: new MenuDataPovider()
         },{
           type:'GridLayout',
           option:{

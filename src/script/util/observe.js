@@ -1,242 +1,329 @@
-let {is} = require('./core'),
+let Util = require('./core'),
+  {is} = Util,
+  array = require('./array'),
+  requestFrame = require('./request-frame'),
   binding = '$observer',
-  cfgBinding = '$observeConfig',
-  arrayMethods = ["pop", "push", "reverse", "shift", "sort", "splice", "unshift"];
-class Observe {
-  constructor(target) {
-    if (target[binding]) {
-      throw binding + ' is defined.';
-    }
-    this.target = target;
-    this.listeners = [];
-    Object.defineProperty(target, binding, {
-      enumerable: false,
-      configurable: true,
-      writable: false,
-      value: this
-    });
-    if (is.array(target)) {
-      this.mock(target);
-      this.defineObserveCfg(target).path = [];
+  objectSetBinding = '$set',
+  objectDelBinding = '$del',
+  defaultAccepts = ["add", "update", "delete"],
+  changeRecords = new Map();
+if (!Object.observe) {
+  function eachChangeRecord(changes, handler) {
+    if (changes.length > 0) {
+      handler(changes);
+      console.log('invoke ', changes, handler);
     }
   }
-  destory() {
-    this.unwatch(this.target);
-    delete this.target[binding];
-    delete this.target;
-    delete this.listeners;
+  function checkChange() {
+    if (changeRecords.size > 0) {
+      setTimeout(function() {
+        changeRecords.forEach(eachChangeRecord);
+        changeRecords = new Map();
+      }, 0);
+    }
+    requestFrame.request(checkChange);
   }
-  onPropChanged(prop, value, oldValue, target, path) {
-    if (value !== oldValue && this.listeners) {
-      let rootName = path[0],
-        i = 0, lis;
-      for (; i < this.listeners.length; i++) {
-        lis = this.listeners[i];
-        if (lis.all ||
-          lis.watchAttrs.indexOf(rootName) != -1 ||
-          rootName.indexOf("Array-") === 0) {
-          lis.handler.call(this.target, prop, value, oldValue, path.concat(prop));
-        }
+  checkChange();
+  class Observe {
+    constructor(target) {
+      if (target[binding]) {
+        throw binding + ' is defined.';
       }
-      this.unwatch(oldValue);
-      this._watchChild(value, path.concat(prop));
-    }
-  }
-  mock(target) {
-    let _self = this;
-    arrayMethods.forEach(function(methodName) {
-      Object.defineProperty(target, methodName, {
+      this.target = target;
+      this.handlers = {};
+      this.watchAttrs = {};
+      Object.defineProperty(target, binding, {
         enumerable: false,
         configurable: true,
         writable: false,
-        value: function() {
-          let oldVal = Array.prototype.slice.call(this, 0),
-            result = Array.prototype[methodName].apply(this, arguments),
-            path = _self.getObserveCfg(this).path;
-          Object.keys(this).forEach((idx) => {
-            _self.watch(this, idx, path);
-          });
-          _self.onPropChanged("Array-" + methodName, this, oldVal, this, path);
-          return result;
-        }
+        value: this
       });
-    });
-  }
-  _watchChild(target, path) {
-    if (typeof target === 'object') {
       if (is.array(target)) {
-        this.mock(target);
-        if (!this.hasObserveCfg(target)) {
-          this.defineObserveCfg(target).path = path;
+        this.mockArray();
+      } else {
+        this.mockObject();
+      }
+      Object.keys(target).forEach(this.watchAttr.bind(this));
+    }
+    objectMockCheck() {
+      if (!this.objectMock) {
+        this.objectMock = Util.assign({}, this.target);
+      } else {
+        let adds = Object.keys(this.target).filter(key => !(key in this.objectMock)),
+          removes = Object.keys(this.objectMock).filter(key => !(key in this.target));
+        if (adds.length > 0 || removes.length > 0) {
+          adds.forEach(attr => {
+            this.watchAttr(attr);
+            this.addChangeRecord(attr, this.target[attr], undefined, 'add');
+          });
+          removes.forEach(attr => {
+            this.unwatchAttr(attr);
+            this.addChangeRecord(attr, undefined, this.objectMock[attr], 'delete');
+          });
+          this.objectMock = Object.assign({}, this.target);
         }
       }
-      Object.keys(target).forEach(prop => {
-        this.watch(target, prop, path);
-      });
+      setTimeout(this.objectMockCheck.bind(this), 10000);
+    //requestFrame.request(this.objectMockCheck.bind(this));
     }
-  }
-  watch(target, attr, path) {
-    if (attr === binding || is.fn(target[attr])) {
-      return;
-    }
-    if (!path) {
-      path = [];
-    }
-    let cfg = this.getObserveCfg(target), watchAttrs;
-    if (!cfg) {
-      cfg = this.defineObserveCfg(target);
-      cfg.path = path;
-    }
-    watchAttrs = cfg.watchAttrs;
-
-    if (!watchAttrs[attr]) {
+    mockObject() {
+      //this.objectMockCheck();
       let _self = this;
-
-      watchAttrs[attr] = {
-        current: target[attr]
-      };
-
-      Object.defineProperty(target, attr, {
-        get: function() {
-          return _self.getObserveCfg(this).watchAttrs[attr].current;
-        },
-        set: function(value) {
-          let cfg = _self.getObserveCfg(this),
-            watchAttrs = cfg.watchAttrs,
-            oldVal;
-          watchAttrs[attr].prev = oldVal = watchAttrs[attr].current;
-          watchAttrs[attr].current = value;
-          _self.onPropChanged(attr, value, oldVal, this, cfg.path);
-        }
-      });
-      this._watchChild(watchAttrs[attr].current, path.concat(attr));
-    }
-  }
-  unwatch(target) {
-    let cfg = this.getObserveCfg(target);
-    if (cfg) {
-      if (is.array(target)) {
-        arrayMethods.forEach(function(methodName) {
-          delete target[methodName];
+      if (!(objectSetBinding in this.target)) {
+        this.setFn = function(attr, val) {
+          let has = attr in this;
+          this[attr] = val;
+          if (!has) {
+            _self.watchAttr(attr);
+            _self.addChangeRecord(attr, val, undefined, 'add');
+          }
+          return this;
+        };
+        Object.defineProperty(this.target, objectSetBinding, {
+          enumerable: false,
+          configurable: true,
+          writable: false,
+          value: this.setFn
         });
       }
-      Object.keys(cfg.watchAttrs).forEach((attr) => {
-        let attrCfg = cfg.watchAttrs[attr];
-        if (typeof target[attr] === 'object') {
-          this.unwatch(target[attr]);
+      if (!(objectDelBinding in this.target)) {
+        this.delFn = function(attr) {
+          let has = attr in this, val;
+          if (has) {
+            val = this[attr];
+            _self.unwatchAttr(attr);
+            delete this[attr];
+            _self.addChangeRecord(attr, undefined, val, 'delete');
+          }
         }
-        delete target[attr];
-        target[attr] = attrCfg.current;
-      });
-      this.cleanObserveCfg(target);
-    }
-  }
-  hasObserveCfg(target) {
-    return !!target[cfgBinding];
-  }
-  getObserveCfg(target) {
-    return target[cfgBinding];
-  }
-  defineObserveCfg(target) {
-    Object.defineProperty(target, cfgBinding, {
-      enumerable: false,
-      configurable: true,
-      writable: false,
-      value: {
-        path: [],
-        watchAttrs: {}
+        Object.defineProperty(this.target, objectDelBinding, {
+          enumerable: false,
+          configurable: true,
+          writable: false,
+          value: this.delFn
+        });
       }
-    });
-    return target[cfgBinding];
-  }
-  cleanObserveCfg(target) {
-    delete target[cfgBinding];
-  }
-  addListener(attrs, callback) {
-    if (is.fn(attrs)) {
-      callback = attrs;
-      attrs = undefined;
     }
-    if (!is.fn(callback)) {
-      throw 'Invalid Observe Listener ' + callback;
-    }
-    let watchAttrs = this.parsewatchAttrs(attrs);
-    if (watchAttrs.all || watchAttrs.attrs.length > 0) {
-      watchAttrs.attrs.forEach(attr => {
-        this.watch(this.target, attr);
-      });
-      this.listeners.push({
-        all: watchAttrs.all,
-        handler: callback,
-        watchAttrs: watchAttrs.attrs
-      });
-    }
-  }
-  removeListener(attrs, callback) {
-    if (is.fn(attrs)) {
-      callback = attrs;
-      attrs = undefined;
-    }
-    let lis, clean,
-      i = 0,
-      all = !(is.array(attrs) && attrs.length > 0);
-    this.listeners = this.listeners.filter(lis => {
-      if (!callback) {
-
-      } else if (lis.handler === callback) {
-        if (all) {
-          return false;
-        } else if (!lis.all && !all) {
-          attrs.forEach(attr => {
-            let idx;
-            if ((idx = lis.watchAttrs.indexOf(attr)) != -1) {
-              lis.watchAttrs.splice(idx, 1);
+    mockArray() {
+      let _self = this,
+        arrayMocks = {
+          push: function() {
+            let ret, attr,
+              len = this.length;
+            ret = Array.prototype.push.apply(this, arguments);
+            for (len++; len > 0 && len <= ret; len++) {
+              attr = (len - 1) + '';
+              _self.watchAttr(attr);
+              _self.addChangeRecord(attr, this[attr], undefined, 'add');
             }
+            return ret;
+          },
+          pop: function() {
+            let ret, attr,
+              len = this.length;
+            ret = Array.prototype.pop.apply(this, arguments);
+            if (len > 0) {
+              attr = (len - 1) + '';
+              _self.unwatchAttr(attr);
+              _self.addChangeRecord(attr, undefined, ret, 'delete');
+            }
+            return ret;
+          },
+          shift: function() {
+            let ret,
+              attr = '0',
+              len = this.length;
+            ret = Array.prototype.shift.apply(this, arguments);
+            if (len > 0) {
+              _self.unwatchAttr(attr);
+              _self.addChangeRecord(attr, undefined, ret, 'delete');
+            }
+            return ret;
+          },
+          unshift: function() {
+            let ret, attr,
+              len = this.length;
+            ret = Array.prototype.unshift.apply(this, arguments);
+            for (len++; len > 0 && len <= ret; len++) {
+              attr = (len - 1) + '';
+              _self.watchAttr(attr);
+              _self.addChangeRecord(attr, this[attr], undefined, 'add');
+            }
+            return ret;
+          },
+          splice: function() {
+            let ret, attr, newLen, oldval,
+              len = this.length;
+            ret = Array.prototype.splice.apply(this, arguments);
+            newLen = this.length;
+            if (len < newLen) {
+              for (len++; len > 0 && len <= newLen; len++) {
+                attr = (len - 1) + '';
+                _self.watchAttr(attr);
+                _self.addChangeRecord(attr, this[attr], undefined, 'add');
+              }
+            } else if (len > newLen) {
+              for (newLen++; len > 0 && newLen <= len; newLen++) {
+                attr = (newLen - 1) + '';
+                oldval = _self.watchAttrs[attr];
+                _self.unwatchAttr(attr);
+                _self.addChangeRecord(attr, undefined, oldval, 'delete');
+              }
+            }
+            return ret;
+          }
+        };
+      Object.keys(arrayMocks).forEach(method => {
+        Object.defineProperty(this.target, method, {
+          enumerable: false,
+          configurable: true,
+          writable: false,
+          value: arrayMocks[method]
+        });
+      });
+    }
+    watchAttr(attr) {
+      if (!(attr in this.watchAttrs)) {
+        let _self = this;
+        this.watchAttrs[attr] = this.target[attr];
+        Object.defineProperty(this.target, attr, {
+          get: function() {
+            return _self.watchAttrs[attr];
+          },
+          set: function(value) {
+            let oldValue = _self.watchAttrs[attr];
+            _self.watchAttrs[attr] = value;
+            _self.addChangeRecord(attr, value, oldValue, 'update');
+          }
+        });
+      }
+    }
+    unwatchAttr(attr) {
+      if (attr in this.watchAttrs) {
+        if (attr in this.target) {
+          Object.defineProperty(this.target, attr, {
+            get: undefined,
+            set: undefined
           });
-          return lis.watchAttrs.length > 0
+        }
+        delete this.watchAttrs[attr];
+      }
+    }
+    addChangeRecord(attr, value, oldValue, accept) {
+      if (value !== oldValue) {
+        let obj = {
+          name: attr,
+          object: this.target,
+          oldValue: oldValue,
+          type: accept
+        };
+        this.handlers[accept].forEach(handler => {
+          let changes = changeRecords.get(handler);
+          if (!changes) {
+            changes = [];
+            changeRecords.set(handler, changes);
+          }
+          changes.push(obj);
+        });
+      }
+    }
+    addHandler(handler, accepts) {
+      accepts.forEach(accept => {
+        if (defaultAccepts.indexOf(accept) != -1) {
+          if (!this.handlers[accept]) {
+            this.handlers[accept] = [];
+          }
+          if (this.handlers[accept].indexOf(handler) == -1) {
+            this.handlers[accept].push(handler);
+          }
+        }
+      });
+    }
+    removeHandler(handler, accepts) {
+      accepts.forEach(accept => {
+        let idx;
+        if (defaultAccepts.indexOf(accept) != -1) {
+          if (this.handlers[accept] && (idx = this.handlers[accept].indexOf(handler)) != -1) {
+            this.handlers[accept].splice(idx, 1);
+          }
+        }
+      });
+    }
+    hasHandler() {
+      let i = 0,
+        accepts = Object.keys(this.handlers), hs;
+      for (; i < accepts.length; i++) {
+        hs = this.handlers[accepts[i]];
+        if (hs && hs.length > 0) {
+          return true;
         }
       }
-      return true;
-    });
-  }
-  parsewatchAttrs(attrs) {
-    let all;
-    if (is.string(attrs)) {
-      attrs = [attrs];
-      all = false;
-    } else if (is.array(attrs) && attrs.length > 0) {
-      attrs = attrs.filter(function(attr) {
-        return is.string(attr);
-      });
-      all = false;
-    } else {
-      attrs = Object.keys(this.target);
-      all = true;
+      return false;
     }
-    return {
-      all: all,
-      attrs: attrs
-    };
-  }
-}
-function observe(target, attrs, handler) {
-  let obs = target[binding];
-  if (!obs) {
-    obs = new Observe(target);
-  }
-  obs.addListener(attrs, handler);
-  return function() {
-    unobserve(target, attrs, handler);
-  }
-}
-function unobserve(target, attrs, handler) {
-  let obs = target[binding];
-  if (obs) {
-    obs.removeListener(attrs, handler);
-    if (obs.listeners.length == 0) {
-      obs.destory();
+    destory() {
+      if (this.setFn) {
+        delete this.target[objectSetBinding]
+      }
+      if (this.delFn) {
+        delete this.target[objectDelBinding]
+      }
+      Object.keys(this.target).forEach(this.unwatchAttr.bind(this));
+      delete this.target[binding];
+      delete this.target;
+      delete this.handlers;
     }
   }
+
+  Object.observe = function(object, handler, accepts) {
+    if (!object || typeof object !== 'object') {
+      throw new TypeError("Object.observe cannot observe non-object");
+    }
+    if (!is.fn(handler)) {
+      throw new TypeError("Object.observe cannot deliver to non-function");
+    }
+    if (Object.isFrozen(handler)) {
+      throw new TypeError("Object.observe cannot deliver to a frozen function object");
+    }
+
+    if (is.undef(accepts)) {
+      accepts = defaultAccepts;
+    } else if (!is.array(accepts)) {
+      throw new TypeError("Third argument to Object.observe must be an array of strings.");
+    }
+    let observe = object[binding];
+    if (!observe) {
+      observe = new Observe(object);
+    }
+    observe.addHandler(handler, accepts);
+    return object;
+  }
+
+  Object.unobserve = function(object, handler, accepts) {
+    if (!object || typeof object !== 'object') {
+      throw new TypeError("Object.observe cannot observe non-object");
+    }
+    if (!is.fn(handler)) {
+      throw new TypeError("Object.observe cannot deliver to non-function");
+    }
+    if (Object.isFrozen(handler)) {
+      throw new TypeError("Object.observe cannot deliver to a frozen function object");
+    }
+    if (is.undef(accepts)) {
+      accepts = defaultAccepts;
+    } else if (!is.array(accepts)) {
+      throw new TypeError("Third argument to Object.observe must be an array of strings.");
+    }
+    let observe = object[binding];
+    if (observe) {
+      observe.removeHandler(handler, accepts);
+      if (!observe.hasHandler()) {
+        observe.destory();
+      }
+    }
+    return object;
+  }
 }
-observe.unobserve = unobserve;
-module.exports = observe;
+module.exports = {
+  observe: Object.observe,
+  unobserve: Object.unobserve
+}

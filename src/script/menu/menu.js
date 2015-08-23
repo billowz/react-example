@@ -25,7 +25,8 @@ let MenuItem = React.createClass({
                 overflow: 'hidden',
                 height: '0px'
               },
-              height: 'auto'
+              height: 'auto',
+              effect: 'bounce-out'
             }
           },
           false: {
@@ -34,7 +35,8 @@ let MenuItem = React.createClass({
                 overflow: 'hidden',
                 display: 'inline-block'
               },
-              height: '0px'
+              height: '0px',
+              effect: 'circ-in'
             }
           }
         }
