@@ -1,12 +1,13 @@
 let {is} = require('./core');
 function unique() {
   let ret = [],
-    i = 0;
-  for (; i < arguments.length; i++) {
-    if (!is.array(arguments[i])) {
+    i = 0,
+    args = arguments;
+  for (; i < args.length; i++) {
+    if (!is.array(args[i])) {
       throw 'Invalid Array';
     }
-    arguments[i].forEach(function(item) {
+    args[i].forEach(function(item) {
       if (ret.indexOf(item) == -1) {
         ret.push(item);
       }

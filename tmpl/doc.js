@@ -16,6 +16,7 @@ let React = require('react'),
         }
     }<%= i < modules.length - 1 ? "," : "" %><% } %>
   };
+
 class MenuDataPovider extends MemoryDataPovider{
   constructor() {
     super({});
