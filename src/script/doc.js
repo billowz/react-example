@@ -45,21 +45,21 @@ let React = require('react'),
         readmes : {
         }
     },
-    Menu : {
-        demos : {
-            Demo : {
-                compontent : require('./menu/doc/demo'),
-                code : ''
-            }
-        },
-        readmes : {
-        }
-    },
     Layout : {
         demos : {
             Demo : {
                 compontent : require('./layout/doc/demo'),
                 code : 'let React = require(&#39;react&#39;),\n  {Layout} = require(&#39;react-ui&#39;);\nmodule.exports = React.createClass({\n  render() {\n    return (&lt;Layout.Grid title=&#34;Workbench Demo&#34;/&gt;);\n  }\n});\n'
+            }
+        },
+        readmes : {
+        }
+    },
+    Menu : {
+        demos : {
+            Demo : {
+                compontent : require('./menu/doc/demo'),
+                code : ''
             }
         },
         readmes : {
@@ -80,19 +80,19 @@ let React = require('react'),
             Core : {
                 compontent : require('./util/doc/core'),
                 code : ''
-            }
+            },
             Demo : {
                 compontent : require('./util/doc/demo'),
                 code : ''
-            }
+            },
             Dom : {
                 compontent : require('./util/doc/dom'),
                 code : ''
-            }
+            },
             Observe : {
                 compontent : require('./util/doc/observe'),
                 code : ''
-            }
+            },
             Router : {
                 compontent : require('./util/doc/router'),
                 code : ''

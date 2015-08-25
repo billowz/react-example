@@ -1,7 +1,9 @@
 let Util = require('./core'),
   {is} = Util;
 class Router {
-  constructor() {
+  constructor(parent) {
+    this.parent = parent;
+
     this.routes = {};
     this.prefix = '';
   }
