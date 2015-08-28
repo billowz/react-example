@@ -5,20 +5,20 @@ let React = require('react'),
   MemoryDataPovider = Data.MemoryPovider,
   Doc={};
   Doc.Compontent = {
-    Animate : {
+    Button : {
         demos : {
             Demo : {
-                compontent : require('./animate/doc/demo'),
+                compontent : require('./button/doc/demo'),
                 code : ''
             }
         },
         readmes : {
         }
     },
-    Button : {
+    Animate : {
         demos : {
             Demo : {
-                compontent : require('./button/doc/demo'),
+                compontent : require('./animate/doc/demo'),
                 code : ''
             }
         },
@@ -75,6 +75,17 @@ let React = require('react'),
         readmes : {
         }
     },
+    Workbench : {
+        demos : {
+            Demo : {
+                compontent : require('./workbench/doc/demo'),
+                code : 'let React = require(&#39;react&#39;),\n  {WorkBench} = require(&#39;react-ui&#39;);\nmodule.exports = React.createClass({\n  render() {\n    return (&lt;WorkBench compontents={[{\n\n      }]}/&gt;);\n  }\n});\n'
+            }
+        },
+        readmes : {
+            Readme : 'read me\n'
+        }
+    },
     Util : {
         demos : {
             Core : {
@@ -92,24 +103,9 @@ let React = require('react'),
             Observe : {
                 compontent : require('./util/doc/observe'),
                 code : ''
-            },
-            Router : {
-                compontent : require('./util/doc/router'),
-                code : ''
             }
         },
         readmes : {
-        }
-    },
-    Workbench : {
-        demos : {
-            Demo : {
-                compontent : require('./workbench/doc/demo'),
-                code : 'let React = require(&#39;react&#39;),\n  {WorkBench} = require(&#39;react-ui&#39;);\nmodule.exports = React.createClass({\n  render() {\n    return (&lt;WorkBench compontents={[{\n\n      }]}/&gt;);\n  }\n});\n'
-            }
-        },
-        readmes : {
-            Readme : 'read me\n'
         }
     }
   };

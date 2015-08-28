@@ -111,7 +111,7 @@ let core = {
     return _objectWithoutProperties.apply(this, arguments);
   },
 
-  chainedFunc(...funcs) {
+  chainedFunc(funcs, scope) {
     return funcs
       .filter(f => is.fn(f))
       .reduce((acc, f) => {
@@ -119,8 +119,8 @@ let core = {
           return f;
         }
         return function chainedFunction(...args) {
-          acc.apply(this, args);
-          f.apply(this, args);
+          acc.apply(scope, args);
+          f.apply(scope, args);
         };
       }, null);
   },

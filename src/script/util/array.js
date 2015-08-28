@@ -3,15 +3,16 @@ function unique() {
   let ret = [],
     i = 0,
     args = arguments;
+  function pusher(item) {
+    if (ret.indexOf(item) == -1) {
+      ret.push(item);
+    }
+  }
   for (; i < args.length; i++) {
     if (!is.array(args[i])) {
       throw 'Invalid Array';
     }
-    args[i].forEach(function(item) {
-      if (ret.indexOf(item) == -1) {
-        ret.push(item);
-      }
-    });
+    args[i].forEach(pusher);
   }
   return ret;
 }
@@ -37,35 +38,25 @@ let arrayUtil = {
       return false;
     });
   },
+
   uniquePush(array, ...vals) {
     if (!is.array(array)) {
       throw 'Invalid Array';
     }
-    if (arguments.length == 2) {
-      vals = vals[0];
-    }
-    if (!is.array(vals)) {
-      vals = [vals];
-    }
-    vals.forEach(function(val) {
+    return vals.filter(function(val) {
       if (array.indexOf(val) == -1) {
         array.push(val);
+        return true;
       }
+      return false;
     });
-    return array;
   },
 
-  removes(array, ...remVals) {
+  remove(array, ...vals) {
     if (!is.array(array)) {
       throw 'Invalid Array';
     }
-    if (arguments.length == 2) {
-      remVals = remVals[0];
-    }
-    if (!is.array(remVals)) {
-      remVals = [remVals];
-    }
-    remVals.forEach(function(val) {
+    vals.forEach(function(val) {
       let idx;
       while ((idx = array.indexOf(val)) != -1) {
         array.splice(idx, 1);

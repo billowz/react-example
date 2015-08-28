@@ -2,7 +2,8 @@
 /**!
  * React UI Module:/event
  */
-let {is} = require('../util/util');
+var Util = require('../util/util'),
+  {array, is} = Util;
 class Event {
   constructor(opt) {
     this._listeners = {};
@@ -19,68 +20,48 @@ class Event {
   }
 
   eventTypes() {
-    Array.prototype.forEach.call(arguments, function(arg) {
+    var arg,
+      i = 0,
+      ret = [];
+    for (; i < arguments.length; i++) {
+      arg = arguments[i];
       if (is.array(arg)) {
-        arg.forEach(function(arg) {
-          if (is.string(arg) && this._eventTypes.indexOf(arg) === -1) {
-            this._eventTypes.push(arg);
-          }
-        }.bind(this));
-      } else if (is.string(arg) && this._eventTypes.indexOf(arg) === -1) {
-        this._eventTypes.push(arg);
+        Array.prototype.push.apply(ret, this.eventTypes.apply(this, arg));
+      } else if (is.string(arg)) {
+        Array.prototype.push.apply(ret, array.uniquePush(this._eventTypes, arg));
       }
-    }.bind(this));
-    return this._eventTypes;
+    }
+    return ret;
   }
 
   on(evt, callback) {
-    if (arguments.length === 1) {
-      if (is.array(evt)) {
-        evt.forEach(function(evt) {
-          this.on(evt.type, evt.handler);
-        }.bind(this));
-      } else if (is.hash(evt)) {
-        Object.keys(evt).forEach(function(type) {
-          let handler = evt[type];
-          if (is.fn(handler)) {
-            this.on(type, handler);
-          } else if (is.array(handler)) {
-            handler.forEach(function(h) {
-              if (is.fn(h)) {
-                this.on(type, h);
-              } else {
-                console.warn('Invalid event handler', type, h);
-              }
-            }.bind(this));
-          } else {
-            console.warn('Invalid event handler', type, handler);
-          }
-        }.bind(this));
-      } else {
-        console.warn('Invalid param', arguments);
-      }
-    } else if (is.string(evt) && is.fn(callback)) {
+    if (is.string(evt) && is.fn(callback)) {
       if (this._eventTypes.indexOf(evt) === -1) {
-        console.warn('Invalid event name', arguments);
-      } else {
-        if (!is.array(this._listeners[evt])) {
-          this._listeners[evt] = [];
-        }
-        let idx = this._listeners[evt].indexOf(callback);
-        if (idx === -1) {
-          this._listeners[evt].push(callback);
-        }
+        console.warn('event name is undefined.', this, arguments);
       }
-    } else {
-      console.warn('Invalid param', arguments);
+      if (!is.array(this._listeners[evt])) {
+        this._listeners[evt] = [];
+      }
+      array.uniquePush(this._listeners[evt], callback);
+      return this.un.bind(this, evt, callback);
+    } else if (arguments.length === 1) {
+      if (is.array(evt)) {
+        return Util.chainedFunc(evt.map(function(evt) {
+          return this.on(evt.type, evt.handler);
+        }.bind(this)), this);
+      } else if (is.hash(evt)) {
+        return Util.chainedFunc(Object.keys(evt).map(function(type) {
+          return this.on(type, evt[type]);
+        }.bind(this)), this);
+      }
     }
+    throw 'Invalid Param';
   }
 
   un(evtname, callback) {
-    let handlers = this._listeners[evtname],
-      idx;
-    if (is.array(handlers) && (idx = handlers.indexOf(callback) !== -1)) {
-      handlers.splice(idx, 1);
+    let handlers = this._listeners[evtname];
+    if (is.array(handlers)) {
+      array.remove(handlers, callback);
     }
   }
 

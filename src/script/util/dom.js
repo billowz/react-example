@@ -102,6 +102,7 @@ let Dom = {
     } else if (el.attachEvent) {
       el.attachEvent('on' + evt, callback);
     }
+    return Dom.un.bind(this, el, evt, callback);
   },
   un(el, evt, callback) {
     checkHtml(el);
@@ -187,7 +188,7 @@ let Dom = {
     }
     if (el.className) {
       let clss = el.className.split(/\s+/g);
-      array.removes(clss, cls);
+      array.remove(clss, cls);
       el.className = clss.join(' ');
     }
   },
