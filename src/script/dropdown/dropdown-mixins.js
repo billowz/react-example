@@ -70,11 +70,11 @@ const DropdownStateMixin = {
 
   unbindRootCloseHandlers() {
     if (this._onDocumentClickListener) {
-      this._onDocumentClickListener.remove();
+      this._onDocumentClickListener();
     }
 
     if (this._onDocumentKeyupListener) {
-      this._onDocumentKeyupListener.remove();
+      this._onDocumentKeyupListener();
     }
   },
   componentWillUnmount() {

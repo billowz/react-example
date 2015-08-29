@@ -2,7 +2,7 @@ let CssEvent = require('./css-event'),
   Util = require('../util/util'),
   Effects = require('./effects'),
   AnimationFrame = Util.requestFrame,
-  {is, dom} = Util;
+  {is, dom, array} = Util;
 
 class AnimateProcessor {
   constructor(option) {
@@ -220,12 +220,12 @@ class TweenFrameProcessor extends AnimateProcessor {
     this.target = this.transition.target || Util.assignWithout({}, ['effect', 'duration', 'from'], this.transition);
     this._targetCssNames = Object.keys(this.target);
     this._fromCssNames = Object.keys(this.from);
-    this._cssNames = Util.array.uniquePush([].concat(this._targetCssNames), this._fromCssNames);
+    this._cssNames = array.uniquePush.apply(null, [[]].concat(this._targetCssNames).concat(this._fromCssNames));
   }
   run() {
     this.stop();
-    this._beforeTransition();
     return Util.promise(function(def) {
+      this._beforeTransition();
       this._animate = AnimationFrame.duration(this.duration,
         this._calStyles.bind(this), function(err) {
           this._animate = null;
@@ -240,6 +240,7 @@ class TweenFrameProcessor extends AnimateProcessor {
   }
   stop() {
     if (this._animate) {
+      console.log('stoping....')
       this._animate();
     }
   }
@@ -247,12 +248,12 @@ class TweenFrameProcessor extends AnimateProcessor {
     Object.keys(this._animateObj).forEach(function(name) {
       let ani = this._animateObj[name],
         style = this.effect(step, ani.from, ani.variation, this.duration) + ani.unit;
-      console.log(name, style)
       dom.css(this.el, name, style);
     }.bind(this));
   }
   _beforeTransition() {
     this._oldCss = dom.innerCss(this.el, this._cssNames);
+    console.log('-->', this._oldCss)
     let fromCss, targetCss;
     dom.css(this.el, this.target);
     targetCss = dom.css(this.el, this._targetCssNames);
@@ -272,11 +273,11 @@ class TweenFrameProcessor extends AnimateProcessor {
         unit: unit
       }
     }.bind(this));
-    console.log(this._animateObj, this._target$from);
   }
   _endTransition() {
     this.promise = null;
     if (!this.keepTarget) {
+      console.log('...', this._oldCss)
       dom.css(this.el, this._oldCss);
     }
     this._oldCss = null;

@@ -48,7 +48,7 @@ Doc.App = React.createClass({
         children:[{
             type:'Menu',
             option:{
-                horizontal:false,
+                horizontal:true,
                 title:'React UI'
             },
             dataPovider: new MenuDataPovider()

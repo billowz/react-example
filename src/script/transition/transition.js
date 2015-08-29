@@ -6,7 +6,8 @@ let React = require('react'),
 let Transition = React.createClass({
   protoTypes: {
     animation: React.PropTypes.object,
-    component: React.PropTypes.string
+    component: React.PropTypes.string,
+    onEnd: React.PropTypes.func
   },
 
   getDefaultProps() {
@@ -45,14 +46,26 @@ let Transition = React.createClass({
   },
 
   transition(animationType, val) {
-    let opt = this.props.animation[animationType];
+    var opt = this.props.animation[animationType];
     if (opt && animationType !== 'enter' && animationType !== 'leave') {
       opt = opt[val];
     }
     if (!opt) {
-      throw 'Transition is undefined';
+      if (is.fn(this.props.onEnd)) {
+        this.props.onEnd(animationType, val);
+      }
+      Util.warn('Transition is undefined %s[%s]', animationType, val);
+      return;
     }
-    return this.getAnimate(opt).run();
+    var prom = this.getAnimate(opt).run();
+    if (is.fn(this.props.onEnd)) {
+      var endLis = function(err) {
+        console.log('==> End', err)
+        this.props.onEnd(this, animationType, val);
+      }.bind(this);
+      prom.then(endLis, endLis);
+    }
+    return prom;
   },
 
   componentWillReceiveProps(nextProps) {

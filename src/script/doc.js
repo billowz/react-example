@@ -5,16 +5,6 @@ let React = require('react'),
   MemoryDataPovider = Data.MemoryPovider,
   Doc={};
   Doc.Compontent = {
-    Button : {
-        demos : {
-            Demo : {
-                compontent : require('./button/doc/demo'),
-                code : ''
-            }
-        },
-        readmes : {
-        }
-    },
     Animate : {
         demos : {
             Demo : {
@@ -35,21 +25,21 @@ let React = require('react'),
         readmes : {
         }
     },
-    Http : {
+    Button : {
         demos : {
             Demo : {
-                compontent : require('./http/doc/demo'),
+                compontent : require('./button/doc/demo'),
                 code : ''
             }
         },
         readmes : {
         }
     },
-    Layout : {
+    Http : {
         demos : {
             Demo : {
-                compontent : require('./layout/doc/demo'),
-                code : 'let React = require(&#39;react&#39;),\n  {Layout} = require(&#39;react-ui&#39;);\nmodule.exports = React.createClass({\n  render() {\n    return (&lt;Layout.Grid title=&#34;Workbench Demo&#34;/&gt;);\n  }\n});\n'
+                compontent : require('./http/doc/demo'),
+                code : ''
             }
         },
         readmes : {
@@ -65,25 +55,14 @@ let React = require('react'),
         readmes : {
         }
     },
-    Transition : {
+    Layout : {
         demos : {
             Demo : {
-                compontent : require('./transition/doc/demo'),
-                code : ''
+                compontent : require('./layout/doc/demo'),
+                code : 'let React = require(&#39;react&#39;),\n\n  {Layout} = require(&#39;react-ui&#39;);\n\nmodule.exports = React.createClass({\n\n  render() {\n\n    return (&lt;Layout.Grid title=&#34;Workbench Demo&#34;/&gt;);\n\n  }\n\n});\n\n'
             }
         },
         readmes : {
-        }
-    },
-    Workbench : {
-        demos : {
-            Demo : {
-                compontent : require('./workbench/doc/demo'),
-                code : 'let React = require(&#39;react&#39;),\n  {WorkBench} = require(&#39;react-ui&#39;);\nmodule.exports = React.createClass({\n  render() {\n    return (&lt;WorkBench compontents={[{\n\n      }]}/&gt;);\n  }\n});\n'
-            }
-        },
-        readmes : {
-            Readme : 'read me\n'
         }
     },
     Util : {
@@ -106,6 +85,27 @@ let React = require('react'),
             }
         },
         readmes : {
+        }
+    },
+    Transition : {
+        demos : {
+            Demo : {
+                compontent : require('./transition/doc/demo'),
+                code : ''
+            }
+        },
+        readmes : {
+        }
+    },
+    Workbench : {
+        demos : {
+            Demo : {
+                compontent : require('./workbench/doc/demo'),
+                code : 'let React = require(&#39;react&#39;),\n\n  {WorkBench} = require(&#39;react-ui&#39;);\n\nmodule.exports = React.createClass({\n\n  render() {\n\n    return (&lt;WorkBench compontents={[{\n\n\n\n      }]}/&gt;);\n\n  }\n\n});\n\n'
+            }
+        },
+        readmes : {
+            Readme : 'read me\n'
         }
     }
   };
@@ -139,7 +139,7 @@ Doc.App = React.createClass({
         children:[{
             type:'Menu',
             option:{
-                horizontal:false,
+                horizontal:true,
                 title:'React UI'
             },
             dataPovider: new MenuDataPovider()

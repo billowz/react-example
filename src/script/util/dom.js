@@ -93,8 +93,29 @@ let prefix = ['webkit', 'moz', 'ms', 'o'],
     }
     return objRet ? {} : undefined;
   };
-
+function parseClsArgs(cls) {
+  return array.mapArray(cls, (cls) => {
+    if (is.string(cls)) {
+      return cls.split(/\s+/g);
+    } else if (is.array(cls)) {
+      return array.mapArray(cls, cls => is.string(cls) ? cls.split(/\s+/g) : []);
+    } else {
+      return [];
+    }
+  });
+}
 let Dom = {
+  isDecendantOf(el, targetEl) {
+    checkEl(el);
+    checkEl(targetEl);
+    while (el) {
+      if (el === targetEl) {
+        return true;
+      }
+      el = el.parentNode;
+    }
+    return false;
+  },
   on(el, evt, callback) {
     checkHtml(el);
     if (el.addEventListener) {
@@ -125,6 +146,8 @@ let Dom = {
       }
     } else if (arguments.length === 3) {
       setStyle(el, attr, value);
+    } else {
+      throw 'Invalid Css Name';
     }
   },
   innerCss(el, attr) {
@@ -133,64 +156,48 @@ let Dom = {
   },
   cleanInnerCss(el, ...attrNames) {
     checkEl(el);
-    if (arguments.length == 2) {
-      attrNames = attrNames[0];
-    }
-    if (is.array(attrNames)) {
-      attrNames.forEach(function(attr) {
-        el.style[attr] = undefined;
-      });
-    } else if (is.string(attrNames)) {
-      el.style[attrNames] = undefined;
-    } else {
-      throw 'Invalid Css Name';
-    }
+    attrNames.forEach(function(attr) {
+      el.style[attr] = undefined;
+    });
   },
   hasCls(el, ...cls) {
     checkEl(el);
-    if (arguments.length == 2) {
-      cls = cls[0];
-    }
-    if (is.string(cls)) {
-      cls = cls.split(/\s+/g);
-    }
-    if (is.array(cls)) {
-      let clsNames = el.className;
-      for (let i = 0; i < cls.length; i++) {
+    cls = parseClsArgs(cls);
+    if (cls.length > 0) {
+      var clsNames = el.className,
+        i = 0;
+      for (; i < cls.length; i++) {
         if (clsNames.match(clsReg(cls[i].trim()))) {
           return true;
         }
       }
       return false;
     } else {
-      throw 'Invalid ClassName'
+      return true;
     }
+
   },
   addCls(el, ...cls) {
     checkEl(el);
-    if (arguments.length == 2) {
-      cls = cls[0];
+    var ret;
+    cls = parseClsArgs(cls);
+    if (cls.length > 0) {
+      var clss = el.className ? el.className.split(/\s+/g) : [];
+      ret = array.uniquePush.apply(null, [clss].concat(cls));
+      el.className = clss.join(' ');
     }
-    if (is.string(cls)) {
-      cls = cls.split(/\s+/g);
-    }
-    let clss = el.className ? el.className.split(/\s+/g) : [];
-    array.uniquePush(clss, cls);
-    el.className = clss.join(' ');
+    return ret || [];
   },
   removeCls(el, ...cls) {
     checkEl(el);
-    if (arguments.length == 2) {
-      cls = cls[0];
-    }
-    if (is.string(cls)) {
-      cls = cls.split(/\s+/g);
-    }
-    if (el.className) {
-      let clss = el.className.split(/\s+/g);
-      array.remove(clss, cls);
+    var ret;
+    cls = parseClsArgs(cls);
+    if (cls.length > 0) {
+      var clss = el.className ? el.className.split(/\s+/g) : [];
+      ret = array.remove.apply(null, [clss].concat(cls));
       el.className = clss.join(' ');
     }
+    return ret || [];
   },
   toggleClass(el, cls) {
     if (Dom.hasCls(el, cls)) {

@@ -291,7 +291,8 @@ builder.buildModule = function(option) {
     excludes = (option.excludes || []).concat([]);
   return through.obj(function(dir, e, c) {
     var _build = function(_path, out, c) {
-      if ((out.existing && fs.readFileSync(out.path, 'utf-8').indexOf(builder._MODULE_GENERATOR) !== 0) || !checkReg(out.path.substr(dir.path.length + 1).replace(/[\\]/g, '/'), includes, excludes)) {
+      if ((out.existing && fs.readFileSync(out.path, 'utf-8').indexOf(builder._MODULE_GENERATOR) !== 0)
+        || !checkReg(out.path.substr(dir.path.length + 1).replace(/[\\]/g, '/'), includes, excludes)) {
         c();
         return;
       }

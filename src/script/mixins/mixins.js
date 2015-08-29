@@ -5,6 +5,6 @@
  */
 
 module.exports = {
-  Masking: require('./masking'),
+  Mask: require('./mask'),
   Status: require('./status')
 };

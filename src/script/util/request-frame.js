@@ -1,8 +1,8 @@
-let Util = require('./core');
+var Util = require('./core');
 module.exports = (function(window) {
-  let prefixes = 'webkit moz ms o'.split(' ');
+  var prefixes = 'webkit moz ms o'.split(' ');
   function getFrame(prop, defaultVal) {
-    let val = window[prop],
+    var val = window[prop],
       i = 0;
     if (val) {
       return val;
@@ -15,9 +15,9 @@ module.exports = (function(window) {
     return defaultVal;
   }
 
-  let lastTime = 0,
+  var lastTime = 0,
     request = getFrame('requestAnimationFrame', function requestAnimationFrame(callback) {
-      let currTime = new Date().getTime(),
+      var currTime = new Date().getTime(),
         timeToCall = Math.max(0, 16 - (currTime - lastTime)),
         id = setTimeout(function() {
           callback(currTime + timeToCall);
@@ -29,27 +29,32 @@ module.exports = (function(window) {
       clearTimeout(id);
     }).bind(window),
     duration = function(duration, onStep, onEnd) {
-      let stoped = false,
-        t = new Date(),
+      var t = new Date(),
+        reqid,
         step = 0,
         calc = function() {
           try {
-            if (stoped) {
-              onEnd('cancel');
+            if (!reqid) {
+              return;
             } else if ((step = new Date() - t) >= duration) {
               onEnd();
+              reqid = null;
             } else {
               onStep(step);
-              request(calc);
+              reqid = request(calc);
             }
           } catch (e) {
             Util.error(e);
             onEnd(e.message);
           }
         };
-      calc();
+      reqid = request(calc);
       return function() {
-        stoped = true;
+        if (reqid) {
+          cancel(reqid);
+          reqid = null;
+          onEnd('cancel');
+        }
       }
     };
   return {
