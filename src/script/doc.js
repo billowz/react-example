@@ -15,20 +15,20 @@ let React = require('react'),
         readmes : {
         }
     },
-    Data : {
+    Button : {
         demos : {
             Demo : {
-                compontent : require('./data/doc/demo'),
+                compontent : require('./button/doc/demo'),
                 code : ''
             }
         },
         readmes : {
         }
     },
-    Button : {
+    Data : {
         demos : {
             Demo : {
-                compontent : require('./button/doc/demo'),
+                compontent : require('./data/doc/demo'),
                 code : ''
             }
         },
@@ -45,6 +45,16 @@ let React = require('react'),
         readmes : {
         }
     },
+    Layout : {
+        demos : {
+            Demo : {
+                compontent : require('./layout/doc/demo'),
+                code : 'let React = require(&#39;react&#39;),\n  {Layout} = require(&#39;react-ui&#39;);\nmodule.exports = React.createClass({\n  render() {\n    return (&lt;Layout.Grid title=&#34;Workbench Demo&#34;/&gt;);\n  }\n});\n'
+            }
+        },
+        readmes : {
+        }
+    },
     Menu : {
         demos : {
             Demo : {
@@ -55,11 +65,11 @@ let React = require('react'),
         readmes : {
         }
     },
-    Layout : {
+    Transition : {
         demos : {
             Demo : {
-                compontent : require('./layout/doc/demo'),
-                code : 'let React = require(&#39;react&#39;),\n\n  {Layout} = require(&#39;react-ui&#39;);\n\nmodule.exports = React.createClass({\n\n  render() {\n\n    return (&lt;Layout.Grid title=&#34;Workbench Demo&#34;/&gt;);\n\n  }\n\n});\n\n'
+                compontent : require('./transition/doc/demo'),
+                code : ''
             }
         },
         readmes : {
@@ -87,21 +97,11 @@ let React = require('react'),
         readmes : {
         }
     },
-    Transition : {
-        demos : {
-            Demo : {
-                compontent : require('./transition/doc/demo'),
-                code : ''
-            }
-        },
-        readmes : {
-        }
-    },
     Workbench : {
         demos : {
             Demo : {
                 compontent : require('./workbench/doc/demo'),
-                code : 'let React = require(&#39;react&#39;),\n\n  {WorkBench} = require(&#39;react-ui&#39;);\n\nmodule.exports = React.createClass({\n\n  render() {\n\n    return (&lt;WorkBench compontents={[{\n\n\n\n      }]}/&gt;);\n\n  }\n\n});\n\n'
+                code : 'let React = require(&#39;react&#39;),\n  {WorkBench} = require(&#39;react-ui&#39;);\nmodule.exports = React.createClass({\n  render() {\n    return (&lt;WorkBench compontents={[{\n\n      }]}/&gt;);\n  }\n});\n'
             }
         },
         readmes : {

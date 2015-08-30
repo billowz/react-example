@@ -3,25 +3,26 @@ let React = require('react'),
   Compontent = require('../compontent'),
   Util = require('../util/util'),
   {dom} = Util,
-  DropdownMixins = require('../dropdown/dropdown-mixins'),
   Status = require('../mixins/status'),
+  Dropdown = require('../mixins/dropdown'),
   Transition = require('../transition/transition');
 
 let MenuItem = React.createClass({
-  mixins: [Status('dropdown', false), Status('selected', false)],
+  mixins: [
+    Dropdown('dropdown', false, 'autoCollapse', true),
+    Status('selected', false)
+  ],
   propTypes: {
     text: PropTypes.string,
     href: PropTypes.string,
     target: PropTypes.string,
     onSelect: PropTypes.func,
     children: PropTypes.array,
-    dropdownAnimation: PropTypes.object,
-    autoCollapse: PropTypes.bool
+    animation: PropTypes.object
   },
   getDefaultProps() {
     return {
-      autoCollapse: true,
-      dropdownAnimation: {
+      animation: {
         dropdown: {
           true: {
             tween: {
@@ -44,24 +45,6 @@ let MenuItem = React.createClass({
             }
           }
         }
-      }
-    }
-  },
-  onToggleDropdown(type) {
-    if (type === 'dropdown' && this.props.autoCollapse) {
-      if (this.isDropdown()) {
-        if (!this._autoCollapseHandler) {
-          this._autoCollapseHandler = dom.on(window.document, 'click', e => {
-            var target = e.target || e.srcElement;
-            if (dom.isDecendantOf(target, React.findDOMNode(this))) {
-              return;
-            }
-            this.setDropdown(false);
-          });
-        }
-      } else if (this._autoCollapseHandler) {
-        this._autoCollapseHandler();
-        this._autoCollapseHandler = null;
       }
     }
   },
@@ -95,7 +78,7 @@ let MenuItem = React.createClass({
           autoCollapse={this.props.autoCollapse}></MenuItem>
         });
         return <Transition id={this.id} component='ul' className="pure-menu-children" dropdown={this.isDropdown()}
-          animation={this.props.dropdownAnimation} onEnd={this.onToggleDropdown}>{subItems}</Transition>
+          animation={this.props.animation} onEnd={this.onToggleDropdown}>{subItems}</Transition>
       }
     },
     onSelectSub(hierarchy) {

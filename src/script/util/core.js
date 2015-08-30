@@ -129,6 +129,12 @@ let core = {
     return _assign.apply(this, [target, null].concat(sources));
   },
 
+  assignIf(target, ...sources) {
+    return _assign.apply(this, [target, function(key) {
+      return !is.defined(target[key]);
+    }].concat(sources));
+  },
+
   assignWith(target, includes, ...srouces) {
     let keyFilter;
     if (is.array(includes) && includes.length > 0) {

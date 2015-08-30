@@ -37,8 +37,8 @@ let Transition = React.createClass({
   },
 
   stopTransition() {
+    var animate;
     if (this.__animates) {
-      let animate;
       for (animate of this.__animates.values()) {
       animate.stop();
       }
@@ -57,11 +57,11 @@ let Transition = React.createClass({
       Util.warn('Transition is undefined %s[%s]', animationType, val);
       return;
     }
+    this.stopTransition();
     var prom = this.getAnimate(opt).run();
     if (is.fn(this.props.onEnd)) {
       var endLis = function(err) {
-        console.log('==> End', err)
-        this.props.onEnd(this, animationType, val);
+        this.props.onEnd(animationType, val);
       }.bind(this);
       prom.then(endLis, endLis);
     }

@@ -55,7 +55,7 @@ module.exports = (function(window) {
           reqid = null;
           onEnd('cancel');
         }
-      }
+      };
     };
   return {
     request: request,

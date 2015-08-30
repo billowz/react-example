@@ -16,13 +16,14 @@ module.exports = {
   Dropdown: require('./dropdown/dropdown'),
   Event: require('./event/event'),
   Http: require('./http/http'),
-  Mixins: require('./mixins/mixins'),
-  Menu: require('./menu/menu'),
   Layout: require('./layout/layout'),
+  Menu: require('./menu/menu'),
+  Mixins: require('./mixins/mixins'),
   Nav: require('./nav/nav'),
   Router: require('./router/router'),
-  Util: require('./util/util'),
   Transition: require('./transition/transition'),
+  Tree: require('./tree/tree'),
+  Util: require('./util/util'),
   Watch: require('./watch/watch'),
   Workbench: require('./workbench/workbench')
 };

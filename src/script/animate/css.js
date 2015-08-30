@@ -224,10 +224,10 @@ class TweenFrameProcessor extends AnimateProcessor {
   }
   run() {
     this.stop();
-    return Util.promise(function(def) {
+    return Util.promise((def) => {
       this._beforeTransition();
       this._animate = AnimationFrame.duration(this.duration,
-        this._calStyles.bind(this), function(err) {
+        this._calStyles.bind(this), (err) => {
           this._animate = null;
           this._endTransition();
           if (err) {
@@ -235,12 +235,11 @@ class TweenFrameProcessor extends AnimateProcessor {
           } else {
             def.resolve();
           }
-        }.bind(this));
-    }.bind(this));
+        });
+    });
   }
   stop() {
     if (this._animate) {
-      console.log('stoping....')
       this._animate();
     }
   }
@@ -253,7 +252,6 @@ class TweenFrameProcessor extends AnimateProcessor {
   }
   _beforeTransition() {
     this._oldCss = dom.innerCss(this.el, this._cssNames);
-    console.log('-->', this._oldCss)
     let fromCss, targetCss;
     dom.css(this.el, this.target);
     targetCss = dom.css(this.el, this._targetCssNames);
@@ -261,7 +259,7 @@ class TweenFrameProcessor extends AnimateProcessor {
     fromCss = dom.css(this.el, this._targetCssNames);
 
     this._animateObj = {};
-    this._targetCssNames.forEach(function(name) {
+    this._targetCssNames.forEach((name) => {
       let from = parseFloat(fromCss[name]),
         to = parseFloat(targetCss[name]),
         unit = name === 'opacity' ? '' : 'px',
@@ -272,12 +270,11 @@ class TweenFrameProcessor extends AnimateProcessor {
         variation: variation,
         unit: unit
       }
-    }.bind(this));
+    });
   }
   _endTransition() {
     this.promise = null;
     if (!this.keepTarget) {
-      console.log('...', this._oldCss)
       dom.css(this.el, this._oldCss);
     }
     this._oldCss = null;
