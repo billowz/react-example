@@ -5,8 +5,7 @@
  */
 
 module.exports = {
-  Dropdown: require('./dropdown'),
-  Expand: require('./expand'),
+  DocumentEvent: require('./document-event'),
   Mask: require('./mask'),
   Status: require('./status')
 };

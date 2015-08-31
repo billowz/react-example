@@ -47,6 +47,10 @@ var fs = require('fs'),
     path: 'reqwest',
     root: 'reqwest',
     lib: 'reqwest'
+  }, {
+    path: 'org/cometd',
+    root: 'org.cometd',
+    lib: 'org/cometd'
   }]),
   appCfg = {
     depDir: './dependency',

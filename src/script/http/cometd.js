@@ -1,4 +1,4 @@
-let Cometd = require('cometd-cjs'),
+let Cometd = require('org/cometd'),
   ajax = require('reqwest');
 function _setHeaders(xhr, headers) {
   if (headers) {

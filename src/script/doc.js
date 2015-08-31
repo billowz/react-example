@@ -5,16 +5,6 @@ let React = require('react'),
   MemoryDataPovider = Data.MemoryPovider,
   Doc={};
   Doc.Compontent = {
-    Animate : {
-        demos : {
-            Demo : {
-                compontent : require('./animate/doc/demo'),
-                code : ''
-            }
-        },
-        readmes : {
-        }
-    },
     Button : {
         demos : {
             Demo : {
@@ -35,10 +25,10 @@ let React = require('react'),
         readmes : {
         }
     },
-    Http : {
+    Animate : {
         demos : {
             Demo : {
-                compontent : require('./http/doc/demo'),
+                compontent : require('./animate/doc/demo'),
                 code : ''
             }
         },
@@ -65,10 +55,10 @@ let React = require('react'),
         readmes : {
         }
     },
-    Transition : {
+    Http : {
         demos : {
             Demo : {
-                compontent : require('./transition/doc/demo'),
+                compontent : require('./http/doc/demo'),
                 code : ''
             }
         },
@@ -91,6 +81,16 @@ let React = require('react'),
             },
             Observe : {
                 compontent : require('./util/doc/observe'),
+                code : ''
+            }
+        },
+        readmes : {
+        }
+    },
+    Transition : {
+        demos : {
+            Demo : {
+                compontent : require('./transition/doc/demo'),
                 code : ''
             }
         },

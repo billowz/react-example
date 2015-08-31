@@ -5,6 +5,5 @@
  */
 
 module.exports = {
-  Ajax: require('./ajax'),
   Cometd: require('./cometd')
 };

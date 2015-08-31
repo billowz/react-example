@@ -11,9 +11,8 @@
 module.exports = {
   Animate: require('./animate/animate'),
   Button: require('./button/button'),
-  Data: require('./data/data'),
   Compontent: require('./compontent'),
-  Dropdown: require('./dropdown/dropdown'),
+  Data: require('./data/data'),
   Event: require('./event/event'),
   Http: require('./http/http'),
   Layout: require('./layout/layout'),

@@ -1,9 +1,9 @@
-let q = require('q'),
+var q = require('q'),
   is = require('is');
 function _arrayEmptyFilter(v) {
   return v;
 }
-function callconsole(fn, ...args) {
+function callconsole(fn, args) {
   if (console && console[fn]) {
     return console[fn].apply(console, args);
   }
@@ -12,7 +12,7 @@ function _assign(target, keyFilter, ...sources) {
   target = target || {};
   sources.forEach(function(source) {
     if (is.hash(source)) {
-      let keys = Object.keys(source);
+      var keys = Object.keys(source);
       if (keyFilter) {
         keys = keys.filter(keyFilter);
       }
@@ -23,16 +23,27 @@ function _assign(target, keyFilter, ...sources) {
   });
   return target;
 }
-let core = {
+var core = {
   is: is,
-  debug(...args) {
-    callconsole('debug', args);
+  parseArguments(args) {
+    var ret = [],
+      i = 0;
+    for (; i < args.length; i++) {
+      ret[i] = args[i];
+    }
+    return ret;
   },
-  log(...args) {
-    callconsole('log', args);
+  debug() {
+    callconsole('debug', ['[debug]'].concat(core.parseArguments(arguments)));
   },
-  warn(...args) {
-    callconsole('warn', args);
+  log() {
+    callconsole('log', ['[info]'].concat(core.parseArguments(arguments)));
+  },
+  warn() {
+    callconsole('warn', ['[warn]'].concat(core.parseArguments(arguments)));
+  },
+  err() {
+    callconsole('error', ['[error]'].concat(core.parseArguments(arguments)));
   },
   consoleGroup(callback, ...args) {
     callconsole('group', args);
@@ -43,9 +54,6 @@ let core = {
     callconsole('time', args);
     callback();
     callconsole('time', args);
-  },
-  err(...args) {
-    callconsole('error', args);
   },
   promise(c) {
     let def = Q.defer();

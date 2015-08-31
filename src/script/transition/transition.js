@@ -18,7 +18,7 @@ let Transition = React.createClass({
     };
   },
 
-  getAnimate(opt) {
+  getAnimate(opt, type) {
     let el = React.findDOMNode(this),
       animate;
     if (opt) {
@@ -29,6 +29,7 @@ let Transition = React.createClass({
       if (!animate) {
         animate = new CssAnimate(el, opt);
         this.__animates.set(opt, animate);
+        animate.type = type;
       }
     } else {
       throw 'Invalid Transition';
@@ -36,7 +37,7 @@ let Transition = React.createClass({
     return animate;
   },
 
-  stopTransition() {
+  stopTransition(type) {
     var animate;
     if (this.__animates) {
       for (animate of this.__animates.values()) {
@@ -54,11 +55,11 @@ let Transition = React.createClass({
       if (is.fn(this.props.onEnd)) {
         this.props.onEnd(animationType, val);
       }
-      Util.warn('Transition is undefined %s[%s]', animationType, val);
+      Util.debug('Transition is undefined ' + animationType + '[' + val + ']');
       return;
     }
-    this.stopTransition();
-    var prom = this.getAnimate(opt).run();
+    this.stopTransition(animationType);
+    var prom = this.getAnimate(opt, animationType).run();
     if (is.fn(this.props.onEnd)) {
       var endLis = function(err) {
         this.props.onEnd(animationType, val);
@@ -68,10 +69,12 @@ let Transition = React.createClass({
     return prom;
   },
 
-  componentWillReceiveProps(nextProps) {
+  componentWillReceiveProps(nextProps, updated) {
     Object.keys(this.props.animation).forEach(function(type) {
-      if (this.props[type] != nextProps[type]) {
-        this.transition(type, nextProps[type]);
+      var oldVal = this.props[type],
+        val = nextProps[type];
+      if (val !== oldVal) {
+        this.transition(type, val);
       }
     }.bind(this))
   },
