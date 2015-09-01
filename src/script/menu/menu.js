@@ -13,13 +13,17 @@ let React = require('react'),
     leafCls: '',
     openCls: 'pure-menu-active',
     selectedCls: 'pure-menu-selected',
-    contentCls: 'pure-menu-link',
     childrenCls: 'pure-menu-children',
     compontent: 'li',
     childrenCompontent: 'ul',
     childNodesProp: 'children',
     leafProp: 'leaf',
-    hrefTargetProp: 'target'
+    content: {
+      contentProp: 'text',
+      contentCls: 'pure-menu-link',
+      hrefProp: 'href',
+      hrefTargetProp: 'target'
+    }
   };
 
 let Menu = Compontent('Menu', {

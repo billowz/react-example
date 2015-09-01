@@ -29,15 +29,15 @@ var React = require('react'),
     }, PropTypes.object],
 
     contentBuilder: [function() {
-      var href = this.props[this.props.hrefProp || 'href'];
+      var href = this.props[this.props.content.hrefProp || 'href'];
       if (!is.string(href)) {
         href = 'javascript:void(0);';
       }
       return <a onClick={this.clickContent}
-        className={this.props.contentCls || 'content'}
+        className={this.props.content.contentCls || 'content'}
         href={href}
-        target={this.props[this.props.hrefTargetProp || 'hrefTtarget']}>
-        {this.props[this.props.contentProp || 'text']}
+        target={this.props[this.props.content.hrefTargetProp || 'hrefTtarget']}>
+        {this.props[this.props.content.contentProp || 'text']}
       </a>;
     }, PropTypes.func],
 

@@ -5,20 +5,20 @@ let React = require('react'),
   MemoryDataPovider = Data.MemoryPovider,
   Doc={};
   Doc.Compontent = {
-    Animate : {
+    Button : {
         demos : {
             Demo : {
-                compontent : require('./animate/doc/demo'),
+                compontent : require('./button/doc/demo'),
                 code : ''
             }
         },
         readmes : {
         }
     },
-    Button : {
+    Animate : {
         demos : {
             Demo : {
-                compontent : require('./button/doc/demo'),
+                compontent : require('./animate/doc/demo'),
                 code : ''
             }
         },
@@ -49,7 +49,7 @@ let React = require('react'),
         demos : {
             Demo : {
                 compontent : require('./layout/doc/demo'),
-                code : 'let React = require(&#39;react&#39;),\n  {Layout} = require(&#39;react-ui&#39;);\nmodule.exports = React.createClass({\n  render() {\n    return (&lt;Layout.Grid title=&#34;Workbench Demo&#34;/&gt;);\n  }\n});\n'
+                code : 'let React = require(&#39;react&#39;),\n\n  {Layout} = require(&#39;react-ui&#39;);\n\nmodule.exports = React.createClass({\n\n  render() {\n\n    return (&lt;Layout.Grid title=&#34;Workbench Demo&#34;/&gt;);\n\n  }\n\n});\n\n'
             }
         },
         readmes : {
@@ -85,12 +85,12 @@ let React = require('react'),
                 compontent : require('./util/doc/demo'),
                 code : ''
             },
-            Dom : {
-                compontent : require('./util/doc/dom'),
-                code : ''
-            },
             Observe : {
                 compontent : require('./util/doc/observe'),
+                code : ''
+            },
+            Dom : {
+                compontent : require('./util/doc/dom'),
                 code : ''
             }
         },
@@ -101,7 +101,7 @@ let React = require('react'),
         demos : {
             Demo : {
                 compontent : require('./workbench/doc/demo'),
-                code : 'let React = require(&#39;react&#39;),\n  {WorkBench} = require(&#39;react-ui&#39;);\nmodule.exports = React.createClass({\n  render() {\n    return (&lt;WorkBench compontents={[{\n\n      }]}/&gt;);\n  }\n});\n'
+                code : 'let React = require(&#39;react&#39;),\n\n  {WorkBench} = require(&#39;react-ui&#39;);\n\nmodule.exports = React.createClass({\n\n  render() {\n\n    return (&lt;WorkBench compontents={[{\n\n\n\n      }]}/&gt;);\n\n  }\n\n});\n\n'
             }
         },
         readmes : {
