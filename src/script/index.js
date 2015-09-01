@@ -14,7 +14,6 @@ module.exports = {
   Compontent: require('./compontent'),
   Data: require('./data/data'),
   Event: require('./event/event'),
-  Http: require('./http/http'),
   Layout: require('./layout/layout'),
   Menu: require('./menu/menu'),
   Mixins: require('./mixins/mixins'),
@@ -22,6 +21,7 @@ module.exports = {
   Router: require('./router/router'),
   Transition: require('./transition/transition'),
   Tree: require('./tree/tree'),
+  Http: require('./http/http'),
   Util: require('./util/util'),
   Watch: require('./watch/watch'),
   Workbench: require('./workbench/workbench')

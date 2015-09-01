@@ -1,9 +1,10 @@
-let React = require('react'),
+var React = require('react'),
   CssAnimate = require('../animate/css'),
   Util = require('../util/util'),
+  Compontent = require('../compontent'),
   {is} = Util;
 
-let Transition = React.createClass({
+var Transition = React.createClass({
   protoTypes: {
     animation: React.PropTypes.object,
     component: React.PropTypes.string,
@@ -19,7 +20,7 @@ let Transition = React.createClass({
   },
 
   getAnimate(opt, type) {
-    let el = React.findDOMNode(this),
+    var el = React.findDOMNode(this),
       animate;
     if (opt) {
       if (!this.__animates) {
@@ -56,7 +57,9 @@ let Transition = React.createClass({
         this.props.onEnd(animationType, val);
       }
       Util.debug('Transition is undefined ' + animationType + '[' + val + ']');
-      return;
+      return Util.promise(def => {
+        def.reject('non Transition');
+      });
     }
     this.stopTransition(animationType);
     var prom = this.getAnimate(opt, animationType).run();
@@ -80,11 +83,23 @@ let Transition = React.createClass({
   },
 
   componentWillUnmount() {
-    this.transition('leave');
+    this.stopTransition();
   },
 
   componentDidMount() {
     this.transition('enter');
+  },
+  componentWillEnter() {
+    var done = function() {
+      console.log('====>>>', arguments);
+    }
+    console.log('componentWillEnter====>>>', arguments);
+    this.transition('enter').then(done, done);
+  },
+
+  componentWillLeave() {
+    console.log('componentWillLeave====>>>', arguments);
+    this.transition('leave').then(done, done);
   },
 
   render() {

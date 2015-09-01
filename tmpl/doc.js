@@ -37,7 +37,8 @@ class MenuDataPovider extends MemoryDataPovider{
         children:Compontents
       },{
         text:'GitHub',
-        href:'https://github.com/tao-zeng/react-example'
+        href:'https://github.com/tao-zeng/react-example',
+        target:'__blank'
     }];
   }
 }
@@ -48,8 +49,8 @@ Doc.App = React.createClass({
         children:[{
             type:'Menu',
             option:{
-                horizontal:true,
-                title:'React UI'
+                header:'React UI',
+                headerHref:'#'
             },
             dataPovider: new MenuDataPovider()
         },{

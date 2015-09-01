@@ -6,6 +6,6 @@
 
 module.exports = {
   Adapter: require('./adapter'),
-  Povider: require('./povider'),
-  MemoryPovider: require('./memory-povider')
+  MemoryPovider: require('./memory-povider'),
+  Povider: require('./povider')
 };

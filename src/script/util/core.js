@@ -143,7 +143,7 @@ var core = {
     }].concat(sources));
   },
 
-  assignWith(target, includes, ...srouces) {
+  assignWith(target, includes, ...sources) {
     let keyFilter;
     if (is.array(includes) && includes.length > 0) {
       keyFilter = function(key) {
@@ -153,14 +153,14 @@ var core = {
     return _assign.apply(this, [target, keyFilter].concat(sources));
   },
 
-  assignWithout(target, excludes, ...srouces) {
+  assignWithout(target, excludes, ...sources) {
     let keyFilter;
     if (is.array(excludes) && excludes.length > 0) {
       keyFilter = function(key) {
         return excludes.indexOf(key) == -1;
       }
     }
-    return _assign.apply(this, [target, keyFilter].concat(srouces));
+    return _assign.apply(this, [target, keyFilter].concat(sources));
   },
 
   upperFirst(str) {

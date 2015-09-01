@@ -5,6 +5,16 @@ let React = require('react'),
   MemoryDataPovider = Data.MemoryPovider,
   Doc={};
   Doc.Compontent = {
+    Animate : {
+        demos : {
+            Demo : {
+                compontent : require('./animate/doc/demo'),
+                code : ''
+            }
+        },
+        readmes : {
+        }
+    },
     Button : {
         demos : {
             Demo : {
@@ -25,10 +35,10 @@ let React = require('react'),
         readmes : {
         }
     },
-    Animate : {
+    Http : {
         demos : {
             Demo : {
-                compontent : require('./animate/doc/demo'),
+                compontent : require('./http/doc/demo'),
                 code : ''
             }
         },
@@ -55,10 +65,10 @@ let React = require('react'),
         readmes : {
         }
     },
-    Http : {
+    Transition : {
         demos : {
             Demo : {
-                compontent : require('./http/doc/demo'),
+                compontent : require('./transition/doc/demo'),
                 code : ''
             }
         },
@@ -81,16 +91,6 @@ let React = require('react'),
             },
             Observe : {
                 compontent : require('./util/doc/observe'),
-                code : ''
-            }
-        },
-        readmes : {
-        }
-    },
-    Transition : {
-        demos : {
-            Demo : {
-                compontent : require('./transition/doc/demo'),
                 code : ''
             }
         },
@@ -128,7 +128,8 @@ class MenuDataPovider extends MemoryDataPovider{
         children:Compontents
       },{
         text:'GitHub',
-        href:'https://github.com/tao-zeng/react-example'
+        href:'https://github.com/tao-zeng/react-example',
+        target:'__blank'
     }];
   }
 }
@@ -139,8 +140,8 @@ Doc.App = React.createClass({
         children:[{
             type:'Menu',
             option:{
-                horizontal:true,
-                title:'React UI'
+                header:'React UI',
+                headerHref:'#'
             },
             dataPovider: new MenuDataPovider()
         },{

@@ -6,6 +6,6 @@
 
 module.exports = {
   HorizontalNav: require('./horizontal-nav'),
-  SideNav: require('./side-nav'),
-  NavMixins: require('./nav-mixins')
+  NavMixins: require('./nav-mixins'),
+  SideNav: require('./side-nav')
 };

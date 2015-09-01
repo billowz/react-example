@@ -26,17 +26,32 @@ body {
     bottom: 0;
     overflow: hidden;
 }
-.pure-menu {
 
-.pure-menu-item{
-  height:auto;
-}
-    .pure-menu-children.animated {
-        display: inline-block;
-    }
+.pure-menu {
+    list-style: none;
+    padding: 0;
+    margin: 0;
     .user-select;
+    .pure-menu-item,
+    .pure-menu-heading {
+        height: auto;
+        padding: 0;
+        margin: 0;
+    }
+    .pure-menu-heading-content {
+        padding: .5em 1em;
+        text-decoration: none;
+        white-space: nowrap;
+    }
+    .pure-menu-heading>.pure-menu-link:hover,
+    .pure-menu-heading>.pure-menu-link:focus {
+        background: transparent;
+    }
     .pure-menu-link {
         cursor: pointer;
+    }
+    .pure-menu-children.animated {
+        display: inline-block;
     }
     .pure-menu-selected .pure-menu-link,
     .pure-menu-selected .pure-menu-link:visited {
