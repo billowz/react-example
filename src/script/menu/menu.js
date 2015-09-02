@@ -6,6 +6,7 @@ let React = require('react'),
   Mixins = require('../mixins/mixins'),
   {DocumentEvent, Status} = Mixins,
   Transition = require('../transition/transition'),
+  Tree = require('../tree/tree'),
   {TreeNode} = require('../tree/tree'),
   MENU_TREE_NODE_STYLE = {
     cls: 'pure-menu-item',
@@ -18,20 +19,15 @@ let React = require('react'),
     childrenCompontent: 'ul',
     childNodesProp: 'children',
     leafProp: 'leaf',
-    content: {
-      contentProp: 'text',
-      contentCls: 'pure-menu-link',
-      hrefProp: 'href',
-      hrefTargetProp: 'target'
-    }
+
+    contentProp: 'text',
+    contentCls: 'pure-menu-link',
+    hrefProp: 'href',
+    hrefTargetProp: 'target'
   };
 
 let Menu = Compontent('Menu', {
   mixins: [
-    DocumentEvent({
-      prop: 'open',
-      autoBindProp: 'horizontal'
-    }),
     Status.Prop({
       prop: 'horizontal',
       type: PropTypes.bool,
@@ -39,10 +35,26 @@ let Menu = Compontent('Menu', {
     })
   ],
   propTypes: {
-    onMenuSelected: PropTypes.func
+    onMenuSelected: PropTypes.func,
+    cls: PropTypes.string,
+    horizontalCls: PropTypes.string,
+    verticalCls: PropTypes.string,
+    headerCls: PropTypes.string,
+    headerContentCls: PropTypes.string,
+    headerLinkContentCls: PropTypes.string,
+    menuCls: PropTypes.string,
+    menuItemStyle: PropTypes.object
   },
   getDefaultProps() {
     return {
+      cls: 'pure-menu',
+      horizontalCls: 'pure-menu-horizontal',
+      verticalCls: 'pure-menu-vertical',
+      headerCls: 'pure-menu-heading',
+      headerContentCls: 'pure-menu-heading-content',
+      headerLinkContentCls: 'pure-menu-link',
+      menuCls: 'pure-menu-list',
+
       menuAnimation: {
         enter: {
           class: ['animated', 'fadeInDown']
@@ -56,35 +68,46 @@ let Menu = Compontent('Menu', {
   render() {
     var {className, horizontal} = this.props,
       cls = Util.parseClassName(
-        'pure-menu', className,
-        horizontal && 'pure-menu-horizontal',
-        !horizontal && 'pure-menu-vertical'
+        this.props.cls,
+        horizontal && this.props.horizontalCls,
+        !horizontal && this.props.verticalCls
       );
+    var st = new Date();
+    setTimeout(() => {
+      console.log('init menu use:' + (new Date() - st))
+    }, 0)
     return <div className={cls}>
-            <div className="pure-menu-heading">{this._renderHeader()}</div>
-            <Transition component="ul" className='pure-menu-list' animation={this.props.menuAnimation}>
+            <div className={this.props.headerCls}>{this._renderHeader()}</div>
+            <Transition component="ul" className={this.props.menuCls} animation={this.props.menuAnimation}>
               {this._renderContent()}
             </Transition>
           </div>
   },
   _renderHeader() {
-    var headerContent;
     if (is.string(this.props.header)) {
-      if (is.string(this.props.headerHref)) {
-        return <a className="pure-menu-heading-content pure-menu-link" href={this.props.headerHref}>
-          {this.props.header}
-        </a>;
-      } else {
-        return <span className="pure-menu-heading-content">{this.props.header}</span>;
+      var Comp = 'span',
+        cls = [this.props.headerContentCls],
+        props = {},
+        href = this.props.headerHref;
+      if (is.string(href)) {
+        Comp = 'a';
+        cls.push(this.props.headerLinkContentCls)
+        props.href = href;
       }
+      props.className = cls.join(' ');
+      return <Comp {...props}>{this.props.header}</Comp>
     }
   },
   _renderContent() {
-    if (this.state.data) {
-      return this.state.data.map((c, idx) => {
-        return <TreeNode {...MENU_TREE_NODE_STYLE} {...c}
-          key={idx} autoClose={this.props.horizontal} onClickContent={this._onMenuSelected}></TreeNode>;
-      });
+    var data = this.state.data || this.props.data;
+    if (data) {
+      var menuItemStyle = Util.assignIf(this.props.menuItemStyle || {}, MENU_TREE_NODE_STYLE);
+      this._menuItemRefs = [];
+      return data.map((c, idx) => {
+        var ref = 'item-' + idx;
+        this._menuItemRefs.push(ref);
+        return <TreeNode {...menuItemStyle} data={c} key={idx} ref={ref} autoClose={this.props.horizontal} onClickContent={this._onMenuSelected}></TreeNode>;
+      })
     }
   },
   _onMenuSelected(node, hierarchy) {

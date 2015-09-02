@@ -174,6 +174,33 @@ var core = {
 
   observe() {
     Object.observe();
+  },
+
+  eq(source, target, deep) {
+    if (source === target) {
+      return true;
+    }
+    if (is.array(source) && is.array(target)) {
+      return !source.some((v, i) => {
+          var tv = target[i];
+          if (deep) {
+            return !core.eq(v, tv, deep);
+          } else {
+            return tv !== v;
+          }
+        });
+    } else if (is.hash(source) && is.hash(target)) {
+      Object.keys(source).some((key) => {
+        var v = source[key],
+          tv = target[key];
+        if (deep) {
+          return !core.eq(v, tv, deep);
+        } else {
+          return tv !== v;
+        }
+      });
+    }
+    return false;
   }
 }
 module.exports = core;

@@ -3,12 +3,13 @@
  */
 var React = require('react'),
   Util = require('../util/util'),
-  {is} = Util,
+  {is, dom} = Util,
   {PropTypes} = React,
   Compontent = require('../compontent'),
   {DocumentEvent, Status} = require('../mixins/mixins'),
   Transition = require('../transition/transition'),
   TREE_NODE_STYLES = {
+    // styles
     cls: ['tree-node'],
     nodeCls: ['node'],
     leafCls: ['leaf'],
@@ -18,29 +19,29 @@ var React = require('react'),
     compontent: ['li'],
     childrenCompontent: ['ul'],
 
-    childNodesProp: ['childNodes'],
+    // data config
+    childrenProp: ['children'],
     leafProp: ['leaf'],
 
-    content: [{
-      contentProp: 'text',
-      contentCls: 'content',
-      hrefProp: 'href',
-      hrefTargetProp: 'hrefTtarget'
-    }, PropTypes.object],
-
+    // content builder
     contentBuilder: [function() {
-      var href = this.props[this.props.content.hrefProp || 'href'];
-      if (!is.string(href)) {
-        href = 'javascript:void(0);';
+      var contentProps = this.props,
+        content = this.getData(contentProps.contentProp || 'text'),
+        href = this.getData(contentProps.hrefProp || 'href'),
+        props = {
+          onClick: this.clickContent,
+          className: contentProps.contentCls || 'content'
+        },
+        Comp = 'span';
+      if (is.string(href)) {
+        Comp = 'a';
+        props.href = href;
+        props.target = this.getData(contentProps.hrefTargetProp || 'target');
       }
-      return <a onClick={this.clickContent}
-        className={this.props.content.contentCls || 'content'}
-        href={href}
-        target={this.props[this.props.content.hrefTargetProp || 'hrefTtarget']}>
-        {this.props[this.props.content.contentProp || 'text']}
-      </a>;
+      return <Comp {...props}>{content}</Comp>;
     }, PropTypes.func],
 
+    // animate
     openChildrenAnimation: [{
       tween: {
         from: {
@@ -75,26 +76,35 @@ var TreeNode = Compontent('TreeNode', {
   mixins: [
     DocumentEvent({
       prop: 'open',
-      value: true,
+      value: false,
       autoBindProp: 'autoClose',
       buildAutoBindProp: true
     }),
     Status({
       prop: 'selected',
-      type: PropTypes.object,
-      value: false,
-      getter: false
+      type: PropTypes.bool,
+      value: false
     })
   ],
 
   propTypes: Util.assign(propTypes, {
-    onClickContent: PropTypes.func
+    onClickContent: PropTypes.func,
+    data: PropTypes.object
   }),
+
+  getData(key) {
+    if (!this.props.data) {
+      return null;
+    }
+    if (is.defined(key)) {
+      return this.props.data[key];
+    }
+    return this.props.data;
+  },
 
   getDefaultProps() {
     return defaultProps;
   },
-
 
   getChildNode(idx) {
     var idx = this._childNodeRefs.indexOf(idx);
@@ -110,43 +120,24 @@ var TreeNode = Compontent('TreeNode', {
     });
   },
 
-  isSelected() {
-    var sel = this.state.selected;
-    if (this.isLeaf()) {
-      return !!sel;
-    } else {
-      return sel && sel.all;
-    }
-  },
-
-  isSelectAll() {
-    var sel = this.state.selected;
-    if (this.isLeaf()) {
-      return !!sel;
-    } else {
-      return sel && sel.all;
-    }
-  },
-
-  select() {
-    if (this.isLeaf()) {
-      this.setSelected(true);
-    } else {
-      this.setSelected({
-        all: true
-      });
-      this.getChildNodes().forEach((cnode) => {
-        cnode.select();
+  open(cascade) {
+    this.setOpen(true);
+    if (cascade) {
+      this.getChildNodes.forEach(c => {
+        if (c.isNode()) {
+          c.open(cascade);
+        }
       });
     }
   },
 
-  unselect() {
-    if (this.isLeaf()) {
-      this.setSelected(false);
-    } else {
-      this.getChildNodes().forEach((cnode) => {
-        cnode.unSelect();
+  close(cascade) {
+    this.setClose(true);
+    if (cascade) {
+      this.getChildNodes.forEach(c => {
+        if (c.isNode()) {
+          c.close(cascade);
+        }
       });
     }
   },
@@ -156,7 +147,7 @@ var TreeNode = Compontent('TreeNode', {
   },
 
   isLeaf() {
-    var leaf = this.props[this.props.leafProp];
+    var leaf = this.getData(this.props.leafProp);
     if (is.boolean(leaf)) {
       return leaf;
     }
@@ -164,17 +155,39 @@ var TreeNode = Compontent('TreeNode', {
   },
 
   hasChildNode() {
-    var cnodes = this._getChildNodes();
-    if (cnodes && cnodes.length > 0) {
-      return true;
+    var cnodes;
+    return !!this.props.children || ((cnodes = this._getChildDatas()) && cnodes.length > 0);
+  },
+
+  toggleCls(add, cls) {
+    if (add) {
+      dom.addCls(this.getDOMNode(), cls);
+    } else {
+      dom.removeCls(this.getDOMNode(), cls);
     }
-    if (this.props.childNodesProp !== 'children') {
-      return !!this.props.children;
+  },
+
+  shouldComponentUpdate(nextProps, nextState) {
+    if (Util.eq(nextProps, this.props)) {
+      if (nextState.open != this.state.open) {
+        this.toggleCls(nextState.open, this.props.openCls);
+        this.state.open = nextState.open;
+        this.componentWillUpdate(this.props, this.state);
+        return false;
+      } else if (nextState.selected != this.state.selected) {
+        this.toggleCls(nextState.selected, this.props.selectedCls);
+        return false;
+      }
     }
-    return false;
+    return true;
   },
 
   render() {
+
+    var st = new Date();
+    setTimeout(() => {
+      console.log('init item use:' + (new Date() - st))
+    }, 0)
     this._childNodeRefs = [];
     var leaf = this.isLeaf(),
       cls;
@@ -187,7 +200,6 @@ var TreeNode = Compontent('TreeNode', {
       !leaf && this.isOpen() && this.props.openCls,
       this.isSelected() && this.props.selectedCls),
     Compontent = this.props.compontent;
-
     return <Compontent className={cls}>
               {this._renderContent()}
               {this._renderChildren()}
@@ -202,11 +214,11 @@ var TreeNode = Compontent('TreeNode', {
 
   _renderChildren() {
     if (this.isNode()) {
-      var children = [], childNodes, propChildren, childrenIdx;
-      if ((childNodes = this._getChildNodes()) && childNodes.length > 0) {
-        children = childNodes.map(this._renderChildNode);
+      var children = [], childDatas, propChildren, childrenIdx;
+      if ((childDatas = this._getChildDatas()) && childDatas.length > 0) {
+        children = childDatas.map(this._renderChildNode);
       }
-      if (this.props.childNodesProp !== 'children' && (propChildren = this.props.children)) {
+      if ( (propChildren = this.props.children) ) {
         if (!is.array(propChildren)) {
           propChildren = [propChildren];
         }
@@ -231,7 +243,7 @@ var TreeNode = Compontent('TreeNode', {
     return null;
   },
   _renderChildElement(child, idx) {
-    var props = Util.assign(_getChildProps, child.props);
+    var props = Util.assign(this._getChildProps(), child.props);
     if (!child.key) {
       props.key = idx;
     }
@@ -246,13 +258,14 @@ var TreeNode = Compontent('TreeNode', {
     this._childNodeRefs.push(props.ref);
     return React.cloneElement(child, props);
   },
-  _renderChildNode(childNode, idx) {
+
+  _renderChildNode(data, idx) {
     var props = this._getChildProps();
     if (is.fn(this.props.onClickContent)) {
       props.onClickContent = this._onClickChildContent;
     }
     this._childNodeRefs.push(idx);
-    return <TreeNode {...props} {...childNode} key={idx} ref={idx} onClickContent={this._onClickChildContent}></TreeNode>
+    return <TreeNode {...props} data={data} key={idx} ref={idx} onClickContent={this._onClickChildContent}></TreeNode>
   },
 
   _onClickChildContent(node, hierarchy) {
@@ -272,7 +285,7 @@ var TreeNode = Compontent('TreeNode', {
   },
 
   _getChildProps() {
-    return Util.assignWith({}, Object.keys(TREE_NODE_STYLES), this.props);
+    return Util.assignWithout({}, ['data', 'onClickContent', 'data', this.props.childrenProp], this.props);
   },
 
   _getChildrenAnimation() {
@@ -285,8 +298,9 @@ var TreeNode = Compontent('TreeNode', {
     }
   },
 
-  _getChildNodes() {
-    return this.props[this.props.childNodesProp];
+  _getChildDatas() {
+    return this.getData(this.props.childrenProp);
   }
 });
+TreeNode.DefaultStyle = defaultProps;
 module.exports = TreeNode;

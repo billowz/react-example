@@ -40,6 +40,25 @@ class MenuDataPovider extends MemoryDataPovider{
         href:'https://github.com/tao-zeng/react-example',
         target:'__blank'
     }];
+    for(var i=0; i<2; i++){
+      var d= {
+        text:'Level1-'+i
+      },children = [];
+      d.children = children;
+      this.data.push(d);
+      for(var j=0; j<100; j++){
+        var dd = {
+          text:'Level2-'+i+'-'+j
+        },cchildren =[];
+        dd.children = cchildren;
+        children.push(dd);
+        for(var k=0; k<10; k++){
+          cchildren.push({
+            text:'Level3-'+i+'-'+j+'-'+k
+          })
+        }
+      }
+    }
   }
 }
 Doc.App = React.createClass({

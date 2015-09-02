@@ -51,12 +51,13 @@ var {PropTypes} = require('react'),
         }
       };
     if (onChanged) {
-      mixinsDefine.componentDidUpdate = function(prevProps, prevState) {
+      mixinsDefine.componentWillUpdate = function(prevProps, prevState) {
         var oldVal = prevState[prop],
           val = this.state[prop];
         if (val !== oldVal) {
           onChanged.call(this, val, oldVal);
         }
+        return true;
       }
     }
     if (bindProp) {

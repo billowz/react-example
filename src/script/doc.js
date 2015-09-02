@@ -5,16 +5,6 @@ let React = require('react'),
   MemoryDataPovider = Data.MemoryPovider,
   Doc={};
   Doc.Compontent = {
-    Button : {
-        demos : {
-            Demo : {
-                compontent : require('./button/doc/demo'),
-                code : ''
-            }
-        },
-        readmes : {
-        }
-    },
     Animate : {
         demos : {
             Demo : {
@@ -49,7 +39,7 @@ let React = require('react'),
         demos : {
             Demo : {
                 compontent : require('./layout/doc/demo'),
-                code : 'let React = require(&#39;react&#39;),\n\n  {Layout} = require(&#39;react-ui&#39;);\n\nmodule.exports = React.createClass({\n\n  render() {\n\n    return (&lt;Layout.Grid title=&#34;Workbench Demo&#34;/&gt;);\n\n  }\n\n});\n\n'
+                code : 'let React = require(&#39;react&#39;),\n  {Layout} = require(&#39;react-ui&#39;);\nmodule.exports = React.createClass({\n  render() {\n    return (&lt;Layout.Grid title=&#34;Workbench Demo&#34;/&gt;);\n  }\n});\n'
             }
         },
         readmes : {
@@ -85,12 +75,12 @@ let React = require('react'),
                 compontent : require('./util/doc/demo'),
                 code : ''
             },
-            Observe : {
-                compontent : require('./util/doc/observe'),
-                code : ''
-            },
             Dom : {
                 compontent : require('./util/doc/dom'),
+                code : ''
+            },
+            Observe : {
+                compontent : require('./util/doc/observe'),
                 code : ''
             }
         },
@@ -101,11 +91,21 @@ let React = require('react'),
         demos : {
             Demo : {
                 compontent : require('./workbench/doc/demo'),
-                code : 'let React = require(&#39;react&#39;),\n\n  {WorkBench} = require(&#39;react-ui&#39;);\n\nmodule.exports = React.createClass({\n\n  render() {\n\n    return (&lt;WorkBench compontents={[{\n\n\n\n      }]}/&gt;);\n\n  }\n\n});\n\n'
+                code : 'let React = require(&#39;react&#39;),\n  {WorkBench} = require(&#39;react-ui&#39;);\nmodule.exports = React.createClass({\n  render() {\n    return (&lt;WorkBench compontents={[{\n\n      }]}/&gt;);\n  }\n});\n'
             }
         },
         readmes : {
             Readme : 'read me\n'
+        }
+    },
+    Button : {
+        demos : {
+            Demo : {
+                compontent : require('./button/doc/demo'),
+                code : ''
+            }
+        },
+        readmes : {
         }
     }
   };
@@ -131,6 +131,25 @@ class MenuDataPovider extends MemoryDataPovider{
         href:'https://github.com/tao-zeng/react-example',
         target:'__blank'
     }];
+    for(var i=0; i<2; i++){
+      var d= {
+        text:'Level1-'+i
+      },children = [];
+      d.children = children;
+      this.data.push(d);
+      for(var j=0; j<100; j++){
+        var dd = {
+          text:'Level2-'+i+'-'+j
+        },cchildren =[];
+        dd.children = cchildren;
+        children.push(dd);
+        for(var k=0; k<10; k++){
+          cchildren.push({
+            text:'Level3-'+i+'-'+j+'-'+k
+          })
+        }
+      }
+    }
   }
 }
 Doc.App = React.createClass({
